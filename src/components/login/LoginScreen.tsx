@@ -60,6 +60,18 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
         placeholder="Password"
         leftIcon={{ type: "feather", name: "lock" }}
       />
+       <Button
+        buttonStyle={{ backgroundColor: Colors.main }}
+        title={"Login"}
+        onPress={() => setMode("login")}
+      />
+       <Button
+        buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
+        titleStyle={{ color: Colors.LightBlack }}
+        title={"Back"}
+        type="outline"
+        onPress={() => setMode("options")}
+      />
     </View>
   );
 };
