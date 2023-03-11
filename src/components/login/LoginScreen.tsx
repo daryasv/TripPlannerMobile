@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, View } from "react-native";
 import {
   Text,
   Card,
@@ -7,6 +7,7 @@ import {
   ThemeProvider,
   Input,
   Button,
+  Image,
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 
@@ -60,12 +61,12 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
         placeholder="Password"
         leftIcon={{ type: "feather", name: "lock" }}
       />
-       <Button
+      <Button
         buttonStyle={{ backgroundColor: Colors.main }}
         title={"Login"}
         onPress={() => setMode("login")}
       />
-       <Button
+      <Button
         buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
         titleStyle={{ color: Colors.LightBlack }}
         title={"Back"}
@@ -78,7 +79,7 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
 
 const LoginScreen = () => {
   const [mode, setMode] = React.useState("options" as Mode);
-  
+
   let CardContainer = null;
   switch (mode) {
     case "options":
@@ -91,16 +92,31 @@ const LoginScreen = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <View style={styles.container}>
-        <View style={{ flex: mode === "options" ? 1 : 0.3 }}>
-          <Text>Hello</Text>
+      <ImageBackground
+        style={{ flex: 1 }}
+        source={require("../../images/backgroundlogin.png")}
+        resizeMode="cover"
+      >
+        <View style={styles.container}>
+          <View
+            style={{
+              flex: mode === "options" ? 1 : 0,
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 15,
+            }}
+          >
+            <Text h2 style={{ color: "white" }}>
+              Trip Planner
+            </Text>
+          </View>
+          <Card
+            containerStyle={[styles.card, { flex: mode === "options" ? 0 : 1 }]}
+          >
+            {CardContainer}
+          </Card>
         </View>
-        <Card
-          containerStyle={[styles.card, { flex: mode === "options" ? 0 : 1 }]}
-        >
-          {CardContainer}
-        </Card>
-      </View>
+      </ImageBackground>
     </ThemeProvider>
   );
 };
