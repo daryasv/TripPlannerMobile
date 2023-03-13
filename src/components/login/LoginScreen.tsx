@@ -80,6 +80,8 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       setErrors({
         password: `Invalid password, minimum ${REGISTER_VALIDATIONS.password} letters`,
       });
+    } else if (data.password !== confirmPassword) {
+      return;
     } else {
       setErrors({});
       postUserRegister(data);
