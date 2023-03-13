@@ -15,7 +15,12 @@ import {
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { postUserRegister, RegisterData } from "../../actions/userActions";
+import {
+  LoginData,
+  postUserLogin,
+  postUserRegister,
+  RegisterData,
+} from "../../actions/userActions";
 
 const theme = createTheme({
   components: {
@@ -76,9 +81,8 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
   const [loading, setLoading] = useState(false as boolean);
 
   const onSignup = () => {
-    if(loading) return;
-    
-    const newErrors = {};
+    if (loading) return;
+
     if (data.userFirstName?.length < REGISTER_VALIDATIONS.userFirstName) {
       setErrors({ userFirstName: "Invalid user first name" });
     } else if (data.userLastName?.length < REGISTER_VALIDATIONS.userLastName) {
@@ -202,6 +206,17 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
 };
 
 export const LoginContainer = ({ setMode }: CardContainer) => {
+  const [data, setData] = useState({} as LoginData);
+  const [loading, setLoading] = useState(false as boolean);
+
+  const onLogin = () => {
+    postUserLogin(data, (succees) => {
+      if (succees) {
+      } else {
+      }
+    });
+  };
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
@@ -212,18 +227,23 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
     >
       <View>
         <Input
-          placeholder="Username"
-          leftIcon={{ type: "feather", name: "user" }}
+          placeholder="Email"
+          leftIcon={{ type: "feather", name: "mail" }}
+          onChangeText={(text) => setData({ ...data, userEmail: text })}
+          value={data.userEmail}
         />
         <Input
           placeholder="Password"
           leftIcon={{ type: "feather", name: "lock" }}
           secureTextEntry={true}
+          onChangeText={(text) => setData({ ...data, password: text })}
+          value={data.password}
         />
         <Button
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Login"}
-          onPress={() => setMode("login")}
+          loading={loading}
+          onPress={() => onLogin()}
         />
         <Button
           buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
