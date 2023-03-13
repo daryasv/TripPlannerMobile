@@ -82,7 +82,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       });
     } else {
       setErrors({});
-      //postUserRegister(data);
+      postUserRegister(data);
     }
   };
 
