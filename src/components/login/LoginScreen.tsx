@@ -210,7 +210,10 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
   const [loading, setLoading] = useState(false as boolean);
 
   const onLogin = () => {
+    setLoading(true);
+    
     postUserLogin(data, (succees) => {
+      setLoading(false);
       if (succees) {
       } else {
       }
