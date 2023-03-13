@@ -1,12 +1,5 @@
-import React from "react";
-import {
-  ImageBackground,
-  StyleSheet,
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import React, { useState } from "react";
+import { ImageBackground, StyleSheet, View } from "react-native";
 import {
   Text,
   Card,
@@ -14,10 +7,10 @@ import {
   ThemeProvider,
   Input,
   Button,
-  Image,
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { postUserRegister, RegisterData } from "../../actions/userActions";
 
 const theme = createTheme({
   components: {
@@ -58,12 +51,45 @@ export const OptionsContainer = ({ setMode }: CardContainer) => {
   );
 };
 
+const REGISTER_VALIDATIONS = {
+  userFirstName: 2,
+  userLastName: 2,
+  userEmail: 3,
+  password: 6,
+};
+
 export const SignupContainer = ({ setMode }: CardContainer) => {
+  const [data, setData] = useState({
+    userFirstName: "",
+    userLastName: "",
+    userEmail: "",
+    password: "",
+  } as RegisterData);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({} as Partial<RegisterData>);
+
+  const save = () => {
+    const newErrors = {};
+    if (data.userFirstName?.length < REGISTER_VALIDATIONS.userFirstName) {
+      setErrors({ userFirstName: "Invalid user first name" });
+    } else if (data.userLastName?.length < REGISTER_VALIDATIONS.userLastName) {
+      setErrors({ userLastName: "Invalid user last name" });
+    } else if (data.userEmail?.length < REGISTER_VALIDATIONS.userEmail) {
+      setErrors({ userEmail: "Invalid user email" });
+    } else if (data.password?.length < REGISTER_VALIDATIONS.password) {
+      setErrors({
+        password: `Invalid password, minimum ${REGISTER_VALIDATIONS.password} letters`,
+      });
+    } else {
+      setErrors({});
+      //postUserRegister(data);
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
         justifyContent: "space-between",
-        paddingTop: 30,
       }}
     >
       <View>
@@ -71,16 +97,23 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           label="First Name"
           placeholder="First name"
           leftIcon={{ type: "feather", name: "user" }}
+          value={data.userFirstName}
+          onChangeText={(text) => setData({ ...data, userFirstName: text })}
+          errorMessage={errors.userFirstName}
         />
         <Input
           label="Last Name"
           placeholder="Last Name"
           leftIcon={{ type: "feather", name: "user" }}
+          value={data.userLastName}
+          onChangeText={(text) => setData({ ...data, userLastName: text })}
+          errorMessage={errors.userLastName}
         />
         <Input
           label="Username"
           placeholder="Username"
           leftIcon={{ type: "feather", name: "user" }}
+          //value={data.userFirstName}
         />
         <Input
           label="Email"
@@ -89,6 +122,9 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           autoComplete={"email"}
           inputMode={"email"}
           keyboardType={"email-address"}
+          value={data.userEmail}
+          onChangeText={(text) => setData({ ...data, userEmail: text })}
+          errorMessage={errors.userEmail}
         />
         <Input
           label="Password"
@@ -96,6 +132,9 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           leftIcon={{ type: "feather", name: "lock" }}
           keyboardType="visible-password"
           secureTextEntry={true}
+          value={data.password}
+          onChangeText={(text) => setData({ ...data, password: text })}
+          errorMessage={errors.password}
         />
         <Input
           label="Confirm Password"
@@ -103,12 +142,19 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           leftIcon={{ type: "feather", name: "lock" }}
           keyboardType="visible-password"
           secureTextEntry={true}
+          onChangeText={(text) => setConfirmPassword(text)}
+          value={confirmPassword}
+          errorMessage={
+            data.password && data.password !== confirmPassword
+              ? "Passwords doesn't match"
+              : null
+          }
         />
 
         <Button
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Sign up"}
-          onPress={() => setMode("signup")}
+          onPress={() => save()}
         />
         <Button
           buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
@@ -134,7 +180,7 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
       contentContainerStyle={{
         justifyContent: "space-between",
         height: "100%",
-        paddingTop: 30,
+        paddingTop: 10,
       }}
     >
       <View>
