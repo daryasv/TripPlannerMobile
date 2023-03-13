@@ -1,5 +1,12 @@
 import React from "react";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import {
+  ImageBackground,
+  StyleSheet,
+  View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import {
   Text,
   Card,
@@ -10,6 +17,7 @@ import {
   Image,
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const theme = createTheme({
   components: {
@@ -50,30 +58,115 @@ export const OptionsContainer = ({ setMode }: CardContainer) => {
   );
 };
 
+export const SignupContainer = ({ setMode }: CardContainer) => {
+  return (
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        justifyContent: "space-between",
+        paddingTop: 30,
+      }}
+    >
+      <View>
+        <Input
+          label="First Name"
+          placeholder="First name"
+          leftIcon={{ type: "feather", name: "user" }}
+        />
+        <Input
+          label="Last Name"
+          placeholder="Last Name"
+          leftIcon={{ type: "feather", name: "user" }}
+        />
+        <Input
+          label="Username"
+          placeholder="Username"
+          leftIcon={{ type: "feather", name: "user" }}
+        />
+        <Input
+          label="Email"
+          placeholder="Email"
+          leftIcon={{ type: "feather", name: "mail" }}
+          autoComplete={"email"}
+          inputMode={"email"}
+          keyboardType={"email-address"}
+        />
+        <Input
+          label="Password"
+          placeholder="Password"
+          leftIcon={{ type: "feather", name: "lock" }}
+          keyboardType="visible-password"
+          secureTextEntry={true}
+        />
+        <Input
+          label="Confirm Password"
+          placeholder="Confirm Password"
+          leftIcon={{ type: "feather", name: "lock" }}
+          keyboardType="visible-password"
+          secureTextEntry={true}
+        />
+
+        <Button
+          buttonStyle={{ backgroundColor: Colors.main }}
+          title={"Sign up"}
+          onPress={() => setMode("signup")}
+        />
+        <Button
+          buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
+          titleStyle={{ color: Colors.LightBlack }}
+          title={"Back"}
+          type="outline"
+          onPress={() => setMode("options")}
+        />
+      </View>
+      <Text style={{ alignSelf: "center" }}>
+        Don't have an account?{" "}
+        <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
+          Sign Up
+        </Text>
+      </Text>
+    </KeyboardAwareScrollView>
+  );
+};
+
 export const LoginContainer = ({ setMode }: CardContainer) => {
   return (
-    <View>
-      <Input
-        placeholder="Username"
-        leftIcon={{ type: "feather", name: "user" }}
-      />
-      <Input
-        placeholder="Password"
-        leftIcon={{ type: "feather", name: "lock" }}
-      />
-      <Button
-        buttonStyle={{ backgroundColor: Colors.main }}
-        title={"Login"}
-        onPress={() => setMode("login")}
-      />
-      <Button
-        buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
-        titleStyle={{ color: Colors.LightBlack }}
-        title={"Back"}
-        type="outline"
-        onPress={() => setMode("options")}
-      />
-    </View>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        justifyContent: "space-between",
+        height: "100%",
+        paddingTop: 30,
+      }}
+    >
+      <View>
+        <Input
+          placeholder="Username"
+          leftIcon={{ type: "feather", name: "user" }}
+        />
+        <Input
+          placeholder="Password"
+          leftIcon={{ type: "feather", name: "lock" }}
+          secureTextEntry={true}
+        />
+        <Button
+          buttonStyle={{ backgroundColor: Colors.main }}
+          title={"Login"}
+          onPress={() => setMode("login")}
+        />
+        <Button
+          buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
+          titleStyle={{ color: Colors.LightBlack }}
+          title={"Back"}
+          type="outline"
+          onPress={() => setMode("options")}
+        />
+      </View>
+      <Text style={{ alignSelf: "center" }}>
+        Don't have an account?{" "}
+        <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
+          Sign Up
+        </Text>
+      </Text>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -87,6 +180,9 @@ const LoginScreen = () => {
       break;
     case "login":
       CardContainer = <LoginContainer setMode={setMode} />;
+      break;
+    case "signup":
+      CardContainer = <SignupContainer setMode={setMode} />;
       break;
   }
 
@@ -136,6 +232,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     margin: 0,
     padding: 30,
+    paddingBottom: 0,
     minHeight: 250,
     flex: 1,
   },

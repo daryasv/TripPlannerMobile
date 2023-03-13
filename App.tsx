@@ -1,9 +1,15 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+} from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/components/login/LoginScreen";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Stack = createNativeStackNavigator();
 
