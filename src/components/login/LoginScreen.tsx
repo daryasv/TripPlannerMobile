@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  ImageBackground,
+  StyleSheet,
+  View,
+} from "react-native";
 import {
   Text,
   Card,
@@ -67,8 +72,12 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
   } as RegisterData);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({} as Partial<RegisterData>);
+  const [generalError, setGeneralError] = useState("");
+  const [loading, setLoading] = useState(false as boolean);
 
-  const save = () => {
+  const onSignup = () => {
+    if(loading) return;
+    
     const newErrors = {};
     if (data.userFirstName?.length < REGISTER_VALIDATIONS.userFirstName) {
       setErrors({ userFirstName: "Invalid user first name" });
@@ -84,7 +93,15 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       return;
     } else {
       setErrors({});
-      postUserRegister(data);
+      setLoading(true);
+      postUserRegister(data, (success) => {
+        if (success) {
+          setMode("login");
+        } else {
+          setGeneralError("Something went wrong");
+        }
+        setLoading(false);
+      });
     }
   };
 
@@ -153,11 +170,19 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           }
         />
 
+        {generalError ? (
+          <Text style={{ color: "red", fontSize: 14, textAlign: "center" }}>
+            {generalError}
+          </Text>
+        ) : null}
+
         <Button
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Sign up"}
-          onPress={() => save()}
+          onPress={() => onSignup()}
+          loading={loading}
         />
+
         <Button
           buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
           titleStyle={{ color: Colors.LightBlack }}
@@ -167,9 +192,9 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
         />
       </View>
       <Text style={{ alignSelf: "center" }}>
-        Don't have an account?{" "}
+        Already have an account?{" "}
         <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
-          Sign Up
+          Login
         </Text>
       </Text>
     </KeyboardAwareScrollView>
