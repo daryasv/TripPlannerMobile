@@ -15,6 +15,7 @@ import {
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   LoginData,
   postUserLogin,
@@ -98,6 +99,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
     } else {
       setErrors({});
       setLoading(true);
+      setGeneralError("");
       postUserRegister(data, (success) => {
         if (success) {
           setMode("login");
@@ -208,14 +210,19 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
 export const LoginContainer = ({ setMode }: CardContainer) => {
   const [data, setData] = useState({} as LoginData);
   const [loading, setLoading] = useState(false as boolean);
+  const [generalError, setGeneralError] = useState("");
 
   const onLogin = () => {
     setLoading(true);
     
-    postUserLogin(data, (succees) => {
+    postUserLogin(data, async (succees) => {
       setLoading(false);
+      setGeneralError("");
       if (succees) {
+        await AsyncStorage.setItem("user_details",JSON.stringify(succees));
+        //todo: Change screen to main screen
       } else {
+        setGeneralError("Something went wrong...");
       }
     });
   };
@@ -242,6 +249,13 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
           onChangeText={(text) => setData({ ...data, password: text })}
           value={data.password}
         />
+        
+        {generalError ? (
+          <Text style={{ color: "red", fontSize: 14, textAlign: "center" }}>
+            {generalError}
+          </Text>
+        ) : null}
+
         <Button
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Login"}
