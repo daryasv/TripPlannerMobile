@@ -12,6 +12,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/components/login/LoginScreen";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { initUser } from "./src/actions/security";
+import MainScreen from "./src/components/main/MainScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ export default function App() {
             initialRouteName={initRoute}
           >
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Main" component={MainScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       ) : (
