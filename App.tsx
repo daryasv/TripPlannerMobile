@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -10,22 +11,35 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/components/login/LoginScreen";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { initUser } from "./src/actions/security";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [initRoute, setInitRoute] = useState(null);
+
+  useEffect(() => {
+    const exist = initUser();
+    setInitRoute(exist ? "Main" : "Login");
+  });
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: "white" },
-          }}
-        >
-          <Stack.Screen name="Login" component={LoginScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      {initRoute ? (
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "white" },
+            }}
+            initialRouteName={initRoute}
+          >
+            <Stack.Screen name="Login" component={LoginScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      ) : (
+        <ActivityIndicator />
+      )}
     </SafeAreaView>
   );
 }

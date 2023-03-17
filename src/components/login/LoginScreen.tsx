@@ -22,6 +22,7 @@ import {
   postUserRegister,
   RegisterData,
 } from "../../actions/userActions";
+import { USER_DETAILS_STORAGE_NAME } from "../../actions/security";
 
 const theme = createTheme({
   components: {
@@ -219,7 +220,7 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
       setLoading(false);
       setGeneralError("");
       if (succees) {
-        await AsyncStorage.setItem("user_details",JSON.stringify(succees));
+        await AsyncStorage.setItem(USER_DETAILS_STORAGE_NAME,JSON.stringify(succees));
         //todo: Change screen to main screen
       } else {
         setGeneralError("Something went wrong...");
