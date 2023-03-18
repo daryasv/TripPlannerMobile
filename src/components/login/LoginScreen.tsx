@@ -16,6 +16,7 @@ import {
 import { Colors } from "../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
 import {
   LoginData,
   postUserLogin,
@@ -221,7 +222,7 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
       setGeneralError("");
       if (succees) {
         await AsyncStorage.setItem(USER_DETAILS_STORAGE_NAME,JSON.stringify(succees));
-        //todo: Change screen to main screen
+        Updates.reloadAsync();//reload the app after password saved
       } else {
         setGeneralError("Something went wrong...");
       }
