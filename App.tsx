@@ -20,8 +20,9 @@ export default function App() {
   const [initRoute, setInitRoute] = useState(null);
 
   useEffect(() => {
-    const exist = initUser();
-    setInitRoute(exist ? "Main" : "Login");
+    initUser((success) => {
+      setInitRoute(success ? "Main" : "Login");
+    });
   });
 
   return (
