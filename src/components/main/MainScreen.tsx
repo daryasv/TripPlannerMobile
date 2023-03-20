@@ -1,15 +1,19 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FeedScreen from "../feed/FeedScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Icon } from "@rneui/themed";
+import { useNavigation } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainScreen() {
+const Empty = () => null;
+
+export default function MainScreen({ navigation }) {
   return (
     <View style={{ flex: 1 }}>
-      <Tab.Navigator>
+      <Tab.Navigator screenOptions={{ tabBarActiveTintColor: "#303C9A" }}>
         <Tab.Screen
           name="Explore"
           component={FeedScreen}
@@ -21,6 +25,34 @@ export default function MainScreen() {
                 color={color}
                 size={size}
               />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="New"
+          component={Empty}
+          options={{
+            tabBarButton: () => (
+              <TouchableOpacity
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "#303C9A",
+                  borderRadius: 28,
+                  width: 56,
+                  height: 56,
+                  marginTop: -10,
+                }}
+                onPress={() => navigation.navigate("NewPost")}
+              >
+                <Icon
+                  name="map-marker"
+                  type="material-community"
+                  size={30}
+                  color="white"
+                />
+                {/* <Text style={{ fontSize: 10}}>New Post</Text> */}
+              </TouchableOpacity>
             ),
           }}
         />
