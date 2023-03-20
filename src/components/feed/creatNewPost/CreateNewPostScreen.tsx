@@ -95,7 +95,6 @@ const LocationTab = () => {
       >
         <Input></Input>
       </ListItem.Accordion>
-      <ListItem.Chevron />
     </KeyboardAwareScrollView>
   );
 };
