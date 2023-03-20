@@ -47,7 +47,7 @@ const Item = ({ data }: { data: PostType }) => {
 
       <Image
         source={{
-          uri: "https://d2gg9evh47fn9z.cloudfront.net/1600px_COLOURBOX27761367.jpg",
+          uri: data.image,
         }}
         style={{
           width: "100%",
@@ -81,6 +81,7 @@ const temp: PostType[] = [
     comments: [],
     views: 10,
     description: "The best pizza place in London!",
+    image: "https://d2gg9evh47fn9z.cloudfront.net/1600px_COLOURBOX27761367.jpg",
   },
   {
     dataID: "2",
@@ -93,6 +94,8 @@ const temp: PostType[] = [
     comments: [],
     views: 10,
     description: "",
+    image:
+      "https://www.discoverlosangeles.com/sites/default/files/media/activities/shopping/shopping_malls_marketplaces/Westfield%20Century%20City.png?width=1600&height=1200&fit=crop&quality=78&auto=webp",
   },
 ];
 

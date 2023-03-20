@@ -14,4 +14,5 @@ export interface PostType {
   comments: string[];
   views: number;
   description: string;
+  image: string;
 }
