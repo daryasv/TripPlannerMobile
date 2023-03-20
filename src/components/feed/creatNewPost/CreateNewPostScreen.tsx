@@ -12,6 +12,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 
 import { Colors } from "../../../theme/Colors";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const LocationTab = () => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -34,7 +35,7 @@ const LocationTab = () => {
   };
   
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       <View style={{ width: "100%", alignItems: "center", marginBottom: 30 }}>
         <TouchableOpacity
           style={{
@@ -95,7 +96,7 @@ const LocationTab = () => {
         <Input></Input>
       </ListItem.Accordion>
       <ListItem.Chevron />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 
