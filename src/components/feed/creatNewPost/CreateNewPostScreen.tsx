@@ -1,5 +1,5 @@
-import { Image, Input, ListItem, Tab, TabView } from "@rneui/themed";
-import React from "react";
+import {  Image, Input, ListItem, Tab, TabView } from "@rneui/themed";
+import React, { useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -13,6 +13,8 @@ import * as ImagePicker from "expo-image-picker";
 
 import { Colors } from "../../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useNavigation } from "@react-navigation/native";
+import { Button } from "react-native";
 
 const LocationTab = () => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -33,7 +35,7 @@ const LocationTab = () => {
       setImage(result.assets[0].uri);
     }
   };
-  
+
   return (
     <KeyboardAwareScrollView>
       <View style={{ width: "100%", alignItems: "center", marginBottom: 30 }}>
@@ -101,6 +103,15 @@ const LocationTab = () => {
 
 export default function CreateNewPostScreen() {
   const [currentTab, setCurrentTab] = React.useState(0);
+
+  const nav = useNavigation();
+  useEffect(() => {
+    nav.setOptions({
+      headerRight: () => (
+        <Button title="Create"/>
+      ),
+    });
+  });
 
   return (
     <View style={{ flex: 1 }}>
