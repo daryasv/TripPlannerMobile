@@ -105,7 +105,7 @@ export default function FeedScreen() {
   useEffect(() => {
     //getExploreFeed();
     setPosts(temp);
-  });
+  }, []);
 
   if (!posts) {
     return <ActivityIndicator />;

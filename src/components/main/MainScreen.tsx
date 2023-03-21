@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FeedScreen from "../feed/FeedScreen";
+import ProfileScreen from "../profile/ProfileScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Icon } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
@@ -57,13 +58,13 @@ export default function MainScreen({ navigation }) {
           }}
         />
         <Tab.Screen
-          name="Home"
-          component={FeedScreen}
+          name="Profile"
+          component={ProfileScreen}
           options={{
-            tabBarLabel: "Explore",
+            tabBarLabel: "Profile", 
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
-                name="compass"
+                name="account-circle"
                 color={color}
                 size={size}
               />

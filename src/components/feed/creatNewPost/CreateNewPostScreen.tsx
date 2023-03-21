@@ -1,4 +1,4 @@
-import {  Image, Input, ListItem, Tab, TabView } from "@rneui/themed";
+import { Image, Input, ListItem, Tab, TabView } from "@rneui/themed";
 import React, { useEffect } from "react";
 import {
   ScrollView,
@@ -107,11 +107,9 @@ export default function CreateNewPostScreen() {
   const nav = useNavigation();
   useEffect(() => {
     nav.setOptions({
-      headerRight: () => (
-        <Button title="Create"/>
-      ),
+      headerRight: () => <Button title="Create" />,
     });
-  });
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
