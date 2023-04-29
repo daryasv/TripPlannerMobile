@@ -33,6 +33,22 @@
         "projectId": "62e2744e-e4d4-4d7a-931e-c3cecf856a1d"
       }
     },
-    "owner": "trip-app"
+    "owner": "trip-app",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "flipper": true
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ] 
+    ]
   }
 }

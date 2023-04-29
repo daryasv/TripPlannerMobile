@@ -13,6 +13,7 @@ import LoginScreen from "./src/components/login/LoginScreen";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { initUser } from "./src/actions/security";
 import MainScreen from "./src/components/main/MainScreen";
+import CreateNewPostScreen from "./src/components/feed/creatNewPost/CreateNewPostScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +24,7 @@ export default function App() {
     initUser((success) => {
       setInitRoute(success ? "Main" : "Login");
     });
-  });
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -31,13 +32,25 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator
             screenOptions={{
-              headerShown: false,
               contentStyle: { backgroundColor: "white" },
             }}
             initialRouteName={initRoute}
           >
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Main" component={MainScreen} />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Main"
+              component={MainScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="NewPost"
+              component={CreateNewPostScreen}
+              options={{ headerTitle: "New Post" }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       ) : (
