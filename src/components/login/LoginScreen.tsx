@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  DevSettings,
   ImageBackground,
   StyleSheet,
   View,
@@ -157,7 +158,6 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           label="Password"
           placeholder="Password"
           leftIcon={{ type: "feather", name: "lock" }}
-          keyboardType="visible-password"
           secureTextEntry={true}
           value={data.password}
           onChangeText={(text) => setData({ ...data, password: text })}
@@ -167,7 +167,6 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           label="Confirm Password"
           placeholder="Confirm Password"
           leftIcon={{ type: "feather", name: "lock" }}
-          keyboardType="visible-password"
           secureTextEntry={true}
           onChangeText={(text) => setConfirmPassword(text)}
           value={confirmPassword}
@@ -222,7 +221,8 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
       setGeneralError("");
       if (succees) {
         await AsyncStorage.setItem(USER_DETAILS_STORAGE_NAME,JSON.stringify(succees));
-        Updates.reloadAsync();//reload the app after password saved
+        DevSettings.reload();
+        //Updates.reloadAsync();//reload the app after password saved
       } else {
         setGeneralError("Something went wrong...");
       }
