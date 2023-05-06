@@ -20,7 +20,7 @@ const Item = ({ data }: { data: PostType }) => {
       <View style={styles.row}>
         <Avatar
           source={{
-            uri: "https://yt3.googleusercontent.com/ytc/AL5GRJUlB_Htyl0G7YujVNVaOYOTeLz3b85bvu76MVngGWM=s900-c-k-c0x00ffffff-no-rj",
+            uri: null
           }}
           rounded
         />
@@ -33,7 +33,7 @@ const Item = ({ data }: { data: PostType }) => {
         </View>
       </View>
 
-      {data.description ? (
+      {data.contentData?.descriptionDTO ? (
         <ReadMore
           numberOfLines={3}
           style={styles.description}
@@ -41,13 +41,13 @@ const Item = ({ data }: { data: PostType }) => {
           seeLessStyle={{ color: Colors.main }}
           seeMoreText={"Read More"}
         >
-          {data.description}
+          {data.contentData.descriptionDTO}
         </ReadMore>
       ) : null}
 
       <Image
         source={{
-          uri: data.image,
+          uri: data?.contentData?.imageFileNameDTO,
         }}
         style={{
           width: "100%",
@@ -68,36 +68,6 @@ const Item = ({ data }: { data: PostType }) => {
     </View>
   );
 };
-
-const temp: PostType[] = [
-  {
-    dataID: "1",
-    postGenre: postGenreEnum.Location,
-    dateUploaded: "2022/12/12",
-    uploadedBy: "Darya Svirsky",
-    categories: ["Food"],
-    cities: ["London"],
-    userIdLiked: [],
-    comments: [],
-    views: 10,
-    description: "The best pizza place in London!",
-    image: "https://d2gg9evh47fn9z.cloudfront.net/1600px_COLOURBOX27761367.jpg",
-  },
-  {
-    dataID: "2",
-    postGenre: postGenreEnum.Location,
-    dateUploaded: "2022/12/12",
-    uploadedBy: "Darya Svirsky",
-    categories: ["Fashion"],
-    cities: ["Los Angeles, USA"],
-    userIdLiked: [],
-    comments: [],
-    views: 10,
-    description: "",
-    image:
-      "https://www.discoverlosangeles.com/sites/default/files/media/activities/shopping/shopping_malls_marketplaces/Westfield%20Century%20City.png?width=1600&height=1200&fit=crop&quality=78&auto=webp",
-  },
-];
 
 export default function FeedScreen() {
   const [posts, setPosts] = useState(null as PostType[]);
