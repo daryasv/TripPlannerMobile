@@ -12,7 +12,7 @@ import ReadMore from "@fawazahmed/react-native-read-more";
 
 import { getExploreFeed } from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
-import { postGenreEnum, PostType } from "./types/postTypes";
+import { postGenreEnum, PostType } from "../../types/postTypes";
 
 const Item = ({ data }: { data: PostType }) => {
   return (
@@ -103,8 +103,12 @@ export default function FeedScreen() {
   const [posts, setPosts] = useState(null as PostType[]);
 
   useEffect(() => {
-    //getExploreFeed();
-    setPosts(temp);
+    getExploreFeed((data) => {
+      if (data?.allPosts) {
+        setPosts(data.allPosts);
+      }
+    });
+    // setPosts(temp);
   }, []);
 
   if (!posts) {

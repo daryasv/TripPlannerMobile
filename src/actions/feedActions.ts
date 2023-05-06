@@ -1,11 +1,19 @@
 import axios from "axios";
 import { getToken } from "./security";
+import { BASE_URL } from "./actionsConfig";
+import { PostType } from "../types/postTypes";
 
-export function getExploreFeed() {
+const POSTS_URL = BASE_URL + "/posts";
+
+export function getExploreFeed(
+  callback: (data?: { allPosts: PostType[] }) => void
+) {
   axios
-    .get("/posts/explore", { headers: { Authorization: getToken() } })
+    .get(POSTS_URL + "/explore", { headers: { Authorization: getToken() } })
     .then((res) => {
-      console.log(res.data);
+      callback(res.data);
     })
-    .catch((e) => {});
+    .catch((e) => {
+      callback(null);
+    });
 }
