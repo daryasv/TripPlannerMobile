@@ -95,6 +95,7 @@ export default function FeedScreen() {
     }
   };
 
+  //initial
   useEffect(() => {
     getData();
   }, []);
