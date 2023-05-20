@@ -1,7 +1,8 @@
 import { Avatar, Card, Icon, Image } from "@rneui/themed";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,7 +21,7 @@ const Item = ({ data }: { data: PostType }) => {
       <View style={styles.row}>
         <Avatar
           source={{
-            uri: null
+            uri: null,
           }}
           rounded
         />
@@ -70,19 +71,31 @@ const Item = ({ data }: { data: PostType }) => {
 };
 
 export default function FeedScreen() {
-  const [posts, setPosts] = useState(null as PostType[]);
+  const [posts, setPosts] = useState([] as PostType[]);
+  const [loading, setLoading] = useState(true as boolean);
 
-  useEffect(() => {
+  const getData = useCallback(() => {
     getExploreFeed((data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
+        setLoading(false);
       }
     });
-    // setPosts(temp);
+  }, []);
+
+  const handleRefresh = () => {
+    if (!loading) {
+      setLoading(true);
+      getData();
+    }
+  };
+
+  useEffect(() => {
+    getData();
   }, []);
 
   if (!posts) {
-    return <ActivityIndicator />;
+    return <RefreshControl refreshing={loading} />;
   }
 
   return (
@@ -96,6 +109,11 @@ export default function FeedScreen() {
         data={posts}
         renderItem={({ item }) => <Item data={item} />}
         keyExtractor={(item) => item.dataID}
+        // refreshControl={<ActivityIndicator />}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
+        }
+        onEndReachedThreshold={0.1}
       />
     </View>
   );
