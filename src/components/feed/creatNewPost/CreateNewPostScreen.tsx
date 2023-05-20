@@ -1,5 +1,11 @@
 import { Image, Input, ListItem, Tab, TabView } from "@rneui/themed";
-import React, { useEffect } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -15,10 +21,20 @@ import { Colors } from "../../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native";
+import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 
-const LocationTab = () => {
+const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
-  const [image, setImage] = React.useState(null);
+  const [data, setData] = useState({
+    description: "",
+    locationLat: "100",
+    locationLong: "200",
+    postGen: "0",
+    cities: "",
+  } as SaveLocationData);
+  const [image, setImage] = React.useState(
+    null as ImagePicker.ImagePickerAsset
+  );
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -32,9 +48,15 @@ const LocationTab = () => {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage(result.assets[0]);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    save() {
+      saveLocation(data, image);
+    },
+  }));
 
   return (
     <KeyboardAwareScrollView>
@@ -54,7 +76,7 @@ const LocationTab = () => {
           {image ? (
             <Image
               source={{
-                uri: image,
+                uri: image?.uri,
               }}
               style={{
                 width: "100%",
@@ -79,8 +101,8 @@ const LocationTab = () => {
             style={{ marginTop: 10, fontSize: 16, margin: 5 }}
             multiline
             underlineColorAndroid={"transparent"}
-            //onChangeText={(text) => setData({ ...data, userEmail: text })}
-            //value={data.userEmail}
+            onChangeText={(text) => setData({ ...data, description: text })}
+            value={data.description}
           />
         </ListItem.Content>
       </ListItem>
@@ -99,15 +121,23 @@ const LocationTab = () => {
       </ListItem.Accordion>
     </KeyboardAwareScrollView>
   );
-};
+});
 
 export default function CreateNewPostScreen() {
   const [currentTab, setCurrentTab] = React.useState(0);
+  const createLocationRef = useRef();
 
   const nav = useNavigation();
+
+  const save = () => {
+    if (createLocationRef?.current) {
+      (createLocationRef.current as any).save();
+    }
+  };
+
   useEffect(() => {
     nav.setOptions({
-      headerRight: () => <Button title="Create" />,
+      headerRight: () => <Button title="Create" onPress={save} />,
     });
   }, []);
 
@@ -141,7 +171,7 @@ export default function CreateNewPostScreen() {
         containerStyle={{ flex: 1 }}
       >
         <TabView.Item style={{ flex: 1 }}>
-          <LocationTab />
+          <LocationTab ref={createLocationRef} />
         </TabView.Item>
         <TabView.Item style={{ flex: 1 }}>
           <Text>Route</Text>

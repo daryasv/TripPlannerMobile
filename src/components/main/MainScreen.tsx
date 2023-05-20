@@ -5,7 +5,6 @@ import FeedScreen from "../feed/FeedScreen";
 import ProfileScreen from "../profile/ProfileScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Icon } from "@rneui/themed";
-import { useNavigation } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 

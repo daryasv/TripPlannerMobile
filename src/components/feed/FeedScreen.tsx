@@ -1,7 +1,8 @@
 import { Avatar, Card, Icon, Image } from "@rneui/themed";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,7 +21,7 @@ const Item = ({ data }: { data: PostType }) => {
       <View style={styles.row}>
         <Avatar
           source={{
-            uri: null
+            uri: null,
           }}
           rounded
         />
@@ -70,19 +71,60 @@ const Item = ({ data }: { data: PostType }) => {
 };
 
 export default function FeedScreen() {
-  const [posts, setPosts] = useState(null as PostType[]);
+  const [posts, setPosts] = useState([] as PostType[]);
+  const [loading, setLoading] = useState(true as boolean);
+  const [loadingMore, setLoadingMore] = useState(false as boolean);
+  const [hasMore, setHasMore] = useState(true as boolean);
+  const [page, setPage] = useState(1 as number);
 
-  useEffect(() => {
-    getExploreFeed((data) => {
+  const getData = useCallback(() => {
+    getExploreFeed({ page }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
+        setLoading(false);
+        setPage(1);
+        setHasMore(true);
       }
     });
-    // setPosts(temp);
   }, []);
 
+  const handleRefresh = () => {
+    if (!loading && !loadingMore) {
+      setLoading(true);
+      getData();
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleLoadMore = () => {
+    if (!loading && !loadingMore && hasMore) {
+      setLoadingMore(true);
+      getExploreFeed({ page: page + 1 }, (data) => {
+        if (data?.allPosts?.length) {
+          const newPosts = [...posts].concat(data.allPosts);
+          setPosts(newPosts);
+          setPage(page + 1);
+          setLoadingMore(false);
+        } else {
+          setHasMore(false);
+          setLoadingMore(false);
+        }
+      });
+    }
+  };
+
+  const ListFooter = () => {
+    if (loadingMore || hasMore) {
+      return <ActivityIndicator />;
+    }
+    return null;
+  };
+
   if (!posts) {
-    return <ActivityIndicator />;
+    return <RefreshControl refreshing={loading} />;
   }
 
   return (
@@ -90,12 +132,20 @@ export default function FeedScreen() {
       style={{
         flex: 1,
         backgroundColor: "white",
+        paddingBottom: 40,
       }}
     >
       <FlatList
         data={posts}
         renderItem={({ item }) => <Item data={item} />}
         keyExtractor={(item) => item.dataID}
+        // refreshControl={<ActivityIndicator />}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
+        }
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={<ListFooter />}
       />
     </View>
   );
