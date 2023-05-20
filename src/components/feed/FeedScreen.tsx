@@ -77,7 +77,7 @@ export default function FeedScreen() {
   const [hasMore, setHasMore] = useState(true as boolean);
   const [page, setPage] = useState(1 as number);
 
-  const getData = useCallback(() => {
+  const getData = () => {
     getExploreFeed({ page }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
@@ -86,7 +86,7 @@ export default function FeedScreen() {
         setHasMore(true);
       }
     });
-  }, []);
+  };
 
   const handleRefresh = () => {
     if (!loading && !loadingMore) {
