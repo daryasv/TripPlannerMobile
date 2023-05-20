@@ -78,7 +78,7 @@ export default function FeedScreen() {
   const [page, setPage] = useState(1 as number);
 
   const getData = () => {
-    getExploreFeed({ page }, (data) => {
+    getExploreFeed({ page: 1 }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
         setLoading(false);
