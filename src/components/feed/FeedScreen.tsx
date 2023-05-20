@@ -73,18 +73,23 @@ const Item = ({ data }: { data: PostType }) => {
 export default function FeedScreen() {
   const [posts, setPosts] = useState([] as PostType[]);
   const [loading, setLoading] = useState(true as boolean);
+  const [loadingMore, setLoadingMore] = useState(false as boolean);
+  const [hasMore, setHasMore] = useState(true as boolean);
+  const [page, setPage] = useState(1 as number);
 
   const getData = useCallback(() => {
-    getExploreFeed((data) => {
+    getExploreFeed({ page }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
         setLoading(false);
+        setPage(1);
+        setHasMore(true);
       }
     });
   }, []);
 
   const handleRefresh = () => {
-    if (!loading) {
+    if (!loading && !loadingMore) {
       setLoading(true);
       getData();
     }
@@ -93,6 +98,30 @@ export default function FeedScreen() {
   useEffect(() => {
     getData();
   }, []);
+
+  const handleLoadMore = () => {
+    if (!loading && !loadingMore && hasMore) {
+      setLoadingMore(true);
+      getExploreFeed({ page: page + 1 }, (data) => {
+        if (data?.allPosts?.length) {
+          const newPosts = [...posts].concat(data.allPosts);
+          setPosts(newPosts);
+          setPage(page + 1);
+          setLoadingMore(false);
+        } else {
+          setHasMore(false);
+          setLoadingMore(false);
+        }
+      });
+    }
+  };
+
+  const ListFooter = () => {
+    if (loadingMore || hasMore) {
+      return <ActivityIndicator />;
+    }
+    return null;
+  };
 
   if (!posts) {
     return <RefreshControl refreshing={loading} />;
@@ -103,6 +132,7 @@ export default function FeedScreen() {
       style={{
         flex: 1,
         backgroundColor: "white",
+        paddingBottom: 40,
       }}
     >
       <FlatList
@@ -113,7 +143,9 @@ export default function FeedScreen() {
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
         }
+        onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
+        ListFooterComponent={<ListFooter />}
       />
     </View>
   );

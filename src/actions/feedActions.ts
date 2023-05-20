@@ -8,10 +8,14 @@ import * as FileSystem from "expo-file-system";
 const POSTS_URL = BASE_URL + "/posts";
 
 export function getExploreFeed(
+  params: { page?: number; cities?: string },
   callback: (data?: { allPosts: PostType[] }) => void
 ) {
   axios
-    .get(POSTS_URL + "/explore", { headers: { Authorization: getToken() } })
+    .get(POSTS_URL + "/explore", {
+      params: params,
+      headers: { Authorization: getToken() },
+    })
     .then((res) => {
       callback(res.data);
     })
