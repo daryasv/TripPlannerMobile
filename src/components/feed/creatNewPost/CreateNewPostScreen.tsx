@@ -20,7 +20,7 @@ import { Colors } from "../../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native";
-import { saveLocation } from "../../../actions/feedActions";
+import { SaveLocationProps, saveLocation } from "../../../actions/feedActions";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -46,7 +46,15 @@ const LocationTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
-      saveLocation(image);
+      const data: SaveLocationProps = {
+        description: "Test desc",
+        locationLat: "100",
+        locationLong: "200",
+        postGen: "0",
+        cities: "Miami",
+        image: image,
+      };
+      saveLocation(data);
     },
   }));
 
@@ -129,7 +137,7 @@ export default function CreateNewPostScreen() {
 
   useEffect(() => {
     nav.setOptions({
-      headerRight: () => <Button title="Create" onPress={save}/>,
+      headerRight: () => <Button title="Create" onPress={save} />,
     });
   }, []);
 

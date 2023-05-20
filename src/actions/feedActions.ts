@@ -3,6 +3,7 @@ import { getToken } from "./security";
 import { BASE_URL } from "./actionsConfig";
 import { PostType } from "../types/postTypes";
 import { ImagePickerAsset } from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 const POSTS_URL = BASE_URL + "/posts";
 
@@ -19,26 +20,30 @@ export function getExploreFeed(
     });
 }
 
-export const saveLocation = (image: ImagePickerAsset) => {
-  const body = new FormData();
+export interface SaveLocationProps {
+  description: string;
+  locationLong: string;
+  locationLat: string;
+  postGen: string;
+  cities: string;
+  image: ImagePickerAsset;
+}
 
-  body.append("files", {
-    uri: image.uri,
-    type: image.type,
-    name: image.fileName,
+export const saveLocation = (props: SaveLocationProps) => {
+
+  FileSystem.uploadAsync(POSTS_URL + "/createLocation", props.image.uri, {
+    fieldName: "imageFile",
+    httpMethod: "POST",
+    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+    headers: { Authorization: getToken() },
+    parameters: {
+      description: props.description,
+      "location.longitude": props.locationLong,
+      "location.latitude": props.locationLat,
+      "cities": props.cities,
+      "postGenre": props.postGen,
+      "user_id": "D@gmail.com"
+    },
   });
 
-  const config = {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      'Content-Disposition': 'form-data',
-      'Authorization': getToken()
-    }
-  }
-
-  const response = axios.post(POSTS_URL+"/createLocation", body, config).then(r=>{
-    console.log("success",r.data);
-  }).catch(e=>{
-    console.log("err",JSON.stringify(e));
-  })
 };
