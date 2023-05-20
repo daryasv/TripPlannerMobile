@@ -1,16 +1,41 @@
 import Axios from "axios";
 import { BASE_URL } from "./actionsConfig";
+import { getToken, getUserEmail, getUserId } from "./security";
+
+export interface UserLocation {
+  "contentData": {
+    "location": {
+      "longitude": number,
+      "latitude": number
+    },
+    "_id": string,
+    "imageFileNameDTO": string,
+    "description": string,
+    "__v": number },
+    "postGenre": number,
+    "dateUploaded": string,
+    "uploadedBy": string,
+    "cities": Array<string>,
+    "categories": Array<string>,
+    "comments": Array<string>,
+    "views": number,
+    "dataID": string
+}
 
 export interface ProfileData {
-  userFirstName: string;
-  userLastName: string;
+  "allPosts": Array<UserLocation>
 }
 
 export const GetUserProfile = (
-  data: ProfileData,
   callback: (success: ProfileData | false) => void
 ) => {
-  Axios.get(BASE_URL + "posts/" + "/wall")
+  const headers = {
+    'Authorization': getToken()
+  };
+  const params = {
+    'userName' : getUserEmail()
+  };
+  Axios.get(BASE_URL + "/posts/profile", { params, headers })
     .then((res) => {
       console.log("success", JSON.stringify(res.data));
       callback(res.data);

@@ -1,17 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, Button, Pressable } from 'react-native';
 import { Colors } from "../../theme/Colors";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  LoginData,
-  postUserLogin,
-  postUserRegister,
-  RegisterData,
-} from "../../actions/userActions";
-import { USER_DETAILS_STORAGE_NAME } from "../../actions/security";
+import { USER_DETAILS_STORAGE_NAME, getUserEmail, getUserId } from "../../actions/security";
 import { Link, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GetUserProfile } from '../../actions/profileActions';
 
 const styles = StyleSheet.create({
     Avatar: {
@@ -27,7 +21,7 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       fontSize: 24,
     },
-    UserDesc: {
+    NoPostsMsg: {
         color: Colors.LightBlack,
         textAlign: 'center',
         fontSize: 16,
@@ -98,11 +92,12 @@ const styles = StyleSheet.create({
     }
   });
 
-  let squares = [];
-  let numberOfSquare = 4;
+  let allLocations = [];
 
-  for (let index = 0; index < numberOfSquare; index++) {
-    squares.push(
+  let routes = [];
+  let numberOfRoutes = 4;
+  for (let index = 0; index < numberOfRoutes; index++) {
+    routes.push(
       <View key={index}>
         <View
           style={{
@@ -133,16 +128,41 @@ export default function ProfileScreen(){
     )
 }
 
-export function ProfileHomeScreen({ navigation }){
+export function ProfileHomeScreen({ navigation }) {
+    const [locations, setLocations] = useState([]);
+    const [numLocations, setLocationsNum] = useState(0);
+    type displayFields = "flex" | "none";
+    const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
+
+    function showViewAll() {
+        if (showNoPosts == "flex") {
+            return "none";
+        } else {
+            return "flex";
+        }
+    }
+
+    useEffect(() => {
+        GetUserProfile((success) => {
+            if (success) {
+                setLocations(success.allPosts.slice(-6));
+                setLocationsNum(success.allPosts.length);
+                success.allPosts.forEach(function (value) { 
+                    allLocations.push(value);
+                });
+                setShowNoPosts(success.allPosts.length ? "none" : "flex");
+            }
+          });
+    }, []);
+
     return (
         <ScrollView showsVerticalScrollIndicator={true}>
             <Image style={styles.Avatar}
             source={{ uri: "https://randomuser.me/api/portraits/women/31.jpg" }}
             />
-            <Text style={styles.UserName}>USER NAME</Text>
-            <Text style={styles.UserDesc}>description words words words</Text>
+            <Text style={styles.UserName}>{getUserEmail()}</Text>
             <View style={styles.row}>
-                <Text style={styles.LocationsNum}>100</Text>
+                <Text style={styles.LocationsNum}>{numLocations}</Text>
                 <Text style={styles.RoutesNum}>10</Text>
             </View>
             <View style={styles.row}>
@@ -152,7 +172,7 @@ export function ProfileHomeScreen({ navigation }){
             <View>
                 <View style={styles.row}>
                     <Text style={styles.LocationsHeader}>Locations</Text>
-                    <Pressable onPress={() => navigation.navigate('Locations')}><Text style={styles.ViewAll}>View all</Text></Pressable>
+                    <Pressable onPress={() => navigation.navigate('Locations')} style={{display : showViewAll()}}><Text style={styles.ViewAll}>View all</Text></Pressable>
                 </View>
                 <View
                 style={{
@@ -166,8 +186,25 @@ export function ProfileHomeScreen({ navigation }){
                             flexDirection: 'row',
                             paddingVertical: 5,
                             justifyContent: 'space-between',
+                            display: 'flex'
                         }}>
-                        {squares}
+                        <View style={{display : showNoPosts}}>
+                            <Text style={styles.NoPostsMsg}>no posts :(</Text>
+                        </View>
+                        {locations.map(location => (
+                            <View key= {location.dataID}>
+                            <Image
+                            style={{
+                                width: 100,
+                                height: 100,
+                                marginVertical: 0.5,
+                                marginBottom: 15,
+                                marginHorizontal: 12,
+                                borderRadius: 10,
+                            }}
+                            source={{ uri: location.contentData.imageFileNameDTO }}/>
+                            </View>
+                        ))}
                     </View>
                 </View>
             <View>
@@ -188,7 +225,7 @@ export function ProfileHomeScreen({ navigation }){
                             paddingVertical: 5,
                             justifyContent: 'space-between',
                         }}>
-                        {squares}
+                        {routes}
                     </View>
                 </View>
         </ScrollView>
@@ -205,13 +242,26 @@ export function ProfileLocationsScreen(){
                     paddingVertical: 5,
                     justifyContent: 'space-between',
                 }}>
-                {squares}
+                {allLocations.map(location => (
+                            <View key= {location.dataID}>
+                            <Image
+                            style={{
+                                width: 100,
+                                height: 100,
+                                marginVertical: 0.5,
+                                marginBottom: 15,
+                                marginHorizontal: 12,
+                                borderRadius: 10,
+                            }}
+                            source={{ uri: location.contentData.imageFileNameDTO }}/>
+                            </View>
+                        ))}
             </View>
         </ScrollView>
     )
 }
 
-export function ProfileRoutesScreen(){
+export function ProfileRoutesScreen() {
     return (
         <ScrollView showsVerticalScrollIndicator={true}>
             <View style={{
@@ -221,7 +271,7 @@ export function ProfileRoutesScreen(){
                     paddingVertical: 5,
                     justifyContent: 'space-between',
                 }}>
-                {squares}
+                {routes}
             </View>
         </ScrollView>
     )
