@@ -20,30 +20,30 @@ export function getExploreFeed(
     });
 }
 
-export interface SaveLocationProps {
+export interface SaveLocationData {
   description: string;
   locationLong: string;
   locationLat: string;
   postGen: string;
   cities: string;
-  image: ImagePickerAsset;
 }
 
-export const saveLocation = (props: SaveLocationProps) => {
-
-  FileSystem.uploadAsync(POSTS_URL + "/createLocation", props.image.uri, {
+export const saveLocation = (
+  data: SaveLocationData,
+  image: ImagePickerAsset
+) => {
+  FileSystem.uploadAsync(POSTS_URL + "/createLocation", data.image.uri, {
     fieldName: "imageFile",
     httpMethod: "POST",
     uploadType: FileSystem.FileSystemUploadType.MULTIPART,
     headers: { Authorization: getToken() },
     parameters: {
-      description: props.description,
-      "location.longitude": props.locationLong,
-      "location.latitude": props.locationLat,
-      "cities": props.cities,
-      "postGenre": props.postGen,
-      "user_id": "D@gmail.com"
+      description: data.description,
+      "location.longitude": data.locationLong,
+      "location.latitude": data.locationLat,
+      cities: data.cities,
+      postGenre: data.postGen,
+      user_id: "D@gmail.com",
     },
   });
-
 };

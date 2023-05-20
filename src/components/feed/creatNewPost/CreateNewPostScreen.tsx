@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import {
   ScrollView,
@@ -20,10 +21,17 @@ import { Colors } from "../../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native";
-import { SaveLocationProps, saveLocation } from "../../../actions/feedActions";
+import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
+  const [data, setData] = useState({
+    description: "",
+    locationLat: "100",
+    locationLong: "200",
+    postGen: "0",
+    cities: "",
+  } as SaveLocationData);
   const [image, setImage] = React.useState(
     null as ImagePicker.ImagePickerAsset
   );
@@ -46,15 +54,7 @@ const LocationTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
-      const data: SaveLocationProps = {
-        description: "Test desc",
-        locationLat: "100",
-        locationLong: "200",
-        postGen: "0",
-        cities: "Miami",
-        image: image,
-      };
-      saveLocation(data);
+      saveLocation(data, image);
     },
   }));
 
@@ -101,8 +101,8 @@ const LocationTab = forwardRef((props, ref) => {
             style={{ marginTop: 10, fontSize: 16, margin: 5 }}
             multiline
             underlineColorAndroid={"transparent"}
-            //onChangeText={(text) => setData({ ...data, userEmail: text })}
-            //value={data.userEmail}
+            onChangeText={(text) => setData({ ...data, description: text })}
+            value={data.description}
           />
         </ListItem.Content>
       </ListItem>
