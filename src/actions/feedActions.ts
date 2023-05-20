@@ -36,7 +36,7 @@ export const saveLocation = (
   data: SaveLocationData,
   image: ImagePickerAsset
 ) => {
-  FileSystem.uploadAsync(POSTS_URL + "/createLocation", data.image.uri, {
+  FileSystem.uploadAsync(POSTS_URL + "/createLocation", image.uri, {
     fieldName: "imageFile",
     httpMethod: "POST",
     uploadType: FileSystem.FileSystemUploadType.MULTIPART,

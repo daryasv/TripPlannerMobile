@@ -25,6 +25,7 @@ import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
+  
   const [data, setData] = useState({
     description: "",
     locationLat: "100",
@@ -32,6 +33,7 @@ const LocationTab = forwardRef((props, ref) => {
     postGen: "0",
     cities: "",
   } as SaveLocationData);
+
   const [image, setImage] = React.useState(
     null as ImagePicker.ImagePickerAsset
   );
