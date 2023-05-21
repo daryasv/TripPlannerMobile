@@ -114,6 +114,7 @@ export default function FeedScreen() {
   }, [getUniqueCities]);
   const handleCityFilter = (activeCities) => {
     if (activeCities.length > 0) {
+      //todo: change filter from frontend to backend 
       const filtered = posts.filter(post => post.cities.some(city => activeCities.includes(city)));
       setFilteredPosts(filtered);
     } else {
