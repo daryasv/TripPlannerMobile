@@ -17,11 +17,13 @@ import { Colors } from "../../../theme/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native";
 import LocationTab from "./LocationTab";
+import RouteTab from "./RouteTab";
 
 export default function CreateNewPostScreen() {
   const [currentTab, setCurrentTab] = React.useState(0);
   const [saving, setSaving] = useState(false as boolean);
   const createLocationRef = useRef();
+  const createRouteRef = useRef();
 
   const nav = useNavigation();
 
@@ -95,7 +97,7 @@ export default function CreateNewPostScreen() {
           <LocationTab ref={createLocationRef} />
         </TabView.Item>
         <TabView.Item style={{ flex: 1 }}>
-          <Text>Route</Text>
+          <RouteTab ref={createRouteRef} />
         </TabView.Item>
       </TabView>
     </View>
