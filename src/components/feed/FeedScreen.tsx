@@ -14,6 +14,7 @@ import ReadMore from "@fawazahmed/react-native-read-more";
 import { getExploreFeed } from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
 import { postGenreEnum, PostType } from "../../types/postTypes";
+import CitiesPanel from "./CitiesPanel";
 
 const Item = ({ data }: { data: PostType }) => {
   return (
@@ -76,6 +77,11 @@ export default function FeedScreen() {
   const [loadingMore, setLoadingMore] = useState(false as boolean);
   const [hasMore, setHasMore] = useState(true as boolean);
   const [page, setPage] = useState(1 as number);
+  const [uniqueCities, setCities] = useState([] as string[]);
+  const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
+  const [cityImages, setCityImages] = useState(new Map<string, string>());
+
+
 
   const getData = () => {
     getExploreFeed({ page: 1 }, (data) => {
@@ -88,6 +94,32 @@ export default function FeedScreen() {
     });
   };
 
+  const getUniqueCities = useCallback(() => {
+    let citySet = new Set<string>();
+    let cityImageMap = new Map<string, string>();
+    posts.forEach((post) => {
+      post.cities.forEach((city) => {
+        if (city != "" && !citySet.has(city)) {
+          citySet.add(city);
+          cityImageMap.set(city, post.contentData.imageFileNameDTO);
+        }
+      });
+    });
+    setCities(Array.from(citySet));
+    setCityImages(cityImageMap);
+  }, [posts]);
+
+  useEffect(() => {
+    getUniqueCities();
+  }, [getUniqueCities]);
+  const handleCityFilter = (activeCities) => {
+    if (activeCities.length > 0) {
+      const filtered = posts.filter(post => post.cities.some(city => activeCities.includes(city)));
+      setFilteredPosts(filtered);
+    } else {
+      setFilteredPosts(null);
+    }
+  };
   const handleRefresh = () => {
     if (!loading && !loadingMore) {
       setLoading(true);
@@ -117,6 +149,8 @@ export default function FeedScreen() {
     }
   };
 
+
+
   const ListFooter = () => {
     if (loadingMore || hasMore) {
       return <ActivityIndicator />;
@@ -136,13 +170,14 @@ export default function FeedScreen() {
         paddingBottom: 40,
       }}
     >
+      <CitiesPanel uniqueCities={uniqueCities} cityImages={cityImages} onCityClick={handleCityFilter} />
       <FlatList
-        data={posts}
+        data={filteredPosts ? filteredPosts : posts}
         renderItem={({ item }) => <Item data={item} />}
         keyExtractor={(item) => item.dataID}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={loading} onRefresh={handleRefresh}/>
         }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
