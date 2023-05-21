@@ -94,12 +94,13 @@ export default function FeedScreen() {
     });
   };
 
+  //todo: change pull list from BE 
   const getUniqueCities = useCallback(() => {
     let citySet = new Set<string>();
     let cityImageMap = new Map<string, string>();
     posts.forEach((post) => {
       post.cities.forEach((city) => {
-        if (city != "" && !citySet.has(city)) {
+        if (city && !citySet.has(city)) {
           citySet.add(city);
           cityImageMap.set(city, post.contentData.imageFileNameDTO);
         }
