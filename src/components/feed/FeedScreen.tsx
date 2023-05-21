@@ -2,6 +2,7 @@ import { Avatar, Card, Icon, Image } from "@rneui/themed";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  DeviceEventEmitter,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -81,9 +82,8 @@ export default function FeedScreen() {
   const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
 
-
-
   const getData = () => {
+    setLoading(true);
     getExploreFeed({ page: 1 }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
@@ -94,12 +94,13 @@ export default function FeedScreen() {
     });
   };
 
+  //todo: change pull list from BE
   const getUniqueCities = useCallback(() => {
     let citySet = new Set<string>();
     let cityImageMap = new Map<string, string>();
     posts.forEach((post) => {
       post.cities.forEach((city) => {
-        if (city != "" && !citySet.has(city)) {
+        if (city && !citySet.has(city)) {
           citySet.add(city);
           cityImageMap.set(city, post.contentData.imageFileNameDTO);
         }
@@ -114,7 +115,10 @@ export default function FeedScreen() {
   }, [getUniqueCities]);
   const handleCityFilter = (activeCities) => {
     if (activeCities.length > 0) {
-      const filtered = posts.filter(post => post.cities.some(city => activeCities.includes(city)));
+      //todo: change filter from frontend to backend
+      const filtered = posts.filter((post) =>
+        post.cities.some((city) => activeCities.includes(city))
+      );
       setFilteredPosts(filtered);
     } else {
       setFilteredPosts(null);
@@ -129,7 +133,12 @@ export default function FeedScreen() {
 
   //initial
   useEffect(() => {
+    const updateEvent = DeviceEventEmitter.addListener("update_feed", getData);
     getData();
+
+    return(()=>{
+      updateEvent.remove();
+    })
   }, []);
 
   const handleLoadMore = () => {
@@ -148,8 +157,6 @@ export default function FeedScreen() {
       });
     }
   };
-
-
 
   const ListFooter = () => {
     if (loadingMore || hasMore) {
@@ -170,14 +177,18 @@ export default function FeedScreen() {
         paddingBottom: 40,
       }}
     >
-      <CitiesPanel uniqueCities={uniqueCities} cityImages={cityImages} onCityClick={handleCityFilter} />
+      <CitiesPanel
+        uniqueCities={uniqueCities}
+        cityImages={cityImages}
+        onCityClick={handleCityFilter}
+      />
       <FlatList
         data={filteredPosts ? filteredPosts : posts}
         renderItem={({ item }) => <Item data={item} />}
         keyExtractor={(item) => item.dataID}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={handleRefresh}/>
+          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
         }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}

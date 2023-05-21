@@ -14,8 +14,11 @@ import {
   View,
   TextInput,
   ImageBackground,
+  ActivityIndicator,
+  DeviceEventEmitter,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import Toast from "react-native-toast-message";
 
 import { Colors } from "../../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -25,7 +28,7 @@ import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
-  
+
   const [data, setData] = useState({
     description: "",
     locationLat: "100",
@@ -56,7 +59,7 @@ const LocationTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
-      saveLocation(data, image);
+      return saveLocation(data, image);
     },
   }));
 
@@ -127,21 +130,47 @@ const LocationTab = forwardRef((props, ref) => {
 
 export default function CreateNewPostScreen() {
   const [currentTab, setCurrentTab] = React.useState(0);
+  const [saving, setSaving] = useState(false as boolean);
   const createLocationRef = useRef();
 
   const nav = useNavigation();
 
   const save = () => {
-    if (createLocationRef?.current) {
-      (createLocationRef.current as any).save();
+    if (createLocationRef?.current && !saving) {
+      setSaving(true);
+      (createLocationRef.current as any)
+        .save()
+        .then((r) => {
+          setSaving(false);
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Post created successfully",
+          });
+          DeviceEventEmitter.emit("update_feed");
+          nav.goBack();
+        })
+        .catch((e) => {
+          Toast.show({
+            type: "error",
+            text1: "Failed",
+            text2: "Failed to create post",
+          });
+          setSaving(false);
+        });
     }
   };
 
   useEffect(() => {
     nav.setOptions({
-      headerRight: () => <Button title="Create" onPress={save} />,
+      headerRight: () =>
+        saving ? (
+          <ActivityIndicator color={"primary"} />
+        ) : (
+          <Button title="Create" onPress={save} />
+        ),
     });
-  }, []);
+  }, [saving]);
 
   return (
     <View style={{ flex: 1 }}>
