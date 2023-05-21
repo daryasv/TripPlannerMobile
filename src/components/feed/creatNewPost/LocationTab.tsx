@@ -1,7 +1,13 @@
 import { Image, Input, ListItem } from "@rneui/themed";
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { Text, TouchableOpacity, View, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
@@ -21,6 +27,12 @@ const LocationTab = forwardRef((props, ref) => {
     null as ImagePicker.ImagePickerAsset
   );
 
+  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
+
+  useEffect(() => {
+    requestPermission();
+  }, []);
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -30,7 +42,29 @@ const LocationTab = forwardRef((props, ref) => {
       quality: 1,
     });
 
-    console.log(result);
+    const asset = result.assets[0];
+
+    MediaLibrary.getAssetInfoAsync({
+      id: asset.assetId,
+      filename: asset.fileName,
+      uri: asset.uri,
+      mediaType: "photo",
+      width: asset.width,
+      height: asset.height,
+      creationTime: null,
+      modificationTime: null,
+      duration: asset.duration,
+    })
+      .then((extraData) => {
+        if (extraData?.location) {
+          setData({
+            ...data,
+            locationLat: extraData.location.latitude.toString(),
+            locationLong: extraData.location.longitude.toString(),
+          });
+        }
+      })
+      .catch((e) => {});
 
     if (!result.canceled) {
       setImage(result.assets[0]);
