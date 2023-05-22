@@ -136,9 +136,9 @@ export default function FeedScreen() {
     const updateEvent = DeviceEventEmitter.addListener("update_feed", getData);
     getData();
 
-    return(()=>{
+    return () => {
       updateEvent.remove();
-    })
+    };
   }, []);
 
   const handleLoadMore = () => {
@@ -185,7 +185,7 @@ export default function FeedScreen() {
       <FlatList
         data={filteredPosts ? filteredPosts : posts}
         renderItem={({ item }) => <Item data={item} />}
-        keyExtractor={(item) => item.dataID}
+        keyExtractor={(item, index) => item.dataID + "_" + index}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
