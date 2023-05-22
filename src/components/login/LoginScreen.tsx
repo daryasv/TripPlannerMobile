@@ -258,7 +258,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       </View>
       <Text style={{ alignSelf: "center" }}>
         Already have an account?{" "}
-        <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
+        <Text style={{ color: "#303C9A" }} onPress={() => setMode("login")}>
           Login
         </Text>
       </Text>
