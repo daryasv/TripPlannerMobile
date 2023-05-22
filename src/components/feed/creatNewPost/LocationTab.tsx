@@ -42,32 +42,32 @@ const LocationTab = forwardRef((props, ref) => {
       quality: 1,
     });
 
-    const asset = result.assets[0];
-
-    MediaLibrary.getAssetInfoAsync({
-      id: asset.assetId,
-      filename: asset.fileName,
-      uri: asset.uri,
-      mediaType: "photo",
-      width: asset.width,
-      height: asset.height,
-      creationTime: null,
-      modificationTime: null,
-      duration: asset.duration,
-    })
-      .then((extraData) => {
-        if (extraData?.location) {
-          setData({
-            ...data,
-            locationLat: extraData.location.latitude.toString(),
-            locationLong: extraData.location.longitude.toString(),
-          });
-        }
-      })
-      .catch((e) => {});
-
     if (!result.canceled) {
-      setImage(result.assets[0]);
+      const asset = result.assets[0];
+
+      MediaLibrary.getAssetInfoAsync({
+        id: asset.assetId,
+        filename: asset.fileName,
+        uri: asset.uri,
+        mediaType: "photo",
+        width: asset.width,
+        height: asset.height,
+        creationTime: null,
+        modificationTime: null,
+        duration: asset.duration,
+      })
+        .then((extraData) => {
+          if (extraData?.location) {
+            setData({
+              ...data,
+              locationLat: extraData.location.latitude.toString(),
+              locationLong: extraData.location.longitude.toString(),
+            });
+          }
+        })
+        .catch((e) => {});
+
+      setImage(asset);
     }
   };
 
