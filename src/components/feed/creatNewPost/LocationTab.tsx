@@ -8,9 +8,11 @@ import React, {
 import { Text, TouchableOpacity, View, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
+import {} from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
+import { getLocationData } from "../../utils/LocationsUtils";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -62,6 +64,14 @@ const LocationTab = forwardRef((props, ref) => {
               ...data,
               locationLat: extraData.location.latitude.toString(),
               locationLong: extraData.location.longitude.toString(),
+            });
+            getLocationData(
+              extraData.location.latitude,
+              extraData.location.longitude
+            ).then((address) => {
+              if (address?.city) {
+                setData({ ...data, cities: address.city });
+              }
             });
           }
         })
