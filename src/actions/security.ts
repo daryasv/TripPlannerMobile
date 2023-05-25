@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DevSettings } from "react-native";
 
 export const USER_DETAILS_STORAGE_NAME = "user_details";
 
@@ -19,6 +20,12 @@ export async function initUser(callback: (success: boolean) => void) {
   }
 
   callback(false);
+}
+
+export async function Logout() {
+  AsyncStorage.clear().then(() => {
+    DevSettings.reload();
+  });
 }
 
 function setToken(newToken) {

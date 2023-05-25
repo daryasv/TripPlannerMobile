@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, Button, Pressable } from 'react-native';
 import { Colors } from "../../theme/Colors";
-import { USER_DETAILS_STORAGE_NAME, getUserEmail, getUserId } from "../../actions/security";
+import { Logout, USER_DETAILS_STORAGE_NAME, getUserEmail, getUserId } from "../../actions/security";
 import { Link, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GetUserProfile } from '../../actions/profileActions';
+import LoginScreen from '../login/LoginScreen';
 
 const styles = StyleSheet.create({
     Avatar: {
@@ -89,6 +90,14 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginHorizontal: '7%',
         minWidth: '41%',
+    },
+    Logout: {
+        color: Colors.main,
+        textAlign: 'right',
+        fontSize: 16,
+        marginHorizontal: '2%',
+        marginTop: '2%',
+        fontWeight: 'bold'
     }
   });
 
@@ -157,6 +166,7 @@ export function ProfileHomeScreen({ navigation }) {
 
     return (
         <ScrollView showsVerticalScrollIndicator={true}>
+            <Text style={styles.Logout} onPress={() => Logout()}>Logout</Text>
             <Image style={styles.Avatar}
             source={{ uri: "https://randomuser.me/api/portraits/women/31.jpg" }}
             />
