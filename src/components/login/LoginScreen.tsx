@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   DevSettings,
   ImageBackground,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import {
@@ -16,8 +16,9 @@ import {
 } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Updates from 'expo-updates';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+
 import {
   LoginData,
   postUserLogin,
@@ -25,6 +26,7 @@ import {
   RegisterData,
 } from "../../actions/userActions";
 import { USER_DETAILS_STORAGE_NAME } from "../../actions/security";
+import { Image } from "react-native-elements";
 
 const theme = createTheme({
   components: {
@@ -73,6 +75,7 @@ const REGISTER_VALIDATIONS = {
 };
 
 export const SignupContainer = ({ setMode }: CardContainer) => {
+  const [image, setImage] = useState(null as ImagePicker.ImagePickerAsset);
   const [data, setData] = useState({
     userFirstName: "",
     userLastName: "",
@@ -114,6 +117,20 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
     }
   };
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0]);
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
@@ -121,6 +138,47 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       }}
     >
       <View>
+        <TouchableOpacity
+          style={{
+            borderColor: "#aaa",
+            borderWidth: 1,
+            width: 100,
+            aspectRatio: 1,
+            borderRadius: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 20,
+            backgroundColor: "#aaa",
+            alignSelf: "center",
+          }}
+          onPress={pickImage}
+        >
+          {image ? (
+            <Image
+              source={{
+                uri: image?.uri,
+              }}
+              style={{
+                width: 100,
+                aspectRatio: 1,
+                borderRadius: 50,
+                resizeMode: "cover",
+              }}
+            />
+          ) : (
+            <Text
+              style={{
+                fontWeight: "600",
+                fontSize: 13,
+                color: "white",
+                textAlign: "center",
+                marginTop: 10,
+              }}
+            >
+              Profile Image
+            </Text>
+          )}
+        </TouchableOpacity>
         <Input
           label="First Name"
           placeholder="First name"
@@ -200,7 +258,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       </View>
       <Text style={{ alignSelf: "center" }}>
         Already have an account?{" "}
-        <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
+        <Text style={{ color: "#303C9A" }} onPress={() => setMode("login")}>
           Login
         </Text>
       </Text>
@@ -215,12 +273,15 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
 
   const onLogin = () => {
     setLoading(true);
-    
+
     postUserLogin(data, async (succees) => {
       setLoading(false);
       setGeneralError("");
       if (succees) {
-        await AsyncStorage.setItem(USER_DETAILS_STORAGE_NAME,JSON.stringify(succees));
+        await AsyncStorage.setItem(
+          USER_DETAILS_STORAGE_NAME,
+          JSON.stringify(succees)
+        );
         DevSettings.reload();
         //Updates.reloadAsync();//reload the app after password saved
       } else {
@@ -251,7 +312,7 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
           onChangeText={(text) => setData({ ...data, password: text })}
           value={data.password}
         />
-        
+
         {generalError ? (
           <Text style={{ color: "red", fontSize: 14, textAlign: "center" }}>
             {generalError}
