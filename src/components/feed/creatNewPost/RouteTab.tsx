@@ -1,6 +1,7 @@
 import { Button, Image, Input, ListItem } from "@rneui/themed";
 import React, {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,18 +10,29 @@ import React, {
 import { Text, TouchableOpacity, View, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
+import * as Location from "expo-location";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 import { ScrollView } from "react-native-gesture-handler";
+import * as TaskManager from "expo-task-manager";
+
+const LOCATION_TASK_NAME = "trip-location-updates";
 
 const RouteTab = forwardRef((props, ref) => {
   const [time, setTime] = useState("" as string);
   const timerRef = useRef<NodeJS.Timer>();
-
+  const [status, requestPermission] = Location.useForegroundPermissions();
+  const [locations, setLocations] = useState([] as Location.LocationObject[]);
   const [image, setImage] = React.useState(
     null as ImagePicker.ImagePickerAsset
   );
+
+  useEffect(() => {
+    if (!status?.granted) {
+      requestPermission();
+    }
+  });
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -40,7 +52,7 @@ const RouteTab = forwardRef((props, ref) => {
     save() {},
   }));
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     const start = moment();
     setTime("00:00:00");
     timerRef.current = setInterval(() => {
@@ -49,7 +61,38 @@ const RouteTab = forwardRef((props, ref) => {
         .format("HH:mm:ss");
       setTime(label);
     }, 1000);
-  };
+
+    Location.getCurrentPositionAsync()
+      .then((res) => {
+        setLocations([res]);
+        Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          distanceInterval: 200,
+          deferredUpdatesInterval: 30,
+          foregroundService: {
+            killServiceOnDestroy: true,
+            notificationTitle: "Trip Planner",
+            notificationBody: "Recording your route",
+          },
+          showsBackgroundLocationIndicator: true,
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((e) => {
+            console.log("e", e);
+          });
+        TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }: any) => {
+          if (error || !data?.locations?.length) {
+            // check `error.message` for more details.
+            return;
+          }
+          setLocations((oldLocations) => [...oldLocations, ...data.locations]);
+        });
+      })
+      .catch(() => {
+        setLocations([]);
+      });
+  }, [locations, time]);
 
   const handleStop = () => {
     if (timerRef?.current) {
@@ -57,6 +100,10 @@ const RouteTab = forwardRef((props, ref) => {
       timerRef.current = null;
       setTime(null);
     }
+    try {
+      Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME).catch((e) => {});
+      TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME).catch((e) => {});
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -64,6 +111,17 @@ const RouteTab = forwardRef((props, ref) => {
       handleStop();
     };
   }, []);
+
+  if (!status?.granted) {
+    return (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text>
+          Missing permissions - we need location permissions in order to start
+          recording
+        </Text>
+      </View>
+    );
+  }
 
   if (!time) {
     return (

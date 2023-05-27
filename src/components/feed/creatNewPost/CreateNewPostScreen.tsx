@@ -94,10 +94,10 @@ export default function CreateNewPostScreen() {
         containerStyle={{ flex: 1 }}
       >
         <TabView.Item style={{ flex: 1 }}>
-          <LocationTab ref={createLocationRef} />
+          {currentTab === 0 && <LocationTab ref={createLocationRef} />}
         </TabView.Item>
         <TabView.Item style={{ flex: 1 }}>
-          <RouteTab ref={createRouteRef} />
+          {currentTab === 1 && <RouteTab ref={createRouteRef} />}
         </TabView.Item>
       </TabView>
     </View>
