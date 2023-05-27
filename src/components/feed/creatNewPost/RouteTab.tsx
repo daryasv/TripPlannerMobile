@@ -127,7 +127,7 @@ const RouteTab = forwardRef((props, ref) => {
     );
   }
 
-  if (timeLabel) {
+  if (!timeLabel) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
