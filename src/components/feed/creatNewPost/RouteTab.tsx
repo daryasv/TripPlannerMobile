@@ -20,7 +20,7 @@ import * as TaskManager from "expo-task-manager";
 const LOCATION_TASK_NAME = "trip-location-updates";
 
 const RouteTab = forwardRef((props, ref) => {
-  const [time, setTime] = useState("" as string);
+  const [timeLabel, setTimeLabel] = useState("" as string);
   const timerRef = useRef<NodeJS.Timer>();
   const [status, requestPermission] = Location.useForegroundPermissions();
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
@@ -28,11 +28,16 @@ const RouteTab = forwardRef((props, ref) => {
     null as ImagePicker.ImagePickerAsset
   );
 
+  //Constractor
   useEffect(() => {
     if (!status?.granted) {
       requestPermission();
     }
-  });
+    
+    return () => {
+      handleStop();
+    };
+  }, []);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -54,20 +59,20 @@ const RouteTab = forwardRef((props, ref) => {
 
   const handleStart = useCallback(() => {
     const start = moment();
-    setTime("00:00:00");
+    setTimeLabel("00:00:00");
     timerRef.current = setInterval(() => {
       const label = moment
         .utc(moment.duration(moment().diff(start)).asMilliseconds())
         .format("HH:mm:ss");
-      setTime(label);
+      setTimeLabel(label);
     }, 1000);
 
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
         Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          distanceInterval: 200,
-          deferredUpdatesInterval: 30,
+          distanceInterval: 100,
+          deferredUpdatesInterval: 10,
           foregroundService: {
             killServiceOnDestroy: true,
             notificationTitle: "Trip Planner",
@@ -92,13 +97,13 @@ const RouteTab = forwardRef((props, ref) => {
       .catch(() => {
         setLocations([]);
       });
-  }, [locations, time]);
+  }, [locations, timeLabel]);
 
   const handleStop = () => {
     if (timerRef?.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-      setTime(null);
+      setTimeLabel(null);
     }
     try {
       Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME).catch((e) => {});
@@ -106,13 +111,10 @@ const RouteTab = forwardRef((props, ref) => {
     } catch (e) {}
   };
 
-  useEffect(() => {
-    return () => {
-      handleStop();
-    };
-  }, []);
+  console.log(locations);
 
   if (!status?.granted) {
+    //todo: add button that sends to settings
     return (
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Text>
@@ -123,7 +125,7 @@ const RouteTab = forwardRef((props, ref) => {
     );
   }
 
-  if (!time) {
+  if (!timeLabel) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
@@ -175,7 +177,7 @@ const RouteTab = forwardRef((props, ref) => {
           >
             Recording
           </Text>
-          <Text>{time}</Text>
+          <Text>{timeLabel}</Text>
           <Button
             title={"Stop"}
             buttonStyle={{ backgroundColor: "black", width: 100 }}
