@@ -106,8 +106,17 @@ const RouteTab = forwardRef((props, ref) => {
             alignItems: "center",
             padding: 10,
             justifyContent: "space-between",
+            marginTop: 20,
           }}
         >
+          <Text
+            style={{
+              fontSize: 18,
+              color: "red",
+            }}
+          >
+            Recording
+          </Text>
           <Text>{time}</Text>
           <Button
             title={"Stop"}
