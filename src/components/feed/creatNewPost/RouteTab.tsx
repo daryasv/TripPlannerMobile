@@ -279,7 +279,7 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.5,
+      quality: 0.4,
       selectionLimit: 1,
       exif: false,
     });
@@ -290,7 +290,7 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
   };
 
   const onSave = async () => {
-    if (!saving && (details.description || details.image)) {
+    if (!saving && details.description && details.image) {
       setSaving(true);
       //go to gps and get current location
       const location: PinLocationProps["location"] = (
@@ -392,7 +392,14 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
             }
           />
         </View>
-        <Button disabled={saving} title={"Save"} radius={50} onPress={onSave} />
+        <Button
+          loading={saving}
+          loadingProps={{ color: "blue" }}
+          disabled={saving}
+          title={"Save"}
+          radius={50}
+          onPress={onSave}
+        />
         <Button
           disabled={saving}
           title={"Cancel"}
