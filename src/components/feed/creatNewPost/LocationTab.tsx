@@ -41,7 +41,9 @@ const LocationTab = forwardRef((props, ref) => {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
+      selectionLimit: 1,
+      exif: false,
     });
 
     if (!result.canceled) {
