@@ -22,6 +22,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import {
   NewPinnedLocationProps,
   SaveLocationData,
+  createRoute,
   saveLocation,
   uploadNewPinnedLocation,
 } from "../../../actions/feedActions";
@@ -43,10 +44,11 @@ interface PinLocationProps {
 
 const RouteTab = forwardRef((props, ref) => {
   const [timeLabel, setTimeLabel] = useState("" as string);
+  const [duration, setDuration] = useState(0 as number);
   const timerRef = useRef<NodeJS.Timer>();
   const [status, requestPermission] = Location.useForegroundPermissions();
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
-  const [pins, setPins] = useState([]);
+  const [pins, setPins] = useState([] as PinLocationProps[]);
 
   //Constractor
   useEffect(() => {
@@ -60,16 +62,24 @@ const RouteTab = forwardRef((props, ref) => {
   }, []);
 
   useImperativeHandle(ref, () => ({
-    save() {},
+    save() {
+      return createRoute({
+        description: "test",
+        totalDuration: duration,
+        locations: locations.map((location) => location.coords),
+        pinnedLocations: pins.map((p) => p.id),
+        totalDistance: 0,
+        user_id: "",
+      });
+    },
   }));
 
   const handleStart = useCallback(() => {
     const start = moment();
     setTimeLabel("00:00:00");
     timerRef.current = setInterval(() => {
-      const label = moment
-        .utc(moment.duration(moment().diff(start)).asMilliseconds())
-        .format("HH:mm:ss");
+      const d = moment.duration(moment().diff(start)).asMilliseconds();
+      const label = moment.utc(d).format("HH:mm:ss");
       setTimeLabel(label);
     }, 1000);
 

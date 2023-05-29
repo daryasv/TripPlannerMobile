@@ -83,3 +83,23 @@ export const uploadNewPinnedLocation = (
       console.log("error");
     });
 };
+
+export interface CreateRouteData {
+  description: string;
+  user_id: string;
+  totalDistance: number;
+  totalDuration: number;
+  pinnedLocations: string[];
+  locations: Location[];
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
+}
+
+export const createRoute = (data: CreateRouteData) => {
+  return axios.post(POSTS_URL + "/createRouteRec", data, {
+    headers: { Authorization: getToken() },
+  });
+};
