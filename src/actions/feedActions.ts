@@ -51,3 +51,35 @@ export const saveLocation = (
     },
   });
 };
+
+export interface NewPinnedLocationProps {
+  "location.longitude": string;
+  "location.latitude": string;
+  description: string;
+}
+
+export const uploadNewPinnedLocation = (
+  image: ImagePickerAsset,
+  data: NewPinnedLocationProps,
+  callback: (id: string) => void
+) => {
+  return FileSystem.uploadAsync(POSTS_URL + "/addPinnedLocation", image.uri, {
+    fieldName: "imageFile",
+    httpMethod: "POST",
+    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+    headers: { Authorization: getToken() },
+    parameters: {
+      description: data.description,
+      "location.longitude": data["location.longitude"],
+      "location.latitude": data["location.latitude"],
+    },
+  })
+    .then((res) => {
+      console.log(JSON.parse(res.body)?._id);
+      callback(JSON.parse(res.body)?._id);
+    })
+    .catch(() => {
+      callback(null);
+      console.log("error");
+    });
+};

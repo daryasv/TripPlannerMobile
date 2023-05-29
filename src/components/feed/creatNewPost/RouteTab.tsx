@@ -19,7 +19,12 @@ import moment from "moment";
 import * as Location from "expo-location";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
+import {
+  NewPinnedLocationProps,
+  SaveLocationData,
+  saveLocation,
+  uploadNewPinnedLocation,
+} from "../../../actions/feedActions";
 import { ScrollView } from "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import { Card } from "@rneui/base";
@@ -33,6 +38,7 @@ interface PinLocationProps {
     latitude: number;
     longitude: number;
   };
+  id?: string;
 }
 
 const RouteTab = forwardRef((props, ref) => {
@@ -103,7 +109,6 @@ const RouteTab = forwardRef((props, ref) => {
     if (timerRef?.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-      setTimeLabel(null);
     }
     try {
       Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME).catch((e) => {});
@@ -247,14 +252,30 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
   const onSave = async () => {
     if (!saving && (details.description || details.image)) {
       setSaving(true);
+      //go to gps and get current location
       const location: PinLocationProps["location"] = (
         await Location.getCurrentPositionAsync()
       )?.coords;
-      const newDetails = { ...details, location };
-      props.handleSavePin(newDetails);
-      setSaving(false);
-      setDetails({});
-      setEditMode(false);
+
+      const dataToSend: NewPinnedLocationProps = {
+        description: details.description,
+        "location.latitude": location.latitude.toString(),
+        "location.longitude": location.longitude.toString(),
+      };
+
+      uploadNewPinnedLocation(details.image, dataToSend, (id) => {
+        setSaving(false);
+        if (id) {
+          setEditMode(false);
+          props.handleSavePin({
+            image: details.image,
+            description: details.description,
+            location: location,
+            id: id,
+          });
+          setDetails({});
+        }
+      });
     }
   };
 
