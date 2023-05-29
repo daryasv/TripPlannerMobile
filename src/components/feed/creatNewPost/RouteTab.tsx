@@ -44,6 +44,7 @@ interface PinLocationProps {
 }
 
 const RouteTab = forwardRef((props, ref) => {
+  const [recording, setRecording] = useState(false as boolean);
   const [timeLabel, setTimeLabel] = useState("" as string);
   const [duration, setDuration] = useState(0 as number);
   const timerRef = useRef<NodeJS.Timer>();
@@ -79,6 +80,7 @@ const RouteTab = forwardRef((props, ref) => {
   }));
 
   const handleStart = useCallback(() => {
+    setRecording(true);
     const start = moment();
     setTimeLabel("00:00:00");
     timerRef.current = setInterval(() => {
@@ -129,6 +131,7 @@ const RouteTab = forwardRef((props, ref) => {
   }, [locations, timeLabel]);
 
   const handleStop = () => {
+    setRecording(false);
     if (timerRef?.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -205,15 +208,17 @@ const RouteTab = forwardRef((props, ref) => {
               color: "red",
             }}
           >
-            Recording
+            {recording ? "Recording" : "Recoreded"}
           </Text>
           <Text>{timeLabel}</Text>
-          <Button
-            title={"Stop"}
-            radius={40}
-            buttonStyle={{ backgroundColor: "black", width: 100 }}
-            onPress={handleStop}
-          ></Button>
+          {recording && (
+            <Button
+              title={"Stop"}
+              radius={40}
+              buttonStyle={{ backgroundColor: "black", width: 100 }}
+              onPress={handleStop}
+            ></Button>
+          )}
         </View>
         <Input
           value={description}
