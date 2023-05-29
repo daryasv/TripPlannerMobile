@@ -67,15 +67,17 @@ const RouteTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
-      return createRoute({
-        description: description,
-        totalDuration: duration,
-        locations: locations.map((location) => location.coords),
-        pinnedLocations: pins.map((p) => p.id),
-        totalDistance: 0,
-        user_id: "",
-        cities: city,
-      });
+      if (description && timeLabel) {
+        return createRoute({
+          description: description,
+          totalDuration: duration,
+          locations: locations.map((location) => location.coords),
+          pinnedLocations: pins.map((p) => p.id),
+          totalDistance: 0,
+          user_id: "",
+          cities: city,
+        });
+      }
     },
   }));
 
