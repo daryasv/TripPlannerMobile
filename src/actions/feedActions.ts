@@ -91,6 +91,7 @@ export interface CreateRouteData {
   totalDuration: number;
   pinnedLocations: string[];
   locations: Location[];
+  cities: string
 }
 
 export interface Location {

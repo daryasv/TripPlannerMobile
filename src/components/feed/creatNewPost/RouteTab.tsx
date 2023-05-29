@@ -29,6 +29,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import { Card } from "@rneui/base";
+import { getLocationData } from "../../utils/LocationsUtils";
 
 const LOCATION_TASK_NAME = "trip-location-updates";
 
@@ -50,6 +51,7 @@ const RouteTab = forwardRef((props, ref) => {
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
   const [pins, setPins] = useState([] as PinLocationProps[]);
   const [description, setDescription] = useState("");
+  const [city, setCity] = useState("");
 
   //Constractor
   useEffect(() => {
@@ -71,6 +73,7 @@ const RouteTab = forwardRef((props, ref) => {
         pinnedLocations: pins.map((p) => p.id),
         totalDistance: 0,
         user_id: "",
+        cities: city,
       });
     },
   }));
@@ -88,6 +91,14 @@ const RouteTab = forwardRef((props, ref) => {
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
+        getLocationData(res.coords.latitude, res.coords.longitude)
+          .then((address) => {
+            if (address?.city) {
+              setCity(address.city);
+            }
+          })
+          .catch((e) => {});
+
         Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           distanceInterval: 100,
           deferredUpdatesInterval: 10,
