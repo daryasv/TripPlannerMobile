@@ -49,6 +49,7 @@ const RouteTab = forwardRef((props, ref) => {
   const [status, requestPermission] = Location.useForegroundPermissions();
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
   const [pins, setPins] = useState([] as PinLocationProps[]);
+  const [description, setDescription] = useState("");
 
   //Constractor
   useEffect(() => {
@@ -64,7 +65,7 @@ const RouteTab = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     save() {
       return createRoute({
-        description: "test",
+        description: description,
         totalDuration: duration,
         locations: locations.map((location) => location.coords),
         pinnedLocations: pins.map((p) => p.id),
@@ -203,6 +204,21 @@ const RouteTab = forwardRef((props, ref) => {
             onPress={handleStop}
           ></Button>
         </View>
+        <Input
+          value={description}
+          onChangeText={(text) => setDescription(text)}
+          label="Description"
+          multiline
+          inputContainerStyle={{ borderBottomWidth: 0 }}
+          containerStyle={{
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: "#aaa",
+            marginStart: "5%",
+            width: "90%",
+            marginTop: 20,
+          }}
+        />
         <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
           <NewPinLocation handleSavePin={addNewPin} />
           {pins.map((p, index) => (
