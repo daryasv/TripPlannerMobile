@@ -79,6 +79,7 @@ const RouteTab = forwardRef((props, ref) => {
     setTimeLabel("00:00:00");
     timerRef.current = setInterval(() => {
       const d = moment.duration(moment().diff(start)).asMilliseconds();
+      setDuration(d);
       const label = moment.utc(d).format("HH:mm:ss");
       setTimeLabel(label);
     }, 1000);
