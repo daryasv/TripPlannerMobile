@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DevSettings } from "react-native";
+import { DevSettings, DeviceEventEmitter } from "react-native";
 
 export const USER_DETAILS_STORAGE_NAME = "user_details";
 
@@ -79,6 +79,6 @@ export function getProfilePictureId() {
 
 export async function Logout() {
   AsyncStorage.clear().then(() => {
-    DevSettings.reload();
+    DeviceEventEmitter.emit("token_changed");
   });
 }
