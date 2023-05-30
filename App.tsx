@@ -14,7 +14,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { initUser } from "./src/actions/security";
 import MainScreen from "./src/components/main/MainScreen";
 import CreateNewPostScreen from "./src/components/feed/creatNewPost/CreateNewPostScreen";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
+import RouteDetailsScreen from "./src/components/feed/RouteDetailsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -52,12 +53,13 @@ export default function App() {
               component={CreateNewPostScreen}
               options={{ headerTitle: "New Post" }}
             />
+          <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       ) : (
         <ActivityIndicator />
       )}
-      <Toast/>
+      <Toast />
     </SafeAreaView>
   );
 }
