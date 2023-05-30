@@ -1,4 +1,4 @@
-import { Button, Image, Input, ListItem } from "@rneui/themed";
+import { Button } from "@rneui/themed";
 import React, {
   forwardRef,
   useCallback,
@@ -32,6 +32,12 @@ import { Card } from "@rneui/base";
 import { getLocationData } from "../../utils/LocationsUtils";
 
 const LOCATION_TASK_NAME = "trip-location-updates";
+import { Text, TouchableOpacity, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import moment from "moment";
+import MapView, { PROVIDER_GOOGLE, Marker, LatLng, Region, Polyline } from "react-native-maps"
+import { ScrollView } from "react-native-gesture-handler";
+import * as Location from "expo-location";
 
 interface PinLocationProps {
   image?: ImagePicker.ImagePickerAsset;
