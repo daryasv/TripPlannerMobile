@@ -264,6 +264,7 @@ export default function FeedScreen({ navigation }) {
     setLoading(true);
     getExploreFeed({ page: 1 }, (data) => {
       if (data?.allPosts) {
+        setFilteredPosts(data.allPosts);
         setPosts(data.allPosts);
         setLoading(false);
         setPage(1);
@@ -278,7 +279,7 @@ export default function FeedScreen({ navigation }) {
     let cityImageMap = new Map<string, string>();
     posts.forEach((post) => {
       post.cities.forEach((city) => {
-        if (city && !citySet.has(city)) {
+        if (city && !citySet.has(city) && city!== 'Undefined') {
           citySet.add(city);
           cityImageMap.set(city, post.contentData.imageFileNameDTO);
         }
@@ -293,13 +294,12 @@ export default function FeedScreen({ navigation }) {
   }, [getUniqueCities]);
   const handleCityFilter = (activeCities) => {
     if (activeCities.length > 0) {
-      //todo: change filter from frontend to backend
       const filtered = posts.filter((post) =>
         post.cities.some((city) => activeCities.includes(city))
       );
       setFilteredPosts(filtered);
     } else {
-      setFilteredPosts(null);
+      setFilteredPosts(posts);
     }
   };
   const handleRefresh = () => {
@@ -378,7 +378,7 @@ export default function FeedScreen({ navigation }) {
         onCityClick={handleCityFilter}
       />
       <FlatList
-        data={posts}
+        data={filteredPosts}
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => item.dataID + "_" + index}
         // refreshControl={<ActivityIndicator />}

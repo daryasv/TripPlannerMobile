@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -7,20 +7,21 @@ import {
   ScrollView,
   Button,
   Pressable,
-  DevSettings,
-  DeviceEventEmitter,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  LoginData,
-  postUserLogin,
-  postUserRegister,
-  RegisterData,
-} from "../../actions/userActions";
-import { USER_DETAILS_STORAGE_NAME } from "../../actions/security";
+  Logout,
+  USER_DETAILS_STORAGE_NAME,
+  getUserEmail,
+  getUserFirstName,
+  getUserId,
+  getUserLastName,
+} from "../../actions/security";
 import { Link, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { GetUserProfile } from "../../actions/profileActions";
+import LoginScreen from "../login/LoginScreen";
+import { postGenreEnum, PostType } from "../../types/postTypes";
 
 const styles = StyleSheet.create({
   Avatar: {
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 24,
   },
-  UserDesc: {
+  NoPostsMsg: {
     color: Colors.LightBlack,
     textAlign: "center",
     fontSize: 16,
@@ -105,13 +106,22 @@ const styles = StyleSheet.create({
     marginHorizontal: "7%",
     minWidth: "41%",
   },
+  Logout: {
+    color: Colors.main,
+    textAlign: "right",
+    fontSize: 16,
+    marginHorizontal: "2%",
+    marginTop: "2%",
+    fontWeight: "bold",
+  },
 });
 
-let squares = [];
-let numberOfSquare = 4;
+let allLocations = [];
 
-for (let index = 0; index < numberOfSquare; index++) {
-  squares.push(
+let routes = [];
+let numberOfRoutes = 4;
+for (let index = 0; index < numberOfRoutes; index++) {
+  routes.push(
     <View key={index}>
       <View
         style={{
@@ -148,25 +158,53 @@ export default function ProfileScreen() {
 }
 
 export function ProfileHomeScreen({ navigation }) {
-  const logout = () => {
-    AsyncStorage.clear().then(() => {
-      // DevSettings.reload();
-      console.log("logout");
-      DeviceEventEmitter.emit("token_changed");
+  const [locations, setLocations] = useState([]);
+  const [numLocations, setLocationsNum] = useState(0);
+  const [numRoutes, setRoutesNum] = useState(0);
+  type displayFields = "flex" | "none";
+  const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
+
+  function showViewAll() {
+    if (showNoPosts == "flex") {
+      return "none";
+    } else {
+      return "flex";
+    }
+  }
+
+  useEffect(() => {
+    GetUserProfile((success) => {
+      if (success) {
+        success.posts.forEach(function (value) {
+          if (value.postGenre == postGenreEnum.Location) {
+            allLocations.push(value);
+          } else {
+            // To Do
+          }
+        });
+        setLocations(allLocations.slice(-6));
+        setLocationsNum(allLocations.length);
+        setRoutesNum(success.posts.length - allLocations.length);
+        setShowNoPosts(success.posts.length ? "none" : "flex");
+      }
     });
-  };
+  }, []);
 
   return (
     <ScrollView showsVerticalScrollIndicator={true}>
+      <Text style={styles.Logout} onPress={() => Logout()}>
+        Logout
+      </Text>
       <Image
         style={styles.Avatar}
         source={{ uri: "https://randomuser.me/api/portraits/women/31.jpg" }}
       />
-      <Text style={styles.UserName}>USER NAME</Text>
-      <Text style={styles.UserDesc}>description words words words</Text>
+      <Text style={styles.UserName}>
+        {getUserFirstName() + " " + getUserLastName()}
+      </Text>
       <View style={styles.row}>
-        <Text style={styles.LocationsNum}>100</Text>
-        <Text style={styles.RoutesNum}>10</Text>
+        <Text style={styles.LocationsNum}>{numLocations}</Text>
+        <Text style={styles.RoutesNum}>{numRoutes}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.LocationsText}>Locations</Text>
@@ -175,7 +213,10 @@ export function ProfileHomeScreen({ navigation }) {
       <View>
         <View style={styles.row}>
           <Text style={styles.LocationsHeader}>Locations</Text>
-          <Pressable onPress={() => navigation.navigate("Locations")}>
+          <Pressable
+            onPress={() => navigation.navigate("Locations")}
+            style={{ display: showViewAll() }}
+          >
             <Text style={styles.ViewAll}>View all</Text>
           </Pressable>
         </View>
@@ -193,9 +234,27 @@ export function ProfileHomeScreen({ navigation }) {
             flexDirection: "row",
             paddingVertical: 5,
             justifyContent: "space-between",
+            display: "flex",
           }}
         >
-          {squares}
+          <View style={{ display: showNoPosts }}>
+            <Text style={styles.NoPostsMsg}>no posts :(</Text>
+          </View>
+          {locations.map((location) => (
+            <View key={location.dataID}>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  marginVertical: 0.5,
+                  marginBottom: 15,
+                  marginHorizontal: 12,
+                  borderRadius: 10,
+                }}
+                source={{ uri: location.contentData.imageFileNameDTO }}
+              />
+            </View>
+          ))}
         </View>
       </View>
       <View>
@@ -221,11 +280,8 @@ export function ProfileHomeScreen({ navigation }) {
             justifyContent: "space-between",
           }}
         >
-          {squares}
+          {routes}
         </View>
-      </View>
-      <View style={{ padding: 20 }}>
-        <Button title="Logout" onPress={logout} />
       </View>
     </ScrollView>
   );
@@ -243,7 +299,21 @@ export function ProfileLocationsScreen() {
           justifyContent: "space-between",
         }}
       >
-        {squares}
+        {allLocations.map((location) => (
+          <View key={location.dataID}>
+            <Image
+              style={{
+                width: 100,
+                height: 100,
+                marginVertical: 0.5,
+                marginBottom: 15,
+                marginHorizontal: 12,
+                borderRadius: 10,
+              }}
+              source={{ uri: location.contentData.imageFileNameDTO }}
+            />
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -261,7 +331,7 @@ export function ProfileRoutesScreen() {
           justifyContent: "space-between",
         }}
       >
-        {squares}
+        {routes}
       </View>
     </ScrollView>
   );
