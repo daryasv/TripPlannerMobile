@@ -29,6 +29,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 export default function RouteDetailsScreen({ route }) {
   const data = route.params.item;
+  console.log("data", JSON.stringify(data));
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
       <View style={styles.itemContainer}>
@@ -73,11 +74,11 @@ export default function RouteDetailsScreen({ route }) {
           </Text>
         </View>
         <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO.map((item) => (
-          <View>
+        {data.contentData.pinnedLocationsDTO.map((item, index) => (
+          <View key={index}>
             <Image
               source={{
-                uri: data.contentData.pinnedLocationsDTO.imageFileNameDTO,
+                uri: item.imageFileNameDTO,
               }}
               style={{
                 width: "100%",
@@ -94,7 +95,7 @@ export default function RouteDetailsScreen({ route }) {
                 size={18}
                 color={"#FF0000"}
               />
-              <Text style={styles.location}>{item.description}</Text>
+              <Text style={styles.location}>{item.descriptionDTO}</Text>
             </View>
           </View>
         ))}
