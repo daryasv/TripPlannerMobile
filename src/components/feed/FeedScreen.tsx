@@ -333,7 +333,9 @@ export default function FeedScreen({ navigation }) {
       setLoadingMore(true);
       getExploreFeed({ page: page + 1 }, (data) => {
         if (data?.allPosts?.length) {
-          const newPosts = [...posts].concat(data.allPosts);
+          const currentPostIds = new Set(posts.map(post => post.id)); // assuming your post objects have an 'id' property
+          const uniquePosts = data.allPosts.filter(post => !currentPostIds.has(post.id));
+          const newPosts = [...posts, ...uniquePosts];
           setPosts(newPosts);
           setPage(page + 1);
           setLoadingMore(false);
@@ -344,6 +346,7 @@ export default function FeedScreen({ navigation }) {
       });
     }
   };
+
 
   const ListFooter = () => {
     if (loadingMore || hasMore) {
