@@ -13,6 +13,7 @@ export interface PostType {
   comments: any[]
   views: number
   dataID: string
+  UploadByProfilePictureUrl:string
 }
 
 export interface ContentData {

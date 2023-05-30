@@ -31,10 +31,11 @@ const Item = ({ data }: { data: PostType }) => {
     <View style={styles.itemContainer}>
       <View style={styles.row}>
         <Avatar
-          source={{
-            uri: null,
-          }}
-          rounded
+            source={{
+              uri: data.UploadByProfilePictureUrl,
+            }}
+            rounded
+            size={55}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.username}>
@@ -90,10 +91,11 @@ const RouteItem = ({ data }: { data: PostType }) => {
     <View style={styles.itemContainer}>
       <View style={styles.row}>
         <Avatar
-          source={{
-            uri: null,
-          }}
-          rounded
+            source={{
+              uri: data.UploadByProfilePictureUrl,
+            }}
+            rounded
+            size={55}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.username}>
@@ -287,9 +289,10 @@ export default function FeedScreen({ navigation }) {
     let cityImageMap = new Map<string, string>();
     posts.forEach((post) => {
       post.cities.forEach((city) => {
-        if (city && !citySet.has(city) && city!== 'Undefined') {
+        if (city && !citySet.has(city) && city!== 'Undefined' && post.contentData.imageFileNameDTO) {
           citySet.add(city);
           cityImageMap.set(city, post.contentData.imageFileNameDTO);
+          console.log("not all posts have post type ? : " + post.contentData.imageFileNameDTO);
         }
       });
     });
@@ -333,8 +336,8 @@ export default function FeedScreen({ navigation }) {
       setLoadingMore(true);
       getExploreFeed({ page: page + 1 }, (data) => {
         if (data?.allPosts?.length) {
-          const currentPostIds = new Set(posts.map(post => post.id)); // assuming your post objects have an 'id' property
-          const uniquePosts = data.allPosts.filter(post => !currentPostIds.has(post.id));
+          const currentPostIds = new Set(posts.map(post => post.dataID));
+          const uniquePosts = data.allPosts.filter(post => !currentPostIds.has(post.dataID));
           const newPosts = [...posts, ...uniquePosts];
           setPosts(newPosts);
           setPage(page + 1);
