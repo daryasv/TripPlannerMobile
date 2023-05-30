@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, Button, Pressable } from 'react-native';
 import { Colors } from "../../theme/Colors";
-import { Logout, USER_DETAILS_STORAGE_NAME, getUserEmail, getUserId } from "../../actions/security";
+import { Logout, USER_DETAILS_STORAGE_NAME, getUserEmail, getUserFirstName, getUserId, getUserLastName } from "../../actions/security";
 import { Link, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GetUserProfile } from '../../actions/profileActions';
 import LoginScreen from '../login/LoginScreen';
+import { postGenreEnum } from '../feed/types/postTypes';
 
 const styles = StyleSheet.create({
     Avatar: {
@@ -140,6 +141,7 @@ export default function ProfileScreen(){
 export function ProfileHomeScreen({ navigation }) {
     const [locations, setLocations] = useState([]);
     const [numLocations, setLocationsNum] = useState(0);
+    const [numRoutes, setRoutesNum] = useState(0);
     type displayFields = "flex" | "none";
     const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
 
@@ -154,12 +156,17 @@ export function ProfileHomeScreen({ navigation }) {
     useEffect(() => {
         GetUserProfile((success) => {
             if (success) {
-                setLocations(success.allPosts.slice(-6));
-                setLocationsNum(success.allPosts.length);
-                success.allPosts.forEach(function (value) { 
-                    allLocations.push(value);
+                success.posts.forEach(function (value) { 
+                    if (value.postGenre == postGenreEnum.Location) {
+                        allLocations.push(value);
+                    } else {
+                        // To Do
+                    }
                 });
-                setShowNoPosts(success.allPosts.length ? "none" : "flex");
+                setLocations(allLocations.slice(-6));
+                setLocationsNum(allLocations.length);
+                setRoutesNum(success.posts.length - allLocations.length)
+                setShowNoPosts(success.posts.length ? "none" : "flex");
             }
           });
     }, []);
@@ -170,10 +177,10 @@ export function ProfileHomeScreen({ navigation }) {
             <Image style={styles.Avatar}
             source={{ uri: "https://randomuser.me/api/portraits/women/31.jpg" }}
             />
-            <Text style={styles.UserName}>{getUserEmail()}</Text>
+            <Text style={styles.UserName}>{getUserFirstName() + " " + getUserLastName()}</Text>
             <View style={styles.row}>
                 <Text style={styles.LocationsNum}>{numLocations}</Text>
-                <Text style={styles.RoutesNum}>10</Text>
+                <Text style={styles.RoutesNum}>{numRoutes}</Text>
             </View>
             <View style={styles.row}>
                 <Text style={styles.LocationsText}>Locations</Text>

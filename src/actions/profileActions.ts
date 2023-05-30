@@ -23,7 +23,7 @@ export interface UserLocation {
 }
 
 export interface ProfileData {
-  "allPosts": Array<UserLocation>
+  "posts": Array<UserLocation>
 }
 
 export const GetUserProfile = (
