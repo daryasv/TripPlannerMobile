@@ -5,23 +5,16 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Button,
   Pressable,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
 import {
   Logout,
-  USER_DETAILS_STORAGE_NAME,
-  getUserEmail,
-  getUserFirstName,
-  getUserId,
-  getUserLastName,
 } from "../../actions/security";
-import { Link, NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { GetUserProfile } from "../../actions/profileActions";
-import LoginScreen from "../login/LoginScreen";
-import { postGenreEnum, PostType } from "../../types/postTypes";
+import { GetUserProfile, User } from "../../actions/profileActions";
+import { postGenreEnum } from "../../types/postTypes";
 
 const styles = StyleSheet.create({
   Avatar: {
@@ -117,27 +110,7 @@ const styles = StyleSheet.create({
 });
 
 let allLocations = [];
-
-let routes = [];
-let numberOfRoutes = 4;
-for (let index = 0; index < numberOfRoutes; index++) {
-  routes.push(
-    <View key={index}>
-      <View
-        style={{
-          width: 100,
-          height: 100,
-          marginVertical: 0.5,
-          backgroundColor: "black",
-          opacity: 0.1,
-          marginBottom: 15,
-          marginHorizontal: 12,
-          borderRadius: 10,
-        }}
-      ></View>
-    </View>
-  );
-}
+let allRoutes = [];
 
 const Stack = createNativeStackNavigator();
 
@@ -159,11 +132,29 @@ export default function ProfileScreen() {
 
 export function ProfileHomeScreen({ navigation }) {
   const [locations, setLocations] = useState([]);
+  const [routes, setRoutes] = useState([]);
   const [numLocations, setLocationsNum] = useState(0);
   const [numRoutes, setRoutesNum] = useState(0);
   type displayFields = "flex" | "none";
   const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
 
+  const defaultUser: User = {
+    _id: '',
+    userFirstName: '',
+    userLastName: '',
+    userEmail: '',
+    password: '',
+    profilePictureId: '',
+    userPicturesIds: [],
+    savedPicturesIds: [],
+    savedRoutes: [],
+    createdAt: '',
+    updatedAt: '',
+    __v: 0,
+  };
+
+  const [user, setUser] = useState<User>(defaultUser);
+  
   function showViewAll() {
     if (showNoPosts == "flex") {
       return "none";
@@ -179,13 +170,15 @@ export function ProfileHomeScreen({ navigation }) {
           if (value.postGenre == postGenreEnum.Location) {
             allLocations.push(value);
           } else {
-            // To Do
+            allRoutes.push(value);
           }
         });
         setLocations(allLocations.slice(-6));
         setLocationsNum(allLocations.length);
+        setRoutes(allRoutes.slice(-6));
         setRoutesNum(success.posts.length - allLocations.length);
         setShowNoPosts(success.posts.length ? "none" : "flex");
+        setUser(success.user);
       }
     });
   }, []);
@@ -197,10 +190,10 @@ export function ProfileHomeScreen({ navigation }) {
       </Text>
       <Image
         style={styles.Avatar}
-        source={{ uri: "https://randomuser.me/api/portraits/women/31.jpg" }}
+        source={{ uri: user.profilePictureId }}
       />
       <Text style={styles.UserName}>
-        {getUserFirstName() + " " + getUserLastName()}
+        {user.userFirstName + " " + user.userLastName}
       </Text>
       <View style={styles.row}>
         <Text style={styles.LocationsNum}>{numLocations}</Text>
@@ -280,7 +273,24 @@ export function ProfileHomeScreen({ navigation }) {
             justifyContent: "space-between",
           }}
         >
-          {routes}
+          {routes.map((route) => (
+            <View
+                style={{
+                width: 100,
+                height: 100,
+                marginVertical: 0.5,
+                backgroundColor: "black",
+                opacity: 0.1,
+                marginBottom: 15,
+                marginHorizontal: 12,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                }}
+            >
+                 <Text style={{fontWeight: 'bold', color: 'white'}}>{route.cities.join(',')}</Text>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -331,7 +341,24 @@ export function ProfileRoutesScreen() {
           justifyContent: "space-between",
         }}
       >
-        {routes}
+        {allRoutes.map((route) => (
+            <View
+                style={{
+                width: 100,
+                height: 100,
+                marginVertical: 0.5,
+                backgroundColor: "black",
+                opacity: 0.1,
+                marginBottom: 15,
+                marginHorizontal: 12,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                }}
+            >
+                 <Text style={{fontWeight: 'bold', color: 'white'}}>{route.cities.join(',')}</Text>
+            </View>
+          ))}
       </View>
     </ScrollView>
   );
