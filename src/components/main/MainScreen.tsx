@@ -16,7 +16,7 @@ export default function MainScreen({ navigation }) {
       <Tab.Navigator screenOptions={{ tabBarActiveTintColor: "#303C9A" }}>
         <Tab.Screen
           name="Explore"
-          component={FeedScreen}
+          component={() => <FeedScreen navigation={navigation} />}
           options={{
             tabBarLabel: "Explore",
             tabBarIcon: ({ color, size }) => (
@@ -60,7 +60,7 @@ export default function MainScreen({ navigation }) {
           name="Profile"
           component={ProfileScreen}
           options={{
-            tabBarLabel: "Profile", 
+            tabBarLabel: "Profile",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="account-circle"
