@@ -37,7 +37,11 @@ const Item = ({ data }: { data: PostType }) => {
           rounded
         />
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.username}>{data.uploadedBy}</Text>
+          <Text style={styles.username}>
+            {data.uploadedBy.includes('@')
+                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf('@'))
+                : data.uploadedBy}
+          </Text>
           <View style={styles.row}>
             <Icon name="location-on" size={14} type={"material"} />
             <Text style={styles.location}>{data.cities.join(",")}</Text>
@@ -92,7 +96,11 @@ const RouteItem = ({ data }: { data: PostType }) => {
           rounded
         />
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.username}>{data.uploadedBy}</Text>
+          <Text style={styles.username}>
+            {data.uploadedBy.includes('@')
+                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf('@'))
+                : data.uploadedBy}
+          </Text>
           <View style={styles.row}>
             <Icon name="location-on" size={14} type={"material"} />
             <Text style={styles.location}>{data.cities.join(",")}</Text>
