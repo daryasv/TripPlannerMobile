@@ -22,7 +22,23 @@ export interface UserLocation {
     "dataID": string
 }
 
+export interface User {
+  "_id": string,
+  "userFirstName": string,
+  "userLastName": string,
+  "userEmail": string,
+  "password": string,
+  "profilePictureId": string,
+  "userPicturesIds": string[],
+  "savedPicturesIds": string[],
+  "savedRoutes": string[],
+  "createdAt": string,
+  "updatedAt": string,
+  "__v": number
+}
+
 export interface ProfileData {
+  "user": User,
   "posts": Array<UserLocation>
 }
 
