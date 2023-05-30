@@ -1,5 +1,9 @@
 import { Tab, TabView } from "@rneui/themed";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   StyleSheet,
   Text,
@@ -16,62 +20,36 @@ import LocationTab from "./LocationTab";
 import RouteTab from "./RouteTab";
 
 export default function CreateNewPostScreen() {
-  const [currentTab, setCurrentTab] = React.useState(0 as number);
+  const [currentTab, setCurrentTab] = React.useState(0);
   const [saving, setSaving] = useState(false as boolean);
   const createLocationRef = useRef();
   const createRouteRef = useRef();
 
   const nav = useNavigation();
 
-  const onCreate = () => {
-    if (currentTab === 0) {
-      if (createLocationRef?.current && !saving) {
-        setSaving(true);
-        (createLocationRef.current as any)
-          .save()
-          .then((r) => {
-            setSaving(false);
-            Toast.show({
-              type: "success",
-              text1: "Success",
-              text2: "Post created successfully",
-            });
-            DeviceEventEmitter.emit("update_feed");
-            nav.goBack();
-          })
-          .catch((e) => {
-            Toast.show({
-              type: "error",
-              text1: "Failed",
-              text2: "Failed to create post",
-            });
-            setSaving(false);
+  const save = () => {
+    if (createLocationRef?.current && !saving) {
+      setSaving(true);
+      (createLocationRef.current as any)
+        .save()
+        .then((r) => {
+          setSaving(false);
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Post created successfully",
           });
-      }
-    } else {
-      if (createRouteRef?.current && !saving) {
-        setSaving(true);
-        (createRouteRef.current as any)
-          .save()
-          .then(() => {
-            setSaving(false);
-            Toast.show({
-              type: "success",
-              text1: "Success",
-              text2: "Post created successfully",
-            });
-            DeviceEventEmitter.emit("update_feed");
-            nav.goBack();
-          })
-          .catch((e) => {
-            Toast.show({
-              type: "error",
-              text1: "Failed",
-              text2: "Failed to create post",
-            });
-            setSaving(false);
+          DeviceEventEmitter.emit("update_feed");
+          nav.goBack();
+        })
+        .catch((e) => {
+          Toast.show({
+            type: "error",
+            text1: "Failed",
+            text2: "Failed to create post",
           });
-      }
+          setSaving(false);
+        });
     }
   };
 
@@ -81,10 +59,10 @@ export default function CreateNewPostScreen() {
         saving ? (
           <ActivityIndicator color={"primary"} />
         ) : (
-          <Button title="Create" onPress={onCreate} />
+          <Button title="Create" onPress={save} />
         ),
     });
-  }, [saving, currentTab, createRouteRef, createLocationRef]);
+  }, [saving]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -111,15 +89,15 @@ export default function CreateNewPostScreen() {
       </Tab>
       <TabView
         value={currentTab}
-        onChange={(n) => setCurrentTab(n)}
+        onChange={setCurrentTab}
         animationType="spring"
         containerStyle={{ flex: 1 }}
       >
         <TabView.Item style={{ flex: 1 }}>
-          {currentTab === 0 && <LocationTab ref={createLocationRef} />}
+          <LocationTab ref={createLocationRef} />
         </TabView.Item>
         <TabView.Item style={{ flex: 1 }}>
-          {currentTab === 1 && <RouteTab ref={createRouteRef} />}
+          <RouteTab ref={createRouteRef} />
         </TabView.Item>
       </TabView>
     </View>
