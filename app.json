@@ -16,26 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tripapp.tripapp",
-      "infoPlist": {
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ],
-        "NSLocationWhenInUseUsageDescription": "Allow $(PRODUCT_NAME) to use your location",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow $(PRODUCT_NAME) to use your location",
-        "NSLocationAlwaysUsageDescription": "Allow $(PRODUCT_NAME) to use your location"
-      }
+      "bundleIdentifier": "com.tripapp.tripapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tripapp.tripapp",
-      "permissions": [
-        "ACCESS_BACKGROUND_LOCATION"
-      ]
+      "package": "com.tripapp.tripapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -72,11 +60,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
-          "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to use your location",
-          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location",
-          "isIosBackgroundLocationEnabled": true,
-          "isAndroidBackgroundLocationEnabled": true
+          "locationAlwaysAndWhenInUsePermission": "Allow app to use your location."
         }
       ]
     ]
