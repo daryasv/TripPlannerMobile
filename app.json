@@ -38,10 +38,7 @@
       "package": "com.tripapp.tripapp",
       "permissions": [
         "ACCESS_BACKGROUND_LOCATION"
-      ],
-      "config": {
-        "googleMapsApiKey": "AIzaSyCnaa6IgGat2HP9Dwimz6S0wjjqpxuH2PA"
-      }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
