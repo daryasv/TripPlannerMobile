@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
   ActivityIndicator,
+  DeviceEventEmitter,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -22,11 +23,22 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const [initRoute, setInitRoute] = useState(null);
 
-  useEffect(() => {
+  const init = () => {
+    console.log("hello")
+    setInitRoute(null);
     initUser((success) => {
+      console.log("initUser",success);
       setInitRoute(success ? "Main" : "Login");
     });
+  };
+
+  useEffect(() => {
+    const listener = DeviceEventEmitter.addListener("token_changed", init);
+    init();
+    return () => listener.remove();
   }, []);
+
+  console.log(initRoute)
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -53,7 +65,7 @@ export default function App() {
               component={CreateNewPostScreen}
               options={{ headerTitle: "New Post" }}
             />
-          <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
+            <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       ) : (

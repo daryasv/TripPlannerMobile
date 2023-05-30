@@ -8,6 +8,7 @@ import {
   Button,
   Pressable,
   DevSettings,
+  DeviceEventEmitter,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -149,7 +150,9 @@ export default function ProfileScreen() {
 export function ProfileHomeScreen({ navigation }) {
   const logout = () => {
     AsyncStorage.clear().then(() => {
-      DevSettings.reload();
+      // DevSettings.reload();
+      console.log("logout");
+      DeviceEventEmitter.emit("token_changed");
     });
   };
 

@@ -227,7 +227,7 @@ const RouteTab = forwardRef((props, ref) => {
             ></Button>
           )}
         </View>
-        <MapView style={{ height: "50%", width: "100%"}}
+        {/* <MapView style={{ height: "50%", width: "100%"}}
         provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
         followsUserLocation={true}
@@ -241,7 +241,7 @@ const RouteTab = forwardRef((props, ref) => {
         </View>
       ))}
           {locations.length > 0 && <Polyline coordinates={path} strokeColor="#FF0000" strokeWidth={3} />}
-        </MapView>
+        </MapView> */}
         <Input
           value={description}
           onChangeText={(text) => setDescription(text)}
