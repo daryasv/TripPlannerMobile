@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  DeviceEventEmitter,
   DevSettings,
   ImageBackground,
   StyleSheet,
@@ -282,7 +283,8 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
           USER_DETAILS_STORAGE_NAME,
           JSON.stringify(succees)
         );
-        DevSettings.reload();
+        DeviceEventEmitter.emit("token_changed");
+        //DevSettings.reload();
         //Updates.reloadAsync();//reload the app after password saved
       } else {
         setGeneralError("Something went wrong...");
