@@ -1,4 +1,4 @@
-import { Button } from "@rneui/themed";
+import { Button, Image, Input, ListItem } from "@rneui/themed";
 import React, {
   forwardRef,
   useCallback,
@@ -30,14 +30,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import { Card } from "@rneui/base";
 import { getLocationData } from "../../utils/LocationsUtils";
+import MapView, { Marker, PROVIDER_GOOGLE, Polyline, Region } from "react-native-maps";
 
 const LOCATION_TASK_NAME = "trip-location-updates";
-import { Text, TouchableOpacity, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import moment from "moment";
-import MapView, { PROVIDER_GOOGLE, Marker, LatLng, Region, Polyline } from "react-native-maps"
-import { ScrollView } from "react-native-gesture-handler";
-import * as Location from "expo-location";
 
 interface PinLocationProps {
   image?: ImagePicker.ImagePickerAsset;
@@ -56,6 +51,7 @@ const RouteTab = forwardRef((props, ref) => {
   const timerRef = useRef<NodeJS.Timer>();
   const [status, requestPermission] = Location.useForegroundPermissions();
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
+  const [path, setPath] = useState([] as Location.LocationObjectCoords[]);
   const [pins, setPins] = useState([] as PinLocationProps[]);
   const [description, setDescription] = useState("");
   const [city, setCity] = useState("");
@@ -101,6 +97,7 @@ const RouteTab = forwardRef((props, ref) => {
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
+        setPath([res.coords])
         getLocationData(res.coords.latitude, res.coords.longitude)
           .then((address) => {
             if (address?.city) {
@@ -131,10 +128,12 @@ const RouteTab = forwardRef((props, ref) => {
             return;
           }
           setLocations((oldLocations) => [...oldLocations, ...data.locations]);
+          setPath((oldPath) => [...oldPath, ...data.locations.coords]);
         });
       })
       .catch(() => {
         setLocations([]);
+        setPath([]);
       });
   }, [locations, timeLabel]);
 
@@ -228,6 +227,21 @@ const RouteTab = forwardRef((props, ref) => {
             ></Button>
           )}
         </View>
+        <MapView style={{ height: "50%", width: "100%"}}
+        provider={PROVIDER_GOOGLE}
+        showsUserLocation={true}
+        followsUserLocation={true}
+        showsMyLocationButton={true}
+        showsCompass={true}
+        toolbarEnabled={true}
+        zoomEnabled={true}>
+          {pins.map((pin) => (
+        <View key={pin.id}>
+          <Marker description={pin.description} coordinate={pin.location} />
+        </View>
+      ))}
+          {locations.length > 0 && <Polyline coordinates={path} strokeColor="#FF0000" strokeWidth={3} />}
+        </MapView>
         <Input
           value={description}
           onChangeText={(text) => setDescription(text)}
