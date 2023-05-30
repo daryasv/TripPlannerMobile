@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   DeviceEventEmitter,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -11,11 +12,14 @@ import {
 } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import ReadMore from "@fawazahmed/react-native-read-more";
-
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { getExploreFeed } from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
 import { postGenreEnum, PostType } from "../../types/postTypes";
 import CitiesPanel from "./CitiesPanel";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Item = ({ data }: { data: PostType }) => {
   return (
@@ -72,7 +76,142 @@ const Item = ({ data }: { data: PostType }) => {
   );
 };
 
-export default function FeedScreen() {
+const RouteItem = ({ data } : { data: PostType }) => {
+  return (
+    <View style={styles.itemContainer}>
+      <View style={styles.row}>
+        <Avatar
+          source={{
+            uri: null,
+          }}
+          rounded
+        />
+        <View style={{ marginLeft: 10 }}>
+          <Text style={styles.username}>{data.uploadedBy}</Text>
+          <View style={styles.row}>
+            <Icon name="location-on" size={14} type={"material"} />
+            <Text style={styles.location}>{data.cities.join(",")}</Text>
+          </View>
+        </View>
+      </View>
+
+      {data.contentData.descriptionDTO ? (
+        <ReadMore
+          numberOfLines={3}
+          style={styles.description}
+          seeMoreStyle={{ color: Colors.main }}
+          seeLessStyle={{ color: Colors.main }}
+          seeMoreText={"Read More"}
+        >
+          {data.contentData.descriptionDTO}
+        </ReadMore>
+      ) : null}
+
+        <MapView style={{ height: "50%", width: "100%", borderRadius: 15}}
+          provider={PROVIDER_GOOGLE}
+          showsCompass={true}
+          toolbarEnabled={false}
+          zoomEnabled={true}
+          scrollEnabled={false}
+          region={calculatedRegion(data)}>
+            {data.contentData.pinnedLocationsDTO.length > 0 && data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+          <Marker
+            coordinate={{ latitude: pinnedLocation.locationDTO.latitude, longitude: pinnedLocation.locationDTO.longitude }}
+            title={pinnedLocation.descriptionDTO}
+          />
+        ))}
+            {<Polyline coordinates={data.contentData.locationsDTO} strokeColor="#FF0000" strokeWidth={3} />}
+        </MapView>
+        <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
+        <Icon
+           name="routes"
+           type={"material-community"}
+           size={18}
+         />
+         <Text style={styles.location}> {data.contentData.totalDurationDTO} hours | {data.contentData.totalDistanceDTO} Km | Created at {data.dateUploaded}</Text>
+       </View>
+    </View>
+  );
+};
+
+function RouteDetailsScreen({ route }) {
+  const data = route.params.item;
+  return (
+    <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
+    <View style={styles.itemContainer}>
+      {/* <Text>Item ID: {data}</Text> */}
+      <MapView style={{ height: "100%", width: "100%", borderRadius: 15}}
+            provider={PROVIDER_GOOGLE}
+            showsCompass={true}
+            toolbarEnabled={false}
+            zoomEnabled={true}
+            region={calculatedRegion(data)}>
+              {data.contentData.pinnedLocationsDTO.length > 0 && data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+          <Marker
+            coordinate={{ latitude: pinnedLocation.locationDTO.latitude, longitude: pinnedLocation.locationDTO.longitude }}
+            title={pinnedLocation.descriptionDTO}
+          />
+        ))}
+            {<Polyline coordinates={data.contentData.locationsDTO} strokeColor="#FF0000" strokeWidth={3} />}
+          </MapView>
+          <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
+          <Icon
+            name="routes"
+            type={"material-community"}
+            size={18}
+          />
+          <Text style={styles.location}> {data.contentData.totalDurationDTO} hours | {data.contentData.totalDistanceDTO} Km | Created at {data.dateUploaded}</Text>
+        </View>
+        <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
+        {data.contentData.pinnedLocationsDTO.map((item) => (
+            <View>
+            <Image
+        source={{
+          uri: data.contentData.pinnedLocationsDTO.imageFileNameDTO,
+        }}
+        style={{
+          width: "100%",
+          aspectRatio: 1.5,
+          marginTop: 15,
+          borderRadius: 15,
+          resizeMode: "cover",
+        }}
+      />
+      <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
+        <Icon
+          name="map-marker"
+          type={"material-community"}
+          size={18}
+          color={"#FF0000"}
+        />
+        <Text style={styles.location}>{item.description}</Text>
+      </View>
+          </View>
+        ))}
+      </View>
+      </ScrollView>
+  );
+}
+
+const calculatedRegion = (data : PostType): Region => {
+  const minLatitude = Math.min(...data.contentData.locationsDTO.map((coord) => coord.latitude));
+  const maxLatitude = Math.max(...data.contentData.locationsDTO.map((coord) => coord.latitude));
+  const minLongitude = Math.min(...data.contentData.locationsDTO.map((coord) => coord.longitude));
+  const maxLongitude = Math.max(...data.contentData.locationsDTO.map((coord) => coord.longitude));
+
+  const padding = 0.01; // Adjust the padding as needed
+
+  const calculatedRegion: Region = {
+    latitude: (minLatitude + maxLatitude) / 2,
+    longitude: (minLongitude + maxLongitude) / 2,
+    latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
+    longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
+  };
+
+  return calculatedRegion;
+}
+
+export function FeedMainScreen({ navigation }) {
   const [posts, setPosts] = useState([] as PostType[]);
   const [loading, setLoading] = useState(true as boolean);
   const [loadingMore, setLoadingMore] = useState(false as boolean);
@@ -133,6 +272,7 @@ export default function FeedScreen() {
 
   //initial
   useEffect(() => {
+    navigation.setOptions({ headerShown: false });
     const updateEvent = DeviceEventEmitter.addListener("update_feed", getData);
     getData();
 
@@ -169,12 +309,22 @@ export default function FeedScreen() {
     return <RefreshControl refreshing={loading} />;
   }
 
+  function showItem({item}) {
+    if (item.postGenre == postGenreEnum.Location)
+    {
+      return (<Item data={item} />);
+    }
+    else {
+      return (<Pressable onPress={() => {navigation.navigate("Route Details", {item})}}><RouteItem data={item} /></Pressable>);
+    }
+  }
+
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: "white",
-        paddingBottom: 40,
+        paddingBottom: 20,
       }}
     >
       <CitiesPanel
@@ -183,18 +333,31 @@ export default function FeedScreen() {
         onCityClick={handleCityFilter}
       />
       <FlatList
-        data={filteredPosts ? filteredPosts : posts}
-        renderItem={({ item }) => <Item data={item} />}
+        data={posts}
+        renderItem={({ item }) => showItem({item})}
         keyExtractor={(item, index) => item.dataID + "_" + index}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
         }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={<ListFooter />}
+        // onEndReached={handleLoadMore}
+        // onEndReachedThreshold={0.1}
+        //ListFooterComponent={<ListFooter />}
       />
     </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+export default function FeedScreen() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator>
+        <Stack.Screen name="default" component={FeedMainScreen} />
+        <Stack.Screen name="Route Details" component={RouteDetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -219,4 +382,10 @@ const styles = StyleSheet.create({
   description: {
     marginTop: 10,
   },
+  pinnedLocations: {
+    marginTop: 20,
+    marginBottom: 5,
+    fontWeight: "bold",
+    fontSize: 18
+  }
 });
