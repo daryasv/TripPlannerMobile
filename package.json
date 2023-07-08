@@ -2,7 +2,7 @@
   "name": "trip-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --dev-client",
+    "start": "expo start",
     "start-devclient": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.22.3",
+    "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/webpack-config": "^18.0.1",
     "@fawazahmed/react-native-read-more": "^3.0.2",
     "@react-native-async-storage/async-storage": "^1.17.11",
@@ -24,6 +25,7 @@
     "expo": "~48.0.15",
     "expo-background-fetch": "~11.1.1",
     "expo-build-properties": "~0.5.1",
+    "expo-camera": "~13.2.1",
     "expo-dev-client": "~2.2.1",
     "expo-file-system": "~15.2.2",
     "expo-image-picker": "~14.1.1",

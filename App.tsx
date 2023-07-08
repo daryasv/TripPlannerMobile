@@ -17,6 +17,7 @@ import MainScreen from "./src/components/main/MainScreen";
 import CreateNewPostScreen from "./src/components/feed/creatNewPost/CreateNewPostScreen";
 import Toast from "react-native-toast-message";
 import RouteDetailsScreen from "./src/components/feed/RouteDetailsScreen";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,10 +25,9 @@ export default function App() {
   const [initRoute, setInitRoute] = useState(null);
 
   const init = () => {
-    console.log("hello")
     setInitRoute(null);
     initUser((success) => {
-      console.log("initUser",success);
+      console.log("initUser", success);
       setInitRoute(success ? "Main" : "Login");
     });
   };
@@ -38,39 +38,42 @@ export default function App() {
     return () => listener.remove();
   }, []);
 
-  console.log(initRoute)
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {initRoute ? (
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              contentStyle: { backgroundColor: "white" },
-            }}
-            initialRouteName={initRoute}
-          >
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Main"
-              component={MainScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="NewPost"
-              component={CreateNewPostScreen}
-              options={{ headerTitle: "New Post" }}
-            />
-            <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      ) : (
-        <ActivityIndicator />
-      )}
+      <ActionSheetProvider>
+        {initRoute ? (
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                contentStyle: { backgroundColor: "white" },
+              }}
+              initialRouteName={initRoute}
+            >
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Main"
+                component={MainScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="NewPost"
+                component={CreateNewPostScreen}
+                options={{ headerTitle: "New Post" }}
+              />
+              <Stack.Screen
+                name="RouteDetails"
+                component={RouteDetailsScreen}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        ) : (
+          <ActivityIndicator />
+        )}
+      </ActionSheetProvider>
       <Toast />
     </SafeAreaView>
   );

@@ -5,7 +5,7 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import { Text, TouchableOpacity, View, TextInput } from "react-native";
+import { Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import {} from "react-native-google-places-autocomplete";
@@ -13,6 +13,7 @@ import {} from "react-native-google-places-autocomplete";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
 import { getLocationData } from "../../utils/LocationsUtils";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -29,13 +30,75 @@ const LocationTab = forwardRef((props, ref) => {
     null as ImagePicker.ImagePickerAsset
   );
 
-  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
+  const [libraryPermissions, requestGalleryPermission] = MediaLibrary.usePermissions();
+  const [cameraPermissions, requestCameraPermission] =
+    ImagePicker.useCameraPermissions();
 
-  useEffect(() => {
-    requestPermission();
-  }, []);
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  const openCamera = async () => {
+    if (!cameraPermissions.granted) {
+      const res = await requestCameraPermission();
+      if (!res.granted) {
+        Alert.alert("Missing camera permissions");
+        return;
+      }
+    }
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+      selectionLimit: 1,
+      exif: false,
+    });
+
+    if (!result.canceled) {
+      const asset = result.assets[0];
+
+      MediaLibrary.getAssetInfoAsync({
+        id: asset.assetId,
+        filename: asset.fileName,
+        uri: asset.uri,
+        mediaType: "photo",
+        width: asset.width,
+        height: asset.height,
+        creationTime: null,
+        modificationTime: null,
+        duration: asset.duration,
+      })
+        .then((extraData) => {
+          if (extraData?.location) {
+            setData({
+              ...data,
+              locationLat: extraData.location.latitude.toString(),
+              locationLong: extraData.location.longitude.toString(),
+            });
+            getLocationData(
+              extraData.location.latitude,
+              extraData.location.longitude
+            ).then((address) => {
+              if (address?.city) {
+                setData({ ...data, cities: address.city });
+              }
+            });
+          }
+        })
+        .catch((e) => {});
+
+      setImage(asset);
+    }
+  };
 
   const pickImage = async () => {
+    if (!libraryPermissions.granted) {
+      const res = await requestGalleryPermission();
+      if (!res.granted) {
+        Alert.alert("Missing gallery permissions");
+        return;
+      }
+    }
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -83,6 +146,32 @@ const LocationTab = forwardRef((props, ref) => {
     }
   };
 
+  const onPress = () => {
+    const options = ["Camera", "Image Gallery", "Cancel"];
+
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      (selectedIndex: number) => {
+        switch (selectedIndex) {
+          case 0:
+            openCamera();
+            break;
+          case 1:
+            pickImage();
+            break;
+
+          case 2:
+            break;
+        }
+      }
+    );
+  };
+
   useImperativeHandle(ref, () => ({
     save() {
       return saveLocation(data, image);
@@ -102,7 +191,7 @@ const LocationTab = forwardRef((props, ref) => {
             justifyContent: "center",
             marginTop: 30,
           }}
-          onPress={pickImage}
+          onPress={onPress}
         >
           {image ? (
             <Image

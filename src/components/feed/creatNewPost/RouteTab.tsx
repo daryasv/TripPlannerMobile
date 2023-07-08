@@ -1,4 +1,4 @@
-import { Button, Image, Input, ListItem } from "@rneui/themed";
+import { Button, Image, Input } from "@rneui/themed";
 import React, {
   forwardRef,
   useCallback,
@@ -7,13 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  Dimensions,
-} from "react-native";
+import { Text, TouchableOpacity, View, Dimensions, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import * as Location from "expo-location";
@@ -21,16 +15,13 @@ import * as Location from "expo-location";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   NewPinnedLocationProps,
-  SaveLocationData,
   createRoute,
-  saveLocation,
   uploadNewPinnedLocation,
 } from "../../../actions/feedActions";
-import { ScrollView } from "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import { Card } from "@rneui/base";
 import { getLocationData } from "../../utils/LocationsUtils";
-import MapView, { Marker, PROVIDER_GOOGLE, Polyline, Region } from "react-native-maps";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const LOCATION_TASK_NAME = "trip-location-updates";
 
@@ -97,7 +88,7 @@ const RouteTab = forwardRef((props, ref) => {
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
-        setPath([res.coords])
+        setPath([res.coords]);
         getLocationData(res.coords.latitude, res.coords.longitude)
           .then((address) => {
             if (address?.city) {
@@ -127,8 +118,13 @@ const RouteTab = forwardRef((props, ref) => {
             // check `error.message` for more details.
             return;
           }
-          setLocations((oldLocations) => [...oldLocations, ...data.locations]);
-          setPath((oldPath) => [...oldPath, ...data.locations.coords]);
+          if (data?.locations?.coords) {
+            setLocations((oldLocations) => [
+              ...oldLocations,
+              ...data.locations,
+            ]);
+            setPath((oldPath) => [...oldPath, ...data.locations.coords]);
+          }
         });
       })
       .catch(() => {
@@ -300,6 +296,33 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
   const [details, setDetails] = React.useState({} as PinLocationProps);
   const [saving, setSaving] = useState(false as boolean);
 
+  const [cameraPermissions, requestCameraPermission] =
+    ImagePicker.useCameraPermissions();
+
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  const openCamera = async () => {
+    if (!cameraPermissions.granted) {
+      const res = await requestCameraPermission();
+      if (!res.granted) {
+        Alert.alert("Missing camera permissions");
+        return;
+      }
+    }
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.4,
+      selectionLimit: 1,
+      exif: false,
+    });
+
+    if (!result.canceled) {
+      setDetails((oldDetails) => ({ ...oldDetails, image: result.assets[0] }));
+    }
+  };
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -346,6 +369,32 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
     }
   };
 
+  const onPress = () => {
+    const options = ["Camera", "Image Gallery", "Cancel"];
+
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      (selectedIndex: number) => {
+        switch (selectedIndex) {
+          case 0:
+            openCamera();
+            break;
+          case 1:
+            pickImage();
+            break;
+
+          case 2:
+            break;
+        }
+      }
+    );
+  };
+
   if (!editMode) {
     return (
       <Button
@@ -373,7 +422,7 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
               alignItems: "center",
               justifyContent: "center",
             }}
-            onPress={pickImage}
+            onPress={onPress}
           >
             {details?.image ? (
               <Image
