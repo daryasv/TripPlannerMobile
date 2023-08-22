@@ -90,7 +90,7 @@ const RouteItem = ({ data }: { data: PostType }) => {
             uri: data.UploadByProfilePictureUrl,
           }}
           rounded
-          size={55}
+          size={40}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.username}>
@@ -105,20 +105,8 @@ const RouteItem = ({ data }: { data: PostType }) => {
         </View>
       </View>
 
-      {data.contentData.descriptionDTO ? (
-        <ReadMore
-          numberOfLines={3}
-          style={styles.description}
-          seeMoreStyle={{ color: Colors.main }}
-          seeLessStyle={{ color: Colors.main }}
-          seeMoreText={"Read More"}
-        >
-          {data.contentData.descriptionDTO}
-        </ReadMore>
-      ) : null}
-
       <MapView
-        style={{ height: 300, width: "100%", borderRadius: 15 }}
+        style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
         provider={PROVIDER_GOOGLE}
         showsCompass={true}
         toolbarEnabled={false}
@@ -144,10 +132,21 @@ const RouteItem = ({ data }: { data: PostType }) => {
           />
         }
       </MapView>
-      <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-        <Icon name="routes" type={"material-community"} size={18} />
+
+      {data.contentData.descriptionDTO ? (
+        <ReadMore
+          numberOfLines={3}
+          style={styles.description}
+          seeMoreStyle={{ color: Colors.main }}
+          seeLessStyle={{ color: Colors.main }}
+          seeMoreText={"Read More"}
+        >
+          {data.contentData.descriptionDTO}
+        </ReadMore>
+      ) : null}
+
+      <View style={[styles.row, { marginTop: 10 }]}>
         <Text style={styles.location}>
-          {" "}
           {data.contentData.totalDurationDTO} hours |{" "}
           {data.contentData.totalDistanceDTO} Km | Created at{" "}
           {data.dateUploaded}
@@ -389,12 +388,14 @@ export default function FeedScreen({ navigation }) {
         paddingBottom: 20,
       }}
     >
-      <CitiesPanel
-        uniqueCities={uniqueCities}
-        cityImages={cityImages}
-        onCityClick={handleCityFilter}
-      />
       <FlatList
+        ListHeaderComponent={
+          <CitiesPanel
+            uniqueCities={uniqueCities}
+            cityImages={cityImages}
+            onCityClick={handleCityFilter}
+          />
+        }
         data={filteredPosts}
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => item.dataID + "_" + index}
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: 10,
-    fontWeight:"600"
+    fontWeight: "600",
   },
   pinnedLocations: {
     marginTop: 20,

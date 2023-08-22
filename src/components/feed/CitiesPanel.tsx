@@ -40,7 +40,6 @@ const CitiesPanel = ({ uniqueCities , cityImages, onCityClick }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
         padding: 10,
     },
     buttonContainer: {
@@ -49,14 +48,14 @@ const styles = StyleSheet.create({
         padding: 10,
         margin:4,
         paddingTop:0,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        height:80
     },
     button: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: 'white',
-        borderWidth: 1,
-        borderColor: 'black',
+        width: 114,
+        height: 54,
+        
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 5,
@@ -66,7 +65,9 @@ const styles = StyleSheet.create({
     },
     buttonTitle: {
         fontSize: 12,
-        textAlign: 'center',
+        textAlign:"left",
+        width:"100%",
+        fontWeight:"600"
     },
     activeButtonTitle: {
         color: 'red',
