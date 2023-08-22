@@ -256,7 +256,7 @@ const RouteTab = forwardRef((props, ref) => {
         </KeyboardAwareScrollView>
         {(recording) && (
           <Button
-            title={"Stop"}
+            title={"Stop Recording"}
             radius={8}
             buttonStyle={{
               backgroundColor: "black",
