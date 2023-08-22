@@ -39,13 +39,13 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1}}>
       <ActionSheetProvider>
         {initRoute ? (
           <NavigationContainer>
             <Stack.Navigator
               screenOptions={{
-                contentStyle: { backgroundColor: "white" },
+                contentStyle: { backgroundColor: "#F2F2F2" },
               }}
               initialRouteName={initRoute}
             >

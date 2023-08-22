@@ -18,11 +18,12 @@ export default function MainScreen({ navigation }) {
           name="Explore"
           component={() => <FeedScreen navigation={navigation} />}
           options={{
+            headerTintColor: "black",
             tabBarLabel: "Explore",
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({focused, color, size }) => (
               <MaterialCommunityIcons
                 name="compass"
-                color={color}
+                color={focused ? "blue" : "black"}
                 size={size}
               />
             ),
@@ -32,39 +33,49 @@ export default function MainScreen({ navigation }) {
           name="New"
           component={Empty}
           options={{
-            tabBarButton: () => (
-              <TouchableOpacity
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#303C9A",
-                  borderRadius: 28,
-                  width: 56,
-                  height: 56,
-                  marginTop: -10,
-                }}
-                onPress={() => navigation.navigate("NewPost")}
-              >
-                <Icon
-                  name="map-marker"
-                  type="material-community"
-                  size={30}
-                  color="white"
-                />
-                {/* <Text style={{ fontSize: 10}}>New Post</Text> */}
-              </TouchableOpacity>
+            tabBarLabel: "Add Post",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="plus" color={"black"} size={size} />
             ),
           }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              // Prevent default action
+              e.preventDefault();
+
+              // Do something with the `navigation` object
+              navigation.navigate("NewPost");
+            },
+          })}
+        />
+        <Tab.Screen
+          name="plan"
+          component={Empty}
+          options={{
+            tabBarLabel: "Plan Trip",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="airplane" color={"black"} size={size} />
+            ),
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              // Prevent default action
+              e.preventDefault();
+
+              // Do something with the `navigation` object
+              navigation.navigate("NewPost");
+            },
+          })}
         />
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
           options={{
             tabBarLabel: "Profile",
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ focused, size }) => (
               <MaterialCommunityIcons
                 name="account-circle"
-                color={color}
+                color={focused ? "blue" : "black"}
                 size={size}
               />
             ),

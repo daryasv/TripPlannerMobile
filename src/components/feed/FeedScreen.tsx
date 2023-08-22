@@ -31,25 +31,38 @@ const Item = ({ data }: { data: PostType }) => {
     <View style={styles.itemContainer}>
       <View style={styles.row}>
         <Avatar
-            source={{
-              uri: data.UploadByProfilePictureUrl,
-            }}
-            rounded
-            size={55}
+          source={{
+            uri: data.UploadByProfilePictureUrl,
+          }}
+          rounded
+          size={40}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.username}>
-            {data.uploadedBy.includes('@')
-                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf('@'))
-                : data.uploadedBy}
+            {data.uploadedBy.includes("@")
+              ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
+              : data.uploadedBy}
           </Text>
-          <View style={styles.row}>
-            <Icon name="location-on" size={14} type={"material"} />
-            <Text style={styles.location}>{data.cities.join(",")}</Text>
-          </View>
+          {data.cities?.length ? (
+            <View style={styles.row}>
+              <Icon name="location-on" size={14} type={"material"} />
+              <Text style={styles.location}>{data.cities.join(",")}</Text>
+            </View>
+          ) : null}
         </View>
       </View>
-
+      <Image
+        source={{
+          uri: data?.contentData?.imageFileNameDTO,
+        }}
+        style={{
+          width: "100%",
+          aspectRatio: 1.5,
+          marginTop: 15,
+          borderRadius: 8,
+          resizeMode: "cover",
+        }}
+      />
       {data.contentData?.descriptionDTO ? (
         <ReadMore
           numberOfLines={3}
@@ -61,25 +74,7 @@ const Item = ({ data }: { data: PostType }) => {
           {data.contentData.descriptionDTO}
         </ReadMore>
       ) : null}
-
-      <Image
-        source={{
-          uri: data?.contentData?.imageFileNameDTO,
-        }}
-        style={{
-          width: "100%",
-          aspectRatio: 1.5,
-          marginTop: 15,
-          borderRadius: 15,
-          resizeMode: "cover",
-        }}
-      />
       <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-        <Icon
-          name="silverware-fork-knife"
-          type={"material-community"}
-          size={18}
-        />
         <Text style={styles.location}>{data.categories.join(" | ")}</Text>
       </View>
     </View>
@@ -91,17 +86,17 @@ const RouteItem = ({ data }: { data: PostType }) => {
     <View style={styles.itemContainer}>
       <View style={styles.row}>
         <Avatar
-            source={{
-              uri: data.UploadByProfilePictureUrl,
-            }}
-            rounded
-            size={55}
+          source={{
+            uri: data.UploadByProfilePictureUrl,
+          }}
+          rounded
+          size={55}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.username}>
-            {data.uploadedBy.includes('@')
-                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf('@'))
-                : data.uploadedBy}
+            {data.uploadedBy.includes("@")
+              ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
+              : data.uploadedBy}
           </Text>
           <View style={styles.row}>
             <Icon name="location-on" size={14} type={"material"} />
@@ -289,10 +284,18 @@ export default function FeedScreen({ navigation }) {
     let cityImageMap = new Map<string, string>();
     posts.forEach((post) => {
       post.cities.forEach((city) => {
-        if (city && !citySet.has(city) && city!== 'Undefined' && post.contentData.imageFileNameDTO) {
+        if (
+          city &&
+          !citySet.has(city) &&
+          city !== "Undefined" &&
+          post.contentData.imageFileNameDTO
+        ) {
           citySet.add(city);
           cityImageMap.set(city, post.contentData.imageFileNameDTO);
-          console.log("not all posts have post type ? : " + post.contentData.imageFileNameDTO);
+          console.log(
+            "not all posts have post type ? : " +
+              post.contentData.imageFileNameDTO
+          );
         }
       });
     });
@@ -336,8 +339,10 @@ export default function FeedScreen({ navigation }) {
       setLoadingMore(true);
       getExploreFeed({ page: page + 1 }, (data) => {
         if (data?.allPosts?.length) {
-          const currentPostIds = new Set(posts.map(post => post.dataID));
-          const uniquePosts = data.allPosts.filter(post => !currentPostIds.has(post.dataID));
+          const currentPostIds = new Set(posts.map((post) => post.dataID));
+          const uniquePosts = data.allPosts.filter(
+            (post) => !currentPostIds.has(post.dataID)
+          );
           const newPosts = [...posts, ...uniquePosts];
           setPosts(newPosts);
           setPage(page + 1);
@@ -349,7 +354,6 @@ export default function FeedScreen({ navigation }) {
       });
     }
   };
-
 
   const ListFooter = () => {
     if (loadingMore || hasMore) {
@@ -382,7 +386,6 @@ export default function FeedScreen({ navigation }) {
     <View
       style={{
         flex: 1,
-        backgroundColor: "white",
         paddingBottom: 20,
       }}
     >
@@ -409,15 +412,18 @@ export default function FeedScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    padding: 20,
+    margin: 10,
+    padding: 10,
     height: "auto",
+    backgroundColor: "white",
+    borderRadius: 8,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
   },
   username: {
-    color: Colors.Orange,
+    color: "black",
     fontWeight: "bold",
   },
   location: {
@@ -427,6 +433,7 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: 10,
+    fontWeight:"600"
   },
   pinnedLocations: {
     marginTop: 20,
