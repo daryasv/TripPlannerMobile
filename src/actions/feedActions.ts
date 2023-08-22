@@ -24,7 +24,7 @@ export function getExploreFeed(
     });
 }
 
-export interface SaveLocationData {
+export interface CreateLocationData {
   description: string;
   locationLong: string;
   locationLat: string;
@@ -32,8 +32,8 @@ export interface SaveLocationData {
   cities: string;
 }
 
-export const saveLocation = (
-  data: SaveLocationData,
+export const createLocation = (
+  data: CreateLocationData,
   image: ImagePickerAsset
 ) => {
   return FileSystem.uploadAsync(POSTS_URL + "/createLocation", image.uri, {
@@ -91,7 +91,7 @@ export interface CreateRouteData {
   totalDuration: number;
   pinnedLocations: string[];
   locations: Location[];
-  cities: string
+  cities: string;
 }
 
 export interface Location {
@@ -103,4 +103,12 @@ export const createRoute = (data: CreateRouteData) => {
   return axios.post(POSTS_URL + "/createRouteRec", data, {
     headers: { Authorization: getToken() },
   });
+};
+
+export const saveLocation = (locationId: string) => {
+  return axios.post(
+    POSTS_URL + "/save-location",
+    { locationId: locationId },
+    { headers: { Authorization: getToken() } }
+  );
 };

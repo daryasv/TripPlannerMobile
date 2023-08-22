@@ -12,8 +12,8 @@ import {
   View,
 } from "react-native";
 import ReadMore from "@fawazahmed/react-native-read-more";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { getExploreFeed } from "../../actions/feedActions";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { getExploreFeed, saveLocation } from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
 import { postGenreEnum, PostType } from "../../types/postTypes";
 import CitiesPanel from "./CitiesPanel";
@@ -26,47 +26,95 @@ import MapView, {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const Item = ({ data }: { data: PostType }) => {
+const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
+  const onSaveLocation = () => {
+    saveLocation(data.dataID).then((response)=>{
+      //todo: change flag 
+    }).catch(e=>{
+
+    });
+  };
+
   return (
     <View style={styles.itemContainer}>
-      <View style={styles.row}>
-        <Avatar
-          source={{
-            uri: data.UploadByProfilePictureUrl,
-          }}
-          rounded
-          size={40}
-        />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={styles.username}>
-            {data.uploadedBy.includes("@")
-              ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
-              : data.uploadedBy}
-          </Text>
-          {data.cities?.length ? (
-            <View style={styles.row}>
-              <Icon name="location-on" size={14} type={"material"} />
-              <Text style={styles.location}>{data.cities.join(",")}</Text>
-            </View>
-          ) : null}
+      <View style={{ flexDirection: "row", alignContent: "center" }}>
+        <View style={{ flexDirection: "row", flex: 1 }}>
+          <Avatar
+            source={{
+              uri: data.UploadByProfilePictureUrl,
+            }}
+            rounded
+            size={40}
+          />
+          <View style={{ marginLeft: 10 }}>
+            <Text style={styles.username}>
+              {data.uploadedBy.includes("@")
+                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
+                : data.uploadedBy}
+            </Text>
+            {data.cities?.length ? (
+              <View style={styles.row}>
+                <Icon name="location-on" size={14} type={"material"} />
+                <Text style={styles.location}>{data.cities.join(",")}</Text>
+              </View>
+            ) : null}
+          </View>
         </View>
+        <Ionicons
+          name="bookmark-outline"
+          size={30}
+          onPress={() => onSaveLocation()}
+        />
       </View>
-      <Image
-        source={{
-          uri: data?.contentData?.imageFileNameDTO,
-        }}
-        style={{
-          width: "100%",
-          aspectRatio: 1.5,
-          marginTop: 15,
-          borderRadius: 8,
-          resizeMode: "cover",
-        }}
-      />
+
+      {type === "route" ? (
+        <MapView
+          style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
+          provider={PROVIDER_GOOGLE}
+          showsCompass={true}
+          toolbarEnabled={false}
+          zoomEnabled={true}
+          scrollEnabled={false}
+          region={calculatedRegion(data)}
+        >
+          {data.contentData.pinnedLocationsDTO.length > 0 &&
+            data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+              <Marker
+                coordinate={{
+                  latitude: pinnedLocation.locationDTO.latitude,
+                  longitude: pinnedLocation.locationDTO.longitude,
+                }}
+                title={pinnedLocation.descriptionDTO}
+              />
+            ))}
+          {
+            <Polyline
+              coordinates={data.contentData.locationsDTO}
+              strokeColor="#FF0000"
+              strokeWidth={3}
+            />
+          }
+        </MapView>
+      ) : (
+        <Image
+          source={{
+            uri: data?.contentData?.imageFileNameDTO,
+          }}
+          style={{
+            width: "100%",
+            aspectRatio: 1.5,
+            marginTop: 15,
+            borderRadius: 8,
+            resizeMode: "cover",
+          }}
+        />
+      )}
+
       {data.contentData?.descriptionDTO ? (
         <ReadMore
           numberOfLines={3}
           style={styles.description}
+          wrapperStyle={{ marginTop: 10 }}
           seeMoreStyle={{ color: Colors.main }}
           seeLessStyle={{ color: Colors.main }}
           seeMoreText={"Read More"}
@@ -74,84 +122,20 @@ const Item = ({ data }: { data: PostType }) => {
           {data.contentData.descriptionDTO}
         </ReadMore>
       ) : null}
-      <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-        <Text style={styles.location}>{data.categories.join(" | ")}</Text>
-      </View>
-    </View>
-  );
-};
 
-const RouteItem = ({ data }: { data: PostType }) => {
-  return (
-    <View style={styles.itemContainer}>
-      <View style={styles.row}>
-        <Avatar
-          source={{
-            uri: data.UploadByProfilePictureUrl,
-          }}
-          rounded
-          size={40}
-        />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={styles.username}>
-            {data.uploadedBy.includes("@")
-              ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
-              : data.uploadedBy}
+      {type === "route" ? (
+        <View style={[styles.row, { marginTop: 10 }]}>
+          <Text style={styles.location}>
+            {data.contentData.totalDurationDTO} hours |{" "}
+            {data.contentData.totalDistanceDTO} Km | Created at{" "}
+            {data.dateUploaded}
           </Text>
-          <View style={styles.row}>
-            <Icon name="location-on" size={14} type={"material"} />
-            <Text style={styles.location}>{data.cities.join(",")}</Text>
-          </View>
         </View>
-      </View>
-
-      <MapView
-        style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
-        provider={PROVIDER_GOOGLE}
-        showsCompass={true}
-        toolbarEnabled={false}
-        zoomEnabled={true}
-        scrollEnabled={false}
-        region={calculatedRegion(data)}
-      >
-        {data.contentData.pinnedLocationsDTO.length > 0 &&
-          data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
-            <Marker
-              coordinate={{
-                latitude: pinnedLocation.locationDTO.latitude,
-                longitude: pinnedLocation.locationDTO.longitude,
-              }}
-              title={pinnedLocation.descriptionDTO}
-            />
-          ))}
-        {
-          <Polyline
-            coordinates={data.contentData.locationsDTO}
-            strokeColor="#FF0000"
-            strokeWidth={3}
-          />
-        }
-      </MapView>
-
-      {data.contentData.descriptionDTO ? (
-        <ReadMore
-          numberOfLines={3}
-          style={styles.description}
-          seeMoreStyle={{ color: Colors.main }}
-          seeLessStyle={{ color: Colors.main }}
-          seeMoreText={"Read More"}
-        >
-          {data.contentData.descriptionDTO}
-        </ReadMore>
-      ) : null}
-
-      <View style={[styles.row, { marginTop: 10 }]}>
-        <Text style={styles.location}>
-          {data.contentData.totalDurationDTO} hours |{" "}
-          {data.contentData.totalDistanceDTO} Km | Created at{" "}
-          {data.dateUploaded}
-        </Text>
-      </View>
+      ) : (
+        <View style={[styles.row, { marginTop: 10 }]}>
+          <Text style={styles.location}>{data.categories.join(" | ")}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -367,7 +351,7 @@ export default function FeedScreen({ navigation }) {
 
   function showItem({ item }) {
     if (item.postGenre == postGenreEnum.Location) {
-      return <Item data={item} />;
+      return <Item type="image" data={item} />;
     } else {
       return (
         <Pressable
@@ -375,7 +359,7 @@ export default function FeedScreen({ navigation }) {
             navigation.navigate("RouteDetails", { item });
           }}
         >
-          <RouteItem data={item} />
+          <Item data={item} type="route" />
         </Pressable>
       );
     }
@@ -433,8 +417,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   description: {
-    marginTop: 10,
     fontWeight: "600",
+    flex: 1,
   },
   pinnedLocations: {
     marginTop: 20,

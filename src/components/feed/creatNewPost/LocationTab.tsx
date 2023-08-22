@@ -11,7 +11,7 @@ import * as MediaLibrary from "expo-media-library";
 import {} from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SaveLocationData, saveLocation } from "../../../actions/feedActions";
+import { CreateLocationData, createLocation } from "../../../actions/feedActions";
 import { getLocationData } from "../../utils/LocationsUtils";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
@@ -24,7 +24,7 @@ const LocationTab = forwardRef((props, ref) => {
     locationLong: "200",
     postGen: "0",
     cities: "",
-  } as SaveLocationData);
+  } as CreateLocationData);
 
   const [image, setImage] = React.useState(
     null as ImagePicker.ImagePickerAsset
@@ -174,7 +174,7 @@ const LocationTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
-      return saveLocation(data, image);
+      return createLocation(data, image);
     },
   }));
 
