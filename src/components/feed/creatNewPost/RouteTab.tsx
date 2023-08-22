@@ -166,27 +166,27 @@ const RouteTab = forwardRef((props, ref) => {
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
           style={{
-            width: 110,
-            height: 110,
+            width: 160,
+            height: 160,
             alignItems: "center",
             justifyContent: "center",
-            borderColor: "red",
+            borderColor: "black",
             borderWidth: 5,
-            borderRadius: 60,
+            borderRadius: 80,
           }}
           onPress={handleStart}
         >
           <View
             style={{
-              backgroundColor: "red",
-              height: 80,
-              width: 80,
-              borderRadius: 50,
+              backgroundColor: "black",
+              height: 140,
+              width: 140,
+              borderRadius: 70,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 30 }}>
               Start
             </Text>
           </View>
@@ -203,25 +203,19 @@ const RouteTab = forwardRef((props, ref) => {
             padding: 10,
             justifyContent: "space-between",
             marginTop: 20,
+            paddingRight: 25,
+            paddingLeft: 25,
           }}
         >
           <Text
             style={{
               fontSize: 18,
-              color: "red",
+              color: "black",
             }}
           >
             {recording ? "Recording" : "Recoreded"}
           </Text>
           <Text>{timeLabel}</Text>
-          {recording && (
-            <Button
-              title={"Stop"}
-              radius={40}
-              buttonStyle={{ backgroundColor: "black", width: 100 }}
-              onPress={handleStop}
-            ></Button>
-          )}
         </View>
         {/* <MapView style={{ height: "50%", width: "100%"}}
         provider={PROVIDER_GOOGLE}
@@ -251,6 +245,7 @@ const RouteTab = forwardRef((props, ref) => {
             marginStart: "5%",
             width: "90%",
             marginTop: 20,
+            backgroundColor: "white",
           }}
         />
         <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
@@ -259,6 +254,19 @@ const RouteTab = forwardRef((props, ref) => {
             <PinLocation key={index} details={p} />
           ))}
         </KeyboardAwareScrollView>
+        {(recording) && (
+          <Button
+            title={"Stop"}
+            radius={8}
+            buttonStyle={{
+              backgroundColor: "black",
+              width: "80%",
+              marginLeft: "10%",
+              marginBottom: 20,
+            }}
+            onPress={handleStop}
+          ></Button>
+        )}
       </View>
     );
   }

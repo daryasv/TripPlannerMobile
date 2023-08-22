@@ -11,7 +11,10 @@ import * as MediaLibrary from "expo-media-library";
 import {} from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { CreateLocationData, createLocation } from "../../../actions/feedActions";
+import {
+  CreateLocationData,
+  createLocation,
+} from "../../../actions/feedActions";
 import { getLocationData } from "../../utils/LocationsUtils";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
@@ -30,7 +33,8 @@ const LocationTab = forwardRef((props, ref) => {
     null as ImagePicker.ImagePickerAsset
   );
 
-  const [libraryPermissions, requestGalleryPermission] = MediaLibrary.usePermissions();
+  const [libraryPermissions, requestGalleryPermission] =
+    MediaLibrary.usePermissions();
   const [cameraPermissions, requestCameraPermission] =
     ImagePicker.useCameraPermissions();
 
@@ -213,9 +217,16 @@ const LocationTab = forwardRef((props, ref) => {
         </TouchableOpacity>
       </View>
 
-      <ListItem topDivider>
+      <ListItem
+        containerStyle={{
+          borderRadius: 8,
+          margin: 10,
+        }}
+      >
         <ListItem.Content>
-          <ListItem.Title>Description</ListItem.Title>
+          <ListItem.Title style={{ fontWeight: "600" }}>
+            Description
+          </ListItem.Title>
           <TextInput
             placeholder="Write description..."
             style={{ marginTop: 10, fontSize: 16, margin: 5 }}
@@ -227,17 +238,26 @@ const LocationTab = forwardRef((props, ref) => {
         </ListItem.Content>
       </ListItem>
       <ListItem.Accordion
+        containerStyle={{
+          borderRadius: 8,
+          margin: 10,
+          marginBottom: 0,
+        }}
         topDivider
         bottomDivider
         isExpanded={locationsOpen}
         onPress={() => setLocationsOpen(!locationsOpen)}
         content={
-          <ListItem.Content>
-            <ListItem.Title>Location</ListItem.Title>
+          <ListItem.Content style={{ backgroundColor: "white" }}>
+            <ListItem.Title style={{ fontWeight: "600" }}>
+              Location
+            </ListItem.Title>
           </ListItem.Content>
         }
       >
-        <Input></Input>
+        <View style={{ backgroundColor: "white", margin: 10, marginTop: 0 }}>
+          <Input></Input>
+        </View>
       </ListItem.Accordion>
     </KeyboardAwareScrollView>
   );

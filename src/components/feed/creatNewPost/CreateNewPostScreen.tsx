@@ -91,19 +91,19 @@ export default function CreateNewPostScreen() {
       <Tab
         value={currentTab}
         onChange={setCurrentTab}
-        indicatorStyle={{ backgroundColor: Colors.main }}
+        indicatorStyle={{ backgroundColor: "transparent" }}
         containerStyle={{ borderBottomWidth: 1, borderBottomColor: "#E6E7F2" }}
       >
         <Tab.Item
           titleStyle={{
-            color: currentTab === 0 ? Colors.main : Colors.LightBlack,
+            color: currentTab === 0 ? "black" : "#939393",
             ...styles.tabTitle,
           }}
           title={"Location"}
         />
         <Tab.Item
           titleStyle={{
-            color: currentTab === 1 ? Colors.main : Colors.LightBlack,
+            color: currentTab === 1 ? "black"  : "#939393",
             ...styles.tabTitle,
           }}
           title={"Route"}
