@@ -26,7 +26,7 @@ const CitiesPanel = ({ uniqueCities , cityImages, onCityClick }) => {
                     >
                         <Image
                             source={{ uri: cityImages.get(city) }}
-                            style={{ width: '100%', height: '100%', borderRadius: 35 }}
+                            style={{ width: '100%', height: '100%', borderRadius: 8,marginTop:5 }}
                         />
                     </TouchableOpacity>
                     <Text style={[styles.buttonTitle, activeCities.includes(city) && styles.activeButtonTitle]}>
