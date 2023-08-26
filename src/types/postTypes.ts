@@ -4,16 +4,17 @@ export enum postGenreEnum {
 }
 
 export interface PostType {
-  contentData: ContentData
-  postGenre: number
-  dateUploaded: string
-  uploadedBy: string
-  cities: string[]
+  UploadByProfilePictureUrl: string
   categories: string[]
+  cities: string[]
   comments: any[]
-  views: number
+  contentData: ContentData
   dataID: string
-  UploadByProfilePictureUrl:string
+  dateUploaded: string
+  numOfSaves: number
+  postGenre: number
+  uploadedBy: string
+  views: number
 }
 
 export interface ContentData {
