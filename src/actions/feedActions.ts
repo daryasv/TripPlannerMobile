@@ -112,6 +112,15 @@ export const createRoute = (data: CreateRouteData) => {
   });
 };
 
+export const unSaveLocation = (locationId: string) => {
+  return axios.post(
+    POSTS_URL + "/unsave-location",
+    { locationId: locationId },
+    { headers: { Authorization: getToken() } }
+  );
+};
+
+
 export const saveLocation = (locationId: string) => {
   return axios.post(
     POSTS_URL + "/save-location",

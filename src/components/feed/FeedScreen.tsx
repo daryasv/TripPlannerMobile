@@ -13,7 +13,11 @@ import {
 } from "react-native";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { getExploreFeed, saveLocation } from "../../actions/feedActions";
+import {
+  getExploreFeed,
+  saveLocation,
+  unSaveLocation,
+} from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
 import { postGenreEnum, PostType } from "../../types/postTypes";
 import CitiesPanel from "./CitiesPanel";
@@ -27,15 +31,23 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
+  const [saved, setSaved] = useState(data.isSavedByUser);
   const onSaveLocation = () => {
-    saveLocation(data.dataID)
-      .then((response) => {
-        //todo: change flag
-      })
-      .catch((e) => {});
+    if (saved) {
+      unSaveLocation(data.dataID)
+        .then(() => {
+          setSaved(false);
+        })
+        .catch((e) => {});
+    } else {
+      saveLocation(data.dataID)
+        .then((response) => {
+          setSaved(true);
+        })
+        .catch((e) => {});
+    }
   };
   if (type === "route") {
-    console.log("route", JSON.stringify(data));
   }
 
   return (
@@ -64,7 +76,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           </View>
         </View>
         <Ionicons
-          name="bookmark-outline"
+          name={saved ? "bookmark" : "bookmark-outline"}
           size={30}
           onPress={() => onSaveLocation()}
         />
