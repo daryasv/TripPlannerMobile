@@ -80,16 +80,17 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           scrollEnabled={false}
           region={calculatedRegion(data)}
         >
-          {/* {data.contentData?.pinnedLocationsDTO?.day1?.length > 0 &&
+          {data.contentData?.pinnedLocationsDTO?.day1?.length > 0 &&
             data.contentData.pinnedLocationsDTO.day1.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.locationDTO.latitude,
-                  longitude: pinnedLocation.locationDTO.longitude,
+                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                  longitude:
+                    pinnedLocation?.contentData?.locationDTO?.longitude,
                 }}
-                title={pinnedLocation.descriptionDTO}
+                title={pinnedLocation?.contentData?.descriptionDTO}
               />
-            ))} */}
+            ))}
           {
             <Polyline
               coordinates={data.contentData?.locationsDTO?.day1 || []}
@@ -126,7 +127,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
         </ReadMore>
       ) : null}
 
-      {/* {type === "route" ? (
+      {type === "route" ? (
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
             {data.contentData.totalDurationDTO} hours |{" "}
@@ -138,7 +139,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>{data.categories.join(" | ")}</Text>
         </View>
-      )} */}
+      )}
     </View>
   );
 };

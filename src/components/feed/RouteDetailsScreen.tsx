@@ -46,16 +46,16 @@ export default function RouteDetailsScreen({ route }) {
           zoomEnabled={true}
           region={calculatedRegion(data)}
         >
-          {/* {data.contentData.pinnedLocationsDTO?.day1?.length > 0 &&
+          {data.contentData.pinnedLocationsDTO?.day1?.length > 0 &&
             data.contentData.pinnedLocationsDTO?.day1?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.locationDTO.latitude,
-                  longitude: pinnedLocation.locationDTO.longitude,
-                }}1
-                title={pinnedLocation.descriptionDTO}
+                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                  longitude: pinnedLocation?.contentData?.locationDTO.longitude,
+                }}
+                title={pinnedLocation?.contentData?.descriptionDTO}
               />
-            ))} */}
+            ))}
           {
             <Polyline
               coordinates={data.contentData.locationsDTO?.day1}
