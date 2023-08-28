@@ -4,42 +4,53 @@ export enum postGenreEnum {
 }
 
 export interface PostType {
-  UploadByProfilePictureUrl: string
-  categories: string[]
-  cities: string[]
-  comments: any[]
   contentData: ContentData
-  dataID: string
-  dateUploaded: string
-  numOfSaves: number
   postGenre: number
+  dateUploaded: string
   uploadedBy: string
+  cities: string[]
+  categories: any[]
+  numOfSaves: number
+  comments: any[]
   views: number
+  dataID: string
+  UploadByProfilePictureUrl: string
+  isSavedByUser: boolean
 }
 
 export interface ContentData {
-  locationDTO: LocationDto
   descriptionDTO: string
-  imageFileNameDTO: string
-}
-
-export interface ContentData {
-  locationsDTO: LocationDto[],
   totalDistanceDTO: number
   totalDurationDTO: number
-  pinnedLocationsDTO: PinnedLocationDTO[]
+  locationsDTO: LocationsDto
+  pinnedLocationsDTO: PinnedLocationsDto
+  imageFileNameDTO:string
+
 }
 
-export interface LocationDto {
-  longitude: number
+export interface LocationsDto {
+  day1: LocationDay[]
+}
+
+export interface LocationDay {
   latitude: number
-  _id: number
+  longitude: number
 }
 
-export interface PinnedLocationDTO{
-  imageFileNameDTO: string
-  locationDTO: LocationDto
-  dateUploadedDTO: Date
-  uploadedByDTO: string
-  descriptionDTO: string
+export interface PinnedLocationsDto {
+  day1: PinnedDay[]
+}
+
+export interface PinnedDay {
+  contentData: ContentData
+  postGenre: number
+  dateUploaded: string
+  uploadedBy: string
+  cities: string[]
+  categories: string[]
+  numOfSaves: number
+  comments: any[]
+  views: number
+  dataID: string
+  UploadByProfilePictureUrl: string
 }

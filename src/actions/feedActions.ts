@@ -20,6 +20,7 @@ export function getExploreFeed(
       callback(res.data);
     })
     .catch((e) => {
+      console.log("e",e);
       callback(null);
     });
 }
@@ -75,7 +76,6 @@ export const uploadNewPinnedLocation = (
     },
   })
     .then((res) => {
-      console.log(JSON.parse(res.body)?._id);
       callback(JSON.parse(res.body)?._id);
     })
     .catch(() => {

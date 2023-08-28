@@ -28,12 +28,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const onSaveLocation = () => {
-    saveLocation(data.dataID).then((response)=>{
-      //todo: change flag 
-    }).catch(e=>{
-
-    });
+    saveLocation(data.dataID)
+      .then((response) => {
+        //todo: change flag
+      })
+      .catch((e) => {});
   };
+  if (type === "route") {
+    console.log("route", JSON.stringify(data));
+  }
 
   return (
     <View style={styles.itemContainer}>
@@ -77,8 +80,8 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           scrollEnabled={false}
           region={calculatedRegion(data)}
         >
-          {data.contentData.pinnedLocationsDTO.length > 0 &&
-            data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+          {/* {data.contentData?.pinnedLocationsDTO?.day1?.length > 0 &&
+            data.contentData.pinnedLocationsDTO.day1.map((pinnedLocation) => (
               <Marker
                 coordinate={{
                   latitude: pinnedLocation.locationDTO.latitude,
@@ -86,10 +89,10 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
                 }}
                 title={pinnedLocation.descriptionDTO}
               />
-            ))}
+            ))} */}
           {
             <Polyline
-              coordinates={data.contentData.locationsDTO}
+              coordinates={data.contentData?.locationsDTO?.day1 || []}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -123,7 +126,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
         </ReadMore>
       ) : null}
 
-      {type === "route" ? (
+      {/* {type === "route" ? (
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
             {data.contentData.totalDurationDTO} hours |{" "}
@@ -135,7 +138,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>{data.categories.join(" | ")}</Text>
         </View>
-      )}
+      )} */}
     </View>
   );
 };
@@ -154,7 +157,7 @@ function RouteDetailsScreen({ route }) {
           zoomEnabled={true}
           region={calculatedRegion(data)}
         >
-          {data.contentData.pinnedLocationsDTO.length > 0 &&
+          {data.contentData?.pinnedLocationsDTO?.length > 0 &&
             data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
               <Marker
                 coordinate={{
@@ -182,7 +185,7 @@ function RouteDetailsScreen({ route }) {
           </Text>
         </View>
         <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO.map((item) => (
+        {data.contentData.pinnedLocationsDTO?.day1?.map((item) => (
           <View>
             <Image
               source={{
@@ -213,17 +216,18 @@ function RouteDetailsScreen({ route }) {
 }
 
 const calculatedRegion = (data: PostType): Region => {
+  if (!data.contentData?.locationsDTO?.day1.length) return null;
   const minLatitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const maxLatitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const minLongitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
   );
   const maxLongitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed
