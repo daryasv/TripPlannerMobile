@@ -130,8 +130,8 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
       {type === "route" ? (
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {data.contentData.totalDurationDTO} hours |{" "}
-            {data.contentData.totalDistanceDTO} Km | Created at{" "}
+            {data.contentData?.totalDurationDTO || 0} hours |{" "}
+            {data.contentData?.totalDistanceDTO || 0} Km | Created at{" "}
             {data.dateUploaded}
           </Text>
         </View>
@@ -276,13 +276,13 @@ export default function FeedScreen({ navigation }) {
           city &&
           !citySet.has(city) &&
           city !== "Undefined" &&
-          post.contentData.imageFileNameDTO
+          post.contentData?.imageFileNameDTO
         ) {
           citySet.add(city);
-          cityImageMap.set(city, post.contentData.imageFileNameDTO);
+          cityImageMap.set(city, post.contentData?.imageFileNameDTO);
           console.log(
             "not all posts have post type ? : " +
-              post.contentData.imageFileNameDTO
+              post.contentData?.imageFileNameDTO
           );
         }
       });
