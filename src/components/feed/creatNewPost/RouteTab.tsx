@@ -369,18 +369,18 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
 
       createLocation(dataToSend, details.image)
         .then((res) => {
-          const location = JSON.parse(res.body);
-          debugger;
-          console.log(JSON.stringify(res));
-          console.log(location);
-          setEditMode(false);
-          props.handleSavePin({
-            image: details.image,
-            description: details.description,
-            location: location,
-            id: location.dataID,
-          });
-          setDetails({});
+          if (res.status === 201 || res.status === 200) {
+            const location = JSON.parse(res.body);
+
+            setEditMode(false);
+            props.handleSavePin({
+              image: details.image,
+              description: details.description,
+              location: location,
+              id: location.dataID,
+            });
+            setDetails({});
+          }
         })
         .catch((e) => {})
         .finally(() => {
