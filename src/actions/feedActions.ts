@@ -20,6 +20,7 @@ export function getExploreFeed(
       callback(res.data);
     })
     .catch((e) => {
+      console.log("e", e);
       callback(null);
     });
 }
@@ -61,7 +62,7 @@ export interface NewPinnedLocationProps {
 export const uploadNewPinnedLocation = (
   image: ImagePickerAsset,
   data: NewPinnedLocationProps,
-  callback: (id: string) => void
+  callback: (data: { _id: string } & pinnedLocationType) => void
 ) => {
   return FileSystem.uploadAsync(POSTS_URL + "/addPinnedLocation", image.uri, {
     fieldName: "imageFile",
@@ -75,8 +76,7 @@ export const uploadNewPinnedLocation = (
     },
   })
     .then((res) => {
-      console.log(JSON.parse(res.body)?._id);
-      callback(JSON.parse(res.body)?._id);
+      callback(JSON.parse(res.body));
     })
     .catch(() => {
       callback(null);
@@ -93,6 +93,13 @@ export interface CreateRouteData {
   locations: Location[];
   cities: string;
 }
+export interface pinnedLocationType {
+  pictureName: string;
+  location: Location;
+  dateUploaded: string;
+  uploadedBy: string;
+  description: string;
+}
 
 export interface Location {
   latitude: number;
@@ -104,6 +111,15 @@ export const createRoute = (data: CreateRouteData) => {
     headers: { Authorization: getToken() },
   });
 };
+
+export const unSaveLocation = (locationId: string) => {
+  return axios.post(
+    POSTS_URL + "/unsave-location",
+    { locationId: locationId },
+    { headers: { Authorization: getToken() } }
+  );
+};
+
 
 export const saveLocation = (locationId: string) => {
   return axios.post(

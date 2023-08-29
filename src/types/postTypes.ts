@@ -4,42 +4,68 @@ export enum postGenreEnum {
 }
 
 export interface PostType {
-  UploadByProfilePictureUrl: string
-  categories: string[]
-  cities: string[]
-  comments: any[]
-  contentData: ContentData
-  dataID: string
-  dateUploaded: string
-  numOfSaves: number
-  postGenre: number
-  uploadedBy: string
-  views: number
+  contentData: ContentData;
+  postGenre: number;
+  dateUploaded: string;
+  uploadedBy: string;
+  cities: string[];
+  categories: any[];
+  numOfSaves: number;
+  comments: any[];
+  views: number;
+  dataID: string;
+  UploadByProfilePictureUrl: string;
+  isSavedByUser: boolean;
 }
 
 export interface ContentData {
-  locationDTO: LocationDto
-  descriptionDTO: string
-  imageFileNameDTO: string
+  descriptionDTO: string;
+  totalDistanceDTO: number;
+  totalDurationDTO: number;
+  locationsDTO: LocationsDto;
+  pinnedLocationsDTO: PinnedLocationsDto;
+  imageFileNameDTO: string;
 }
 
-export interface ContentData {
-  locationsDTO: LocationDto[],
-  totalDistanceDTO: number
-  totalDurationDTO: number
-  pinnedLocationsDTO: PinnedLocationDTO[]
+export interface LocationsDto {
+  day1: LocationDay[];
+}
+
+export interface LocationDay {
+  longitude: number;
+  latitude: number;
+  accuracy?: number;
+  altitude: any;
+  altitudeAccuracy: any;
+  heading: any;
+  speed: any;
+}
+
+export interface PinnedLocationsDto {
+  day1: PinnedDay[];
+}
+
+export interface PinnedDay {
+  contentData: PinnedContentData;
+  postGenre: number;
+  dateUploaded: string;
+  uploadedBy: string;
+  cities: string[];
+  categories: string[];
+  numOfSaves: number;
+  comments: any[];
+  views: number;
+  dataID: string;
+  UploadByProfilePictureUrl: string;
+}
+
+export interface PinnedContentData {
+  locationDTO: LocationDto;
+  descriptionDTO: string;
+  imageFileNameDTO: string;
 }
 
 export interface LocationDto {
-  longitude: number
-  latitude: number
-  _id: number
-}
-
-export interface PinnedLocationDTO{
-  imageFileNameDTO: string
-  locationDTO: LocationDto
-  dateUploadedDTO: Date
-  uploadedByDTO: string
-  descriptionDTO: string
+  longitude: number;
+  latitude: number;
 }

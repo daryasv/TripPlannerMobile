@@ -28,7 +28,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 export default function RouteDetailsScreen({ route }) {
-  const data = route.params.item;
+  const data: PostType = route.params.item;
   console.log("data", JSON.stringify(data));
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
@@ -46,19 +46,19 @@ export default function RouteDetailsScreen({ route }) {
           zoomEnabled={true}
           region={calculatedRegion(data)}
         >
-          {data.contentData.pinnedLocationsDTO.length > 0 &&
-            data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+          {data.contentData.pinnedLocationsDTO?.day1?.length > 0 &&
+            data.contentData.pinnedLocationsDTO?.day1?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.locationDTO.latitude,
-                  longitude: pinnedLocation.locationDTO.longitude,
+                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                  longitude: pinnedLocation?.contentData?.locationDTO.longitude,
                 }}
-                title={pinnedLocation.descriptionDTO}
+                title={pinnedLocation?.contentData?.descriptionDTO}
               />
             ))}
           {
             <Polyline
-              coordinates={data.contentData.locationsDTO}
+              coordinates={data.contentData.locationsDTO?.day1}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -74,11 +74,11 @@ export default function RouteDetailsScreen({ route }) {
           </Text>
         </View>
         <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO.map((item, index) => (
+        {data.contentData.pinnedLocationsDTO?.day1?.map((item, index) => (
           <View key={index}>
             <Image
               source={{
-                uri: item.imageFileNameDTO,
+                uri: item?.contentData?.imageFileNameDTO,
               }}
               style={{
                 width: "100%",
@@ -95,7 +95,9 @@ export default function RouteDetailsScreen({ route }) {
                 size={18}
                 color={"#FF0000"}
               />
-              <Text style={styles.location}>{item.descriptionDTO}</Text>
+              <Text style={styles.location}>
+                {item?.contentData?.descriptionDTO}
+              </Text>
             </View>
           </View>
         ))}
@@ -106,16 +108,16 @@ export default function RouteDetailsScreen({ route }) {
 
 const calculatedRegion = (data: PostType): Region => {
   const minLatitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const maxLatitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const minLongitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.longitude)
   );
   const maxLongitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.longitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed

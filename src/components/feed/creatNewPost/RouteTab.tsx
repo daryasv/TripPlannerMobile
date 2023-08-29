@@ -14,25 +14,29 @@ import * as Location from "expo-location";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
+  CreateLocationData,
   NewPinnedLocationProps,
+  createLocation,
   createRoute,
+  pinnedLocationType,
   uploadNewPinnedLocation,
 } from "../../../actions/feedActions";
 import * as TaskManager from "expo-task-manager";
 import { Card } from "@rneui/base";
 import { getLocationData } from "../../utils/LocationsUtils";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { postGenreEnum } from "../../../types/postTypes";
 
 const LOCATION_TASK_NAME = "trip-location-updates";
 
 interface PinLocationProps {
+  id: string;
   image?: ImagePicker.ImagePickerAsset;
   description?: string;
   location?: {
     latitude: number;
     longitude: number;
   };
-  id?: string;
 }
 
 const RouteTab = forwardRef((props, ref) => {
@@ -254,7 +258,7 @@ const RouteTab = forwardRef((props, ref) => {
             <PinLocation key={index} details={p} />
           ))}
         </KeyboardAwareScrollView>
-        {(recording) && (
+        {recording && (
           <Button
             title={"Stop Recording"}
             radius={8}
@@ -355,25 +359,33 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
         await Location.getCurrentPositionAsync()
       )?.coords;
 
-      const dataToSend: NewPinnedLocationProps = {
+      const dataToSend: CreateLocationData = {
         description: details.description,
-        "location.latitude": location.latitude.toString(),
-        "location.longitude": location.longitude.toString(),
+        locationLat: location.latitude.toString(),
+        locationLong: location.longitude.toString(),
+        cities: "",
+        postGen: "0",
       };
 
-      uploadNewPinnedLocation(details.image, dataToSend, (id) => {
-        setSaving(false);
-        if (id) {
-          setEditMode(false);
-          props.handleSavePin({
-            image: details.image,
-            description: details.description,
-            location: location,
-            id: id,
-          });
-          setDetails({});
-        }
-      });
+      createLocation(dataToSend, details.image)
+        .then((res) => {
+          if (res.status === 201 || res.status === 200) {
+            const location = JSON.parse(res.body);
+
+            setEditMode(false);
+            props.handleSavePin({
+              image: details.image,
+              description: details.description,
+              location: location,
+              id: location.dataID,
+            });
+            setDetails({});
+          }
+        })
+        .catch((e) => {})
+        .finally(() => {
+          setSaving(false);
+        });
     }
   };
 

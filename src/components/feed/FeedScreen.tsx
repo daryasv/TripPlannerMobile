@@ -13,7 +13,11 @@ import {
 } from "react-native";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { getExploreFeed, saveLocation } from "../../actions/feedActions";
+import {
+  getExploreFeed,
+  saveLocation,
+  unSaveLocation,
+} from "../../actions/feedActions";
 import { Colors } from "../../theme/Colors";
 import { postGenreEnum, PostType } from "../../types/postTypes";
 import CitiesPanel from "./CitiesPanel";
@@ -27,13 +31,24 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
+  const [saved, setSaved] = useState(data.isSavedByUser);
   const onSaveLocation = () => {
-    saveLocation(data.dataID).then((response)=>{
-      //todo: change flag 
-    }).catch(e=>{
-
-    });
+    if (saved) {
+      unSaveLocation(data.dataID)
+        .then(() => {
+          setSaved(false);
+        })
+        .catch((e) => {});
+    } else {
+      saveLocation(data.dataID)
+        .then((response) => {
+          setSaved(true);
+        })
+        .catch((e) => {});
+    }
   };
+  if (type === "route") {
+  }
 
   return (
     <View style={styles.itemContainer}>
@@ -61,7 +76,7 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           </View>
         </View>
         <Ionicons
-          name="bookmark-outline"
+          name={saved ? "bookmark" : "bookmark-outline"}
           size={30}
           onPress={() => onSaveLocation()}
         />
@@ -77,19 +92,20 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           scrollEnabled={false}
           region={calculatedRegion(data)}
         >
-          {data.contentData.pinnedLocationsDTO.length > 0 &&
-            data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+          {data.contentData?.pinnedLocationsDTO?.day1?.length > 0 &&
+            data.contentData.pinnedLocationsDTO.day1.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.locationDTO.latitude,
-                  longitude: pinnedLocation.locationDTO.longitude,
+                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                  longitude:
+                    pinnedLocation?.contentData?.locationDTO?.longitude,
                 }}
-                title={pinnedLocation.descriptionDTO}
+                title={pinnedLocation?.contentData?.descriptionDTO}
               />
             ))}
           {
             <Polyline
-              coordinates={data.contentData.locationsDTO}
+              coordinates={data.contentData?.locationsDTO?.day1 || []}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -126,8 +142,8 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
       {type === "route" ? (
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {data.contentData.totalDurationDTO} hours |{" "}
-            {data.contentData.totalDistanceDTO} Km | Created at{" "}
+            {data.contentData?.totalDurationDTO || 0} hours |{" "}
+            {data.contentData?.totalDistanceDTO || 0} Km | Created at{" "}
             {data.dateUploaded}
           </Text>
         </View>
@@ -154,7 +170,7 @@ function RouteDetailsScreen({ route }) {
           zoomEnabled={true}
           region={calculatedRegion(data)}
         >
-          {data.contentData.pinnedLocationsDTO.length > 0 &&
+          {data.contentData?.pinnedLocationsDTO?.length > 0 &&
             data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
               <Marker
                 coordinate={{
@@ -182,7 +198,7 @@ function RouteDetailsScreen({ route }) {
           </Text>
         </View>
         <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO.map((item) => (
+        {data.contentData.pinnedLocationsDTO?.day1?.map((item) => (
           <View>
             <Image
               source={{
@@ -213,17 +229,18 @@ function RouteDetailsScreen({ route }) {
 }
 
 const calculatedRegion = (data: PostType): Region => {
+  if (!data.contentData?.locationsDTO?.day1.length) return null;
   const minLatitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const maxLatitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.latitude)
+    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
   );
   const minLongitude = Math.min(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
   );
   const maxLongitude = Math.max(
-    ...data.contentData.locationsDTO.map((coord) => coord.longitude)
+    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed
@@ -271,13 +288,13 @@ export default function FeedScreen({ navigation }) {
           city &&
           !citySet.has(city) &&
           city !== "Undefined" &&
-          post.contentData.imageFileNameDTO
+          post.contentData?.imageFileNameDTO
         ) {
           citySet.add(city);
-          cityImageMap.set(city, post.contentData.imageFileNameDTO);
+          cityImageMap.set(city, post.contentData?.imageFileNameDTO);
           console.log(
             "not all posts have post type ? : " +
-              post.contentData.imageFileNameDTO
+              post.contentData?.imageFileNameDTO
           );
         }
       });
