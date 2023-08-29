@@ -23,9 +23,11 @@ import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScre
 import ChooseCityScreen from "./src/components/TripPlanning/ChooseCityScreen";
 import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
 import ChooseCategoriesScreen from "./src/components/TripPlanning/ChooseCategoriesScreen";
-// import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
-// import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
-// import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
+
+import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
+import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
+import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -96,11 +98,12 @@ export default function App() {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+
                 name="ChooseCategoriesScreen"
                 component={ChooseCategoriesScreen}
                 options={{ headerShown: false }}
               />
-              {/* <Stack.Screen
+              <Stack.Screen
                 name="PlanDaysScreen"
                 component={PlanDaysScreen}
                 options={{ headerShown: false }}
@@ -114,7 +117,7 @@ export default function App() {
                 name="TripOverviewScreen"
                 component={TripOverviewScreen}
                 options={{ headerShown: false }}
-              /> */}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         ) : (
