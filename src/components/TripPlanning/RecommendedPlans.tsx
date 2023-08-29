@@ -174,7 +174,7 @@ export default function RecommendedPlansScreen({ route }) {
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => index.toString()}
       />
-      <Button
+      {/* <Button
         title="Next"
         radius={5}
         type="solid"
@@ -183,7 +183,7 @@ export default function RecommendedPlansScreen({ route }) {
         onPress={() => buttonPressed()}
         containerStyle={styles.frameButtonBtn1}
         buttonStyle={styles.frameButtonBtn2}
-      />
+      /> */}
     </View>
   );
 }
