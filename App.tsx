@@ -22,9 +22,9 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScreen";
 import ChooseCityScreen from "./src/components/TripPlanning/ChooseCityScreen";
 import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
-// import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
-// import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
-// import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
+import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
+import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
+import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -95,7 +95,7 @@ export default function App() {
                 component={ChooseDaysScreen}
                 options={{ headerShown: false }}
               />
-              {/* <Stack.Screen
+              <Stack.Screen
                 name="PlanDaysScreen"
                 component={PlanDaysScreen}
                 options={{ headerShown: false }}
@@ -109,7 +109,7 @@ export default function App() {
                 name="TripOverviewScreen"
                 component={TripOverviewScreen}
                 options={{ headerShown: false }}
-              /> */}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         ) : (
