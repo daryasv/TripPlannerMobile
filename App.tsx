@@ -22,10 +22,10 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScreen";
 import ChooseCityScreen from "./src/components/TripPlanning/ChooseCityScreen";
 import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
+import ChooseCategoriesScreen from "./src/components/TripPlanning/ChooseCategoriesScreen";
 // import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
 // import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
 // import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
-
 
 const Stack = createNativeStackNavigator();
 
@@ -47,7 +47,7 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ActionSheetProvider>
         {initRoute ? (
           <NavigationContainer>
@@ -93,6 +93,11 @@ export default function App() {
               <Stack.Screen
                 name="ChooseDaysScreen"
                 component={ChooseDaysScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChooseCategoriesScreen"
+                component={ChooseCategoriesScreen}
                 options={{ headerShown: false }}
               />
               {/* <Stack.Screen

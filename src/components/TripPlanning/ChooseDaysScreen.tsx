@@ -21,7 +21,7 @@ export default function ChooseDaysScreen({route}) {
     if (key == 1) {
       navigation.navigate("PlanDaysScreen", {city, numOfDays, currDay})
     } else {
-      navigation.navigate("differentScreen", {city, numOfDays, currDay})
+      navigation.navigate("ChooseCategoriesScreen", {city, numOfDays, currDay})
     }   
   };
 
