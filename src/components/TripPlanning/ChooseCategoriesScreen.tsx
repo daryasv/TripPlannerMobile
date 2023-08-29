@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { Button } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
@@ -70,7 +71,7 @@ export default function ChooseCategoriesScreen({ route }) {
     const newCategories = Array.from(categories); //Duplicate the array for state to notice changes and rerender
     if (newCategories.includes(categoryName)) {
       const index = newCategories.indexOf(categoryName);
-      newCategories.splice(index,1);
+      newCategories.splice(index, 1);
     } else {
       newCategories.push(categoryName);
     }
@@ -78,7 +79,7 @@ export default function ChooseCategoriesScreen({ route }) {
   };
 
   const buttonPressed = () => {
-    navigation.navigate("differentScreen", { city, numOfDays, currDay });
+    navigation.navigate("differentScreen", { city, numOfDays, categories });
   };
 
   return (
@@ -102,7 +103,7 @@ export default function ChooseCategoriesScreen({ route }) {
           <Text style={styles.planATrip}>Plan a trip</Text>
         </View>
       </View>
-      <View style={styles.whereAreYouTravelingParent}>
+      <ScrollView contentContainerStyle={styles.whereAreYouTravelingParent}>
         <Text style={styles.planATripTypo}>What would you like to do?</Text>
         <View
           style={{
@@ -138,7 +139,7 @@ export default function ChooseCategoriesScreen({ route }) {
             );
           })}
         </View>
-      </View>
+      </ScrollView>
       <Button
         title="Next"
         radius={5}
