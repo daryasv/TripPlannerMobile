@@ -31,7 +31,7 @@ export default function ChooseCategoriesScreen({ route }) {
     {
       label: "Restaurant",
       icon: <MaterialIcons name="restaurant" size={30} />,
-      name: "restaurant",
+      name: "resturants",
     },
     {
       label: "Bars",
@@ -56,7 +56,7 @@ export default function ChooseCategoriesScreen({ route }) {
     {
       label: "Tourist Sites",
       icon: <MaterialIcons name="location-city" size={30} />,
-      name: "tourist_sites",
+      name: "tourist sites",
     },
     {
       label: "Other",
@@ -79,7 +79,7 @@ export default function ChooseCategoriesScreen({ route }) {
   };
 
   const buttonPressed = () => {
-    navigation.navigate("differentScreen", { city, numOfDays, categories });
+    navigation.navigate("RecommendedPlansScreen", { city, numOfDays, categories });
   };
 
   return (
