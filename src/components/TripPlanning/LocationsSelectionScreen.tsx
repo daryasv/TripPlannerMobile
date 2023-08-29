@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Text,
-  ScrollView
-} from "react-native";
+import { View, FlatList, StyleSheet, Text, ScrollView } from "react-native";
 import { Avatar, Button, Icon, Image } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -15,7 +9,6 @@ import ReadMore from "@fawazahmed/react-native-read-more";
 import { AddLocationToRoute, getRouteId } from "../../actions/tripActions";
 
 export default function LocationsSelectionScreen({ route }) {
-
   const category = route.params.title;
   const currDay = route.params.currDay;
   const city = route.params.city;
@@ -31,32 +24,40 @@ export default function LocationsSelectionScreen({ route }) {
 
   const iconPressed = (item) => {
     if (selected.includes(item.dataID)) {
-      setSelected(selected.filter(id => id !== item.dataID))
+      setSelected(selected.filter((id) => id !== item.dataID));
     } else {
       setSelected([...selected, item.dataID]);
     }
 
-    AddLocationToRoute({
-      routeId: getRouteId(),
-      day: currDay,
-      newPinnedLocationId: item.dataID,
-    }, (success) => {
-      if (success) {
-        setNewRoute(success.updatedRoute)
+    AddLocationToRoute(
+      {
+        routeId: getRouteId(),
+        day: currDay,
+        newPinnedLocationId: item.dataID,
+      },
+      (success) => {
+        if (success) {
+          setNewRoute(success.updatedRoute);
+        }
       }
-    });
+    );
   };
 
   const handleGoBack = () => {
-    navigation.navigate("PlanDaysScreen", {updatedRoute, city, currDay, region, numOfDays})
+    navigation.navigate("PlanDaysScreen", {
+      updatedRoute,
+      city,
+      currDay,
+      region,
+      numOfDays,
+    });
   };
-
 
   return (
     <View style={styles.iphone1313Pro16}>
       <View style={styles.frame1}>
-        <View style={{alignItems: 'flex-start'}}>
-        <Button
+        <View style={{ alignItems: "flex-start" }}>
+          <Button
             radius={5}
             iconPosition="left"
             type="clear"
@@ -68,61 +69,106 @@ export default function LocationsSelectionScreen({ route }) {
               color={Colors.LightBlack}
               size={30}
             />
-        </Button>
+          </Button>
         </View>
-          <View style={{alignItems: 'center', flex: 1}}>
-            <Text style={[styles.yourTrip]}>{category}</Text>
-          </View>
+        <View style={{ alignItems: "center", flex: 1 }}>
+          <Text style={[styles.yourTrip]}>{category}</Text>
         </View>
-      <View style={{ paddingBottom: 20}}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={{ minHeight: '100%', paddingBottom: 0 }}>
-          <View style={[styles.frameParent]}>
-          <MapView
-          style={styles.image29Icon}
-          provider={PROVIDER_GOOGLE}
-          showsCompass={true}
-          toolbarEnabled={false}
-          zoomEnabled={true}
-          region={region}
+      </View>
+      <View
+        style={{
+          paddingBottom: 20,
+          flex:1
+        }}
+      >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={{
+            paddingBottom: 0,
+          }}
         >
-          {locations.length > 0 &&
-            locations.map((pinnedLocation) => (
-              <Marker
-                key={pinnedLocation.dataID + temp.getTime()}
-                coordinate={{
-                  longitude: pinnedLocation.contentData.locationDTO.latitude,
-                  latitude: pinnedLocation.contentData.locationDTO.longitude,
-                }}
-                title={pinnedLocation.contentData.descriptionDTO}
-                pinColor={selected.includes(pinnedLocation.dataID) ? Colors.main : "#FF000"}
-              />
-            ))
-          }
-        </MapView>
+          <View style={[styles.frameParent]}>
+            <MapView
+              style={styles.image29Icon}
+              provider={PROVIDER_GOOGLE}
+              showsCompass={true}
+              toolbarEnabled={false}
+              zoomEnabled={true}
+              region={region}
+            >
+              {locations.length > 0 &&
+                locations.map((pinnedLocation) => (
+                  <Marker
+                    key={pinnedLocation.dataID + temp.getTime()}
+                    coordinate={{
+                      longitude:
+                        pinnedLocation.contentData.locationDTO.latitude,
+                      latitude:
+                        pinnedLocation.contentData.locationDTO.longitude,
+                    }}
+                    title={pinnedLocation.contentData.descriptionDTO}
+                    pinColor={
+                      selected.includes(pinnedLocation.dataID)
+                        ? Colors.main
+                        : "#FF000"
+                    }
+                  />
+                ))}
+            </MapView>
           </View>
           <View style={styles.frameParent2}>
-          {locations.map((item, index) => (
-              <View key={index} style={[styles.locationFrame, selected.includes(item.dataID) && styles.selectedLocationFrame]}>
-                <View style={{ flexDirection: "row"}}>
+            {locations.map((item, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.locationFrame,
+                  selected.includes(item.dataID) &&
+                    styles.selectedLocationFrame,
+                ]}
+              >
+                <View style={{ flexDirection: "row" }}>
                   <Avatar
                     source={{
                       uri: item.UploadByProfilePictureUrl,
                     }}
                     rounded
                     size={40}
-                    containerStyle={{paddingTop: 5, paddingLeft: 5}}
+                    containerStyle={{ paddingTop: 5, paddingLeft: 5 }}
                   />
-                  <View style={{ marginLeft: 8, width: "70%", justifyContent: "space-evenly"}}>
+                  <View
+                    style={{
+                      marginLeft: 8,
+                      width: "70%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
                     <Text style={styles.username}>
                       {item.uploadedBy.includes("@")
-                        ? item.uploadedBy.substring(0, item.uploadedBy.indexOf("@"))
+                        ? item.uploadedBy.substring(
+                            0,
+                            item.uploadedBy.indexOf("@")
+                          )
                         : item.uploadedBy}
                     </Text>
                   </View>
-                  <Button type="clear" style={{width: 48, height: 48, borderColor:"black", alignContent:"flex-end"}} onPress={() => {iconPressed(item)}}>
+                  <Button
+                    type="clear"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderColor: "black",
+                      alignContent: "flex-end",
+                    }}
+                    onPress={() => {
+                      iconPressed(item);
+                    }}
+                  >
                     <MaterialCommunityIcons
                       name="plus-circle-outline"
-                      style={[styles.addToTrip, selected.includes(item.dataID) && styles.selectedIcon]}
+                      style={[
+                        styles.addToTrip,
+                        selected.includes(item.dataID) && styles.selectedIcon,
+                      ]}
                     />
                   </Button>
                 </View>
@@ -144,16 +190,18 @@ export default function LocationsSelectionScreen({ route }) {
                     size={18}
                     color={"#FF0000"}
                   />
-                  <Text style={styles.location}>{item.contentData.descriptionDTO}</Text>
+                  <Text style={styles.location}>
+                    {item.contentData.descriptionDTO}
+                  </Text>
                 </View>
               </View>
             ))}
           </View>
         </ScrollView>
       </View>
-      </View>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   username: {
@@ -169,15 +217,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     overflow: "hidden",
     alignItems: "center",
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   selectedIcon: {
     color: Colors.main,
-    fontSize: 30
+    fontSize: 30,
   },
   addToTrip: {
     color: "black",
-    fontSize: 30
+    fontSize: 30,
   },
   selectedLocationFrame: {
     borderWidth: 2,
@@ -186,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginHorizontal: "2%",
     borderRadius: 10,
-    width: "96%"
+    width: "96%",
   },
   locationFrame: {
     borderWidth: 0,
@@ -259,7 +307,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 5,
     width: "96%",
-    marginLeft: "2%"
+    marginLeft: "2%",
   },
   frameItem: {
     borderRadius: 8,
@@ -275,12 +323,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   arrowLeft1Icon: {
-    alignItems: "flex-start"
+    alignItems: "flex-start",
   },
   yourTrip: {
     fontSize: 24,
     fontWeight: "700",
-    marginRight: 48
+    marginRight: 48,
   },
   save: {
     fontSize: 18,
@@ -299,15 +347,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "10%",
     flexDirection: "row",
-    overflow: "hidden",
     alignItems: "center",
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   frame: {
     width: "100%",
     alignItems: "flex-end",
     position: "absolute",
-    height: "10%"
+    height: "10%",
   },
   iphone1313Pro16: {
     backgroundColor: Colors.Whitesmoke,
