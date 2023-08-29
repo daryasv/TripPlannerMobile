@@ -27,7 +27,7 @@ import ChooseCategoriesScreen from "./src/components/TripPlanning/ChooseCategori
 import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
 import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
 import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
-
+import RecommendedPlansScreen from "./src/components/TripPlanning/RecommendedPlans";
 
 const Stack = createNativeStackNavigator();
 
@@ -116,6 +116,11 @@ export default function App() {
               <Stack.Screen
                 name="TripOverviewScreen"
                 component={TripOverviewScreen}
+                options={{ headerShown: false }}
+              />
+               <Stack.Screen
+                name="RecommendedPlansScreen"
+                component={RecommendedPlansScreen}
                 options={{ headerShown: false }}
               />
             </Stack.Navigator>

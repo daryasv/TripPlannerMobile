@@ -78,15 +78,10 @@ export default function LocationsSelectionScreen({ route }) {
       <View
         style={{
           paddingBottom: 20,
-          flex:1
+          flex: 1,
         }}
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={{
-            paddingBottom: 0,
-          }}
-        >
+        <ScrollView style={styles.scrollView} contentContainerStyle={{}}>
           <View style={[styles.frameParent]}>
             <MapView
               style={styles.image29Icon}
@@ -270,6 +265,7 @@ const styles = StyleSheet.create({
   scrollView: {
     // width: "100%",
     // flexGrow: 1,
+    flex: 1,
   },
   row: {
     flexDirection: "row",
@@ -282,7 +278,6 @@ const styles = StyleSheet.create({
   },
   frameParent2: {
     top: 12,
-    height: 300,
     width: "100%",
   },
   frameFlatList1Content: {

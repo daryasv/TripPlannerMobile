@@ -12,8 +12,9 @@ import { Colors } from "../../theme/Colors";
 import { useNavigation } from "@react-navigation/native";
 
 export default function RecommendedPlansScreen() {
-    const navigation = useNavigation();
-
+  const navigation = useNavigation();
+  const buttonPressed = ()=>{}
+  
   return (
     <View style={styles.iphone1313Pro7}>
       <View style={styles.frame}>
@@ -37,40 +38,7 @@ export default function RecommendedPlansScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.whereAreYouTravelingParent}>
         <Text style={styles.planATripTypo}>What would you like to do?</Text>
-        <View
-          style={{
-            justifyContent: "flex-start",
-            flexWrap: "wrap",
-            maxWidth: (maxItemWidth + itemMargin) * 3,
-            gap: itemMargin,
-            flexDirection: "row",
-            alignSelf: "center",
-            marginTop: 20,
-            marginBottom: 20,
-          }}
-        >
-          {allCategories.map((category, index) => {
-            const selected = categories.includes(category.name);
-
-            return (
-              <TouchableOpacity
-                style={selected ? styles.selectedCube : styles.cube}
-                key={index}
-                onPress={() => selectCategory(category.name)}
-              >
-                <Text style={{ color: selected ? "white" : "black" }}>
-                  {category.icon}
-                </Text>
-
-                <Text
-                  style={selected ? styles.selectedCubeText : styles.cubeText}
-                >
-                  {category.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+      
       </ScrollView>
       <Button
         title="Next"
@@ -211,5 +179,5 @@ const styles = StyleSheet.create({
       paddingHorizontal: "1%",
       paddingVertical: "5%",
       overflow: "hidden",
-    },
-}
+    }
+});
