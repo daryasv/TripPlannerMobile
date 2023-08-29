@@ -92,7 +92,7 @@ const handleSelectItem = (item) => {
                 contentInsetAdjustmentBehavior: "automatic",
                 keyboardShouldPersistTaps: 'always',
                     renderItem: ( ({item}) => (
-                    <TouchableOpacity style={{height: 30, paddingTop: 8}}
+                    <TouchableOpacity style={{height: 30, paddingTop: 8, paddingLeft: 8}}
                         onPress={() => handleSelectItem(item)}>
                         <Text style={{fontSize:16}}> 
                             {item}

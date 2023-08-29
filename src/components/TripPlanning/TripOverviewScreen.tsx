@@ -26,7 +26,7 @@ export default function TripOverViewScreen({ route }) {
 
   const [daySelected, setDaySelected] = useState("Day 1")
   const [categorySelected, setCategorySelected] = useState("")
-  const [shownLocations, setShownLocations] = useState(tripLocations[1]);
+  const [shownLocations, setShownLocations] = useState([]);
   const [shownPath, setShownPath] = useState(path[1]);
   const [description, setDescription] = React.useState("");
   
@@ -49,6 +49,7 @@ export default function TripOverViewScreen({ route }) {
       setCategorySelected(title)
       updateFilter(daySelected, title)
     } else {
+      setCategorySelected("")
       updateFilter(daySelected, "")
     }
   };
@@ -70,9 +71,11 @@ export default function TripOverViewScreen({ route }) {
 
   const findLocations = (idList) => {
     let returnValue = []
-    return idList.forEach(element => {
+    idList.forEach(element => {
       totalTripLocations.filter(location => location.dataID == element).forEach(location => {returnValue.push(location)})
     });
+
+    return (returnValue)
   };
 
   const updateFilter = (day, category) => {
@@ -82,11 +85,13 @@ export default function TripOverViewScreen({ route }) {
       setShownLocations(findLocations(tripLocations[parseInt(day.slice(4))]))
     }
 
-    setShownPath(path[parseInt(day.slice(4))])
+    setShownPath(path[parseInt(day.slice(4))].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
   };
 
-  // useEffect(() => {
-  // }, []);
+  useEffect(() => {
+    setShownLocations(findLocations(tripLocations[1]))
+    setShownPath(path[1].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+  }, []);
 
   return (
     <View style={styles.iphone1313Pro16}>
@@ -121,11 +126,11 @@ export default function TripOverViewScreen({ route }) {
                 title={pinnedLocation.contentData.descriptionDTO}
               />
             ))}
-          {
+          {shownPath.length > 1 &&
             <Polyline
               coordinates={shownPath}
               strokeColor="#FF0000"
-              strokeWidth={3}
+              strokeWidth={5}
             />
           }
         </MapView>
@@ -152,13 +157,13 @@ export default function TripOverViewScreen({ route }) {
               type="outline"
               color="#fff"
               containerStyle={styles.travelAirportBaggageCheckBtn}
-              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Restaurants" && styles.buttonPressed]}
-              onPress={() => clickedCategory("Restaurants")}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Resturants" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Resturants")}
             >
               <MaterialCommunityIcons
               name= "silverware-fork-knife"
               size={30}
-              style={[styles.icon, categorySelected == "Restaurants" && styles.iconPressed]}
+              style={[styles.icon, categorySelected == "Resturants" && styles.iconPressed]}
             />
             </Button>
             <Button
@@ -197,13 +202,13 @@ export default function TripOverViewScreen({ route }) {
               type="outline"
               color="#fff"
               containerStyle={styles.travelAirportBaggageCheckBtn}
-              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Tourists Sites" && styles.buttonPressed]}
-              onPress={() => clickedCategory("Tourists Sites")}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Tourist Sites" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Tourist Sites")}
             >
               <MaterialCommunityIcons
                 name= "pillar"
                 size={30}
-                style={[styles.icon, categorySelected == "Tourists Sites" && styles.iconPressed]}
+                style={[styles.icon, categorySelected == "Tourist Sites" && styles.iconPressed]}
               />
             </Button>
             <Button

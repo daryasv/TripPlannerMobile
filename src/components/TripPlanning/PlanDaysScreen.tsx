@@ -95,13 +95,14 @@ export default function PlanDaysScreen({route}) {
       }
     });
 
+    CheckDays()
+
     const unsubscribe = navigation.addListener('focus', ListenerFunc);
     return unsubscribe;
   }, [test.params]);
 
   const ListenerFunc = () => {
     FindTripLocationsAndTotalPath()
-    // CheckDays()
   };
 
   const FindTripLocationsAndTotalPath = () => {
@@ -131,7 +132,7 @@ export default function PlanDaysScreen({route}) {
         // updatedRoute.locations.forEach(dayPath => dayPath.forEach(position => newTotalPath.push(position)));
 
         setTotalTripLocations(newTripLocations)
-        setTotalPath(newTotalPath)
+        setTotalPath(newTotalPath.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
         setTripLocations(updatedRoute.pinnedLocations)
         setPath(updatedRoute.locations)
     }
@@ -144,6 +145,7 @@ export default function PlanDaysScreen({route}) {
   };
 
   const ChooseLocations = (title) => {
+    if(title == "Restaurants") {title = "resturants"}
     let categoryLocations = savedLocations.filter(location => location.categories.includes(title.toLowerCase()))
     navigation.navigate("LocationsSelectionScreen", {city, title, categoryLocations, region, currDay, numOfDays})
   };
@@ -220,7 +222,7 @@ export default function PlanDaysScreen({route}) {
                 title={pinnedLocation.contentData.descriptionDTO}
               />
             ))}
-          {totalPath.length > 0 &&
+          {totalPath.length > 1 &&
             <Polyline
               coordinates={totalPath}
               strokeColor="#FF0000"

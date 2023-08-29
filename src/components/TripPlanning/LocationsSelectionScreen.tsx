@@ -77,11 +77,10 @@ export default function LocationsSelectionScreen({ route }) {
       </View>
       <View
         style={{
-          paddingBottom: 20,
           flex: 1,
         }}
       >
-        <ScrollView style={styles.scrollView} contentContainerStyle={{}}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={{paddingBottom: 20}}>
           <View style={[styles.frameParent]}>
             <MapView
               style={styles.image29Icon}
