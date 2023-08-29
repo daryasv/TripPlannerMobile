@@ -19,8 +19,9 @@ import CreateNewTripScreen from "./src/components/TripPlanning/CreateNewTripScre
 import Toast from "react-native-toast-message";
 import RouteDetailsScreen from "./src/components/feed/RouteDetailsScreen";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-// import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScreen";
-// import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
+import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScreen";
+import ChooseCityScreen from "./src/components/TripPlanning/ChooseCityScreen";
+import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
 // import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
 // import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
 // import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
@@ -79,9 +80,14 @@ export default function App() {
                 name="TripPlanning"
                 component={CreateNewTripScreen}
               />
-              {/* <Stack.Screen
+              <Stack.Screen
                 name="ChooseCountryScreen"
                 component={ChooseCountryScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChooseCityScreen"
+                component={ChooseCityScreen}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
@@ -89,7 +95,7 @@ export default function App() {
                 component={ChooseDaysScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen
+              {/* <Stack.Screen
                 name="PlanDaysScreen"
                 component={PlanDaysScreen}
                 options={{ headerShown: false }}

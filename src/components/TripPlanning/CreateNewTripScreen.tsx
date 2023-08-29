@@ -101,6 +101,10 @@ const styles = StyleSheet.create({
   export default function CreateNewTripScreen() {
   const navigation = useNavigation();
 
+  const buttonPressed = (key) => {
+    navigation.navigate("ChooseCountryScreen", {key})
+  };
+
   return (
     <View style={styles.screen}>
       <View style={styles.top}>
@@ -128,7 +132,7 @@ const styles = StyleSheet.create({
           radius={5}
           iconPosition="left"
           titleStyle={styles.planYourOwnTrip}
-          // onPress={() => navigation.navigate("ChooseCountryScreen")}
+          onPress={() => buttonPressed(1)}
           containerStyle={styles.yourOwnTripContainer}
           buttonStyle={styles.yourOwnTripButton}
         />
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
           iconPosition="left"
           loading={false}
           titleStyle={styles.recommendedRoutes}
+          onPress={() => buttonPressed(2)}
           containerStyle={styles.recommendedRoutesContainer}
           buttonStyle={styles.recommendedRoutesButton}
         />

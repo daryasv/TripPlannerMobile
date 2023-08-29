@@ -16,7 +16,7 @@ export default function MainScreen({ navigation }) {
       <Tab.Navigator screenOptions={{ tabBarActiveTintColor: "#303C9A"}}>
         <Tab.Screen
           name="Explore"
-          component={() => <FeedScreen navigation={navigation} />}
+          component={Empty}
           options={{
             headerTintColor: "black",
             tabBarLabel: "Explore",
