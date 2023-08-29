@@ -70,7 +70,7 @@ export default function ChooseCategoriesScreen({ route }) {
     const newCategories = Array.from(categories); //Duplicate the array for state to notice changes and rerender
     if (newCategories.includes(categoryName)) {
       const index = newCategories.indexOf(categoryName);
-      newCategories.splice(index);
+      newCategories.splice(index,1);
     } else {
       newCategories.push(categoryName);
     }
