@@ -15,9 +15,17 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { initUser } from "./src/actions/security";
 import MainScreen from "./src/components/main/MainScreen";
 import CreateNewPostScreen from "./src/components/feed/creatNewPost/CreateNewPostScreen";
+import CreateNewTripScreen from "./src/components/TripPlanning/CreateNewTripScreen";
 import Toast from "react-native-toast-message";
 import RouteDetailsScreen from "./src/components/feed/RouteDetailsScreen";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import ChooseCountryScreen from "./src/components/TripPlanning/ChooseCountryScreen";
+import ChooseCityScreen from "./src/components/TripPlanning/ChooseCityScreen";
+import ChooseDaysScreen from "./src/components/TripPlanning/ChooseDaysScreen";
+// import PlanDaysScreen from "./src/components/TripPlanning/PlanDaysScreen";
+// import LocationsSelectionScreen from "./src/components/TripPlanning/LocationsSelectionScreen";
+// import TripOverviewScreen from "./src/components/TripPlanning/TripOverviewScreen";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +76,40 @@ export default function App() {
                 name="RouteDetails"
                 component={RouteDetailsScreen}
               />
+              <Stack.Screen
+                name="TripPlanning"
+                component={CreateNewTripScreen}
+              />
+              <Stack.Screen
+                name="ChooseCountryScreen"
+                component={ChooseCountryScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChooseCityScreen"
+                component={ChooseCityScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChooseDaysScreen"
+                component={ChooseDaysScreen}
+                options={{ headerShown: false }}
+              />
+              {/* <Stack.Screen
+                name="PlanDaysScreen"
+                component={PlanDaysScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="LocationsSelectionScreen"
+                component={LocationsSelectionScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="TripOverviewScreen"
+                component={TripOverviewScreen}
+                options={{ headerShown: false }}
+              /> */}
             </Stack.Navigator>
           </NavigationContainer>
         ) : (

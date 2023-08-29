@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FeedScreen from "../feed/FeedScreen";
 import ProfileScreen from "../profile/ProfileScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Icon } from "@rneui/themed";
+import CreateNewTripScreen from "../TripPlanning/CreateNewTripScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -13,10 +13,10 @@ const Empty = () => null;
 export default function MainScreen({ navigation }) {
   return (
     <View style={{ flex: 1 }}>
-      <Tab.Navigator screenOptions={{ tabBarActiveTintColor: "#303C9A" }}>
+      <Tab.Navigator screenOptions={{ tabBarActiveTintColor: "#303C9A"}}>
         <Tab.Screen
           name="Explore"
-          component={() => <FeedScreen navigation={navigation} />}
+          component={Empty}
           options={{
             headerTintColor: "black",
             tabBarLabel: "Explore",
@@ -50,22 +50,14 @@ export default function MainScreen({ navigation }) {
         />
         <Tab.Screen
           name="plan"
-          component={Empty}
+          component={CreateNewTripScreen}
           options={{
-            tabBarLabel: "Plan Trip",
-            tabBarIcon: ({ color, size }) => (
+            headerShown: false,
+            tabBarLabel: "New Trip",
+            tabBarIcon: ({ focused, size }) => (
               <MaterialCommunityIcons name="airplane" color={"black"} size={size} />
             ),
           }}
-          listeners={({ navigation }) => ({
-            tabPress: (e) => {
-              // Prevent default action
-              e.preventDefault();
-
-              // Do something with the `navigation` object
-              navigation.navigate("NewPost");
-            },
-          })}
         />
         <Tab.Screen
           name="Profile"
