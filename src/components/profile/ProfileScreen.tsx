@@ -164,23 +164,23 @@ export function ProfileHomeScreen({ navigation }) {
   }
 
   useEffect(() => {
-    GetUserProfile((success) => {
-      if (success) {
-        success.posts.forEach(function (value) {
-          if (value.postGenre == postGenreEnum.Location) {
-            allLocations.push(value);
-          } else {
-            allRoutes.push(value);
-          }
-        });
-        setLocations(allLocations.slice(-6));
-        setLocationsNum(allLocations.length);
-        setRoutes(allRoutes.slice(-6));
-        setRoutesNum(success.posts.length - allLocations.length);
-        setShowNoPosts(success.posts.length ? "none" : "flex");
-        setUser(success.user);
-      }
-    });
+    // GetUserProfile((success) => {
+    //   if (success) {
+    //     success.posts.forEach(function (value) {
+    //       if (value.postGenre == postGenreEnum.Location) {
+    //         allLocations.push(value);
+    //       } else {
+    //         allRoutes.push(value);
+    //       }
+    //     });
+    //     setLocations(allLocations.slice(-6));
+    //     setLocationsNum(allLocations.length);
+    //     setRoutes(allRoutes.slice(-6));
+    //     setRoutesNum(success.posts.length - allLocations.length);
+    //     setShowNoPosts(success.posts.length ? "none" : "flex");
+    //     setUser(success.user);
+    //   }
+    // });
   }, []);
 
   return (

@@ -3,4 +3,5 @@ export const Colors = {
   Gray: "#888",
   LightBlack: "#333",
   Orange: "#E6711B",
+  Whitesmoke: "#f2f2f2",
 };
