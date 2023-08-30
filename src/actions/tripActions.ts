@@ -206,7 +206,7 @@ export const StartPlanRoute = (
 
 export const AddLocationToRoute = (
   data: updateRouteData,
-  callback: (success: AddToRouteResp | false) => void
+  callback: (success: RouteDTO | false) => void
 ) => {
   const headers = {
     Authorization:
@@ -280,23 +280,27 @@ export interface SuggestedRoutesParams {
   city: string;
 }
 
-export interface SuggestedRoute {
-  cities: any;
-  uploadedBy: any;
-  UploadByProfilePictureUrl: string;
-  _id: string;
-  description: string;
-  totalDistance: number;
-  totalDuration: number;
-  completed: boolean;
-  __v: number;
-  locations: Locations;
-  pinnedLocations: PinnedLocationsDto;
-  pinnedLocationcategories: PinnedLocationcategories;
-}
+// export interface SuggestedRoute {
+//   cities: any;
+//   uploadedBy: any;
+//   UploadByProfilePictureUrl: string;
+//   _id: string;
+//   description: string;
+//   totalDistance: number;
+//   totalDuration: number;
+//   completed: boolean;
+//   __v: number;
+//   locations: Locations;
+//   pinnedLocations: PinnedLocationsDto;
+//   pinnedLocationcategories: PinnedLocationcategories;
+// }
 
-export interface Locations {
-  day1: LocationDay[];
+export interface RouteDTO {
+  descriptionDTO: string;
+  totalDistanceDTO: number;
+  totalDurationDTO: number;
+  locationsDTO: { [day: string]: GeolocationCoordinates[] };
+  pinnedLocationsDTO: { [day: string]: PostType[] };
 }
 
 export interface PinnedLocationcategories {
@@ -305,10 +309,10 @@ export interface PinnedLocationcategories {
 
 export const getSuggestedRoutes = (
   data: SuggestedRoutesParams,
-  callback: (data?: SuggestedRoute[]) => void
+  callback: (data?: RouteDTO[]) => void
 ) => {
   const headers = {
-    Authorization: getToken(),
+    Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
   };
 
   let url = BASE_URL + "/routes/suggestedRoutes?";
@@ -329,7 +333,7 @@ export const getSuggestedRoutes = (
   Axios.get(url, { headers })
     .then((res) => {
       console.log("success", JSON.stringify(res));
-      callback(res.data?.suggestedRoutes);
+      callback(res.data?.suggestedRoutesDTOS);
     })
     .catch((e) => {
       console.log("error", JSON.stringify(e));

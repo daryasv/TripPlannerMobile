@@ -18,18 +18,15 @@ export interface PostType {
   isSavedByUser: boolean;
 }
 
-export interface ContentData {
-  descriptionDTO: string;
-  totalDistanceDTO: number;
-  totalDurationDTO: number;
-  locationsDTO: LocationsDto;
-  pinnedLocationsDTO: PinnedLocationsDto;
-  imageFileNameDTO: string;
-}
+// export interface ContentData {
+//   descriptionDTO: string;
+//   totalDistanceDTO: number;
+//   totalDurationDTO: number;
+//   locationsDTO: { [day: string]: GeolocationCoordinates[] };
+//   pinnedLocationsDTO: { [day: string]: PostType[] };
+//   imageFileNameDTO: string;
+// }
 
-export interface LocationsDto {
-  day1: LocationDay[];
-}
 
 export interface LocationDay {
   longitude: number;
@@ -41,25 +38,21 @@ export interface LocationDay {
   speed: any;
 }
 
-export interface PinnedLocationsDto {
-  day1: PinnedDay[];
-}
+// export interface PinnedDay {
+//   contentData: PinnedContentData;
+//   postGenre: number;
+//   dateUploaded: string;
+//   uploadedBy: string;
+//   cities: string[];
+//   categories: string[];
+//   numOfSaves: number;
+//   comments: any[];
+//   views: number;
+//   dataID: string;
+//   UploadByProfilePictureUrl: string;
+// }
 
-export interface PinnedDay {
-  contentData: PinnedContentData;
-  postGenre: number;
-  dateUploaded: string;
-  uploadedBy: string;
-  cities: string[];
-  categories: string[];
-  numOfSaves: number;
-  comments: any[];
-  views: number;
-  dataID: string;
-  UploadByProfilePictureUrl: string;
-}
-
-export interface PinnedContentData {
+export interface ContentData {
   locationDTO: LocationDto;
   descriptionDTO: string;
   imageFileNameDTO: string;

@@ -69,27 +69,18 @@ export default function TripOverViewScreen({ route }) {
     updateFilter(item, categorySelected)
   };
 
-  const findLocations = (idList) => {
-    let returnValue = []
-    idList.forEach(element => {
-      totalTripLocations.filter(location => location.dataID == element).forEach(location => {returnValue.push(location)})
-    });
-
-    return (returnValue)
-  };
-
   const updateFilter = (day, category) => {
     if (category != "") {
-      setShownLocations(findLocations(tripLocations[parseInt(day.slice(4))]).filter(location => location.categories.includes(category.toLowerCase())))
+      setShownLocations(tripLocations[parseInt(day.slice(4))].filter(location => location.categories.includes(category.toLowerCase())))
     } else {
-      setShownLocations(findLocations(tripLocations[parseInt(day.slice(4))]))
+      setShownLocations(tripLocations[parseInt(day.slice(4))])
     }
 
     setShownPath(path[parseInt(day.slice(4))].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
   };
 
   useEffect(() => {
-    setShownLocations(findLocations(tripLocations[1]))
+    setShownLocations(tripLocations[1])
     setShownPath(path[1].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
   }, []);
 

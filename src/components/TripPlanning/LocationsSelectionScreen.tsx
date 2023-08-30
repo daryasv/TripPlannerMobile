@@ -37,7 +37,7 @@ export default function LocationsSelectionScreen({ route }) {
       },
       (success) => {
         if (success) {
-          setNewRoute(success.updatedRoute);
+          setNewRoute(success.RouteDto);
         }
       }
     );

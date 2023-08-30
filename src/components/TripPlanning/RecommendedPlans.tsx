@@ -11,122 +11,168 @@ import { Colors } from "../../theme/Colors";
 import { useNavigation } from "@react-navigation/native";
 import {
   Region,
-  SuggestedRoute,
+  RouteDTO,
   getSuggestedRoutes,
 } from "../../actions/tripActions";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
+import { PostType } from "../../types/postTypes";
 
-const showItem = ({ item }: { item: SuggestedRoute }) => {
-  return (
-    <View style={styles.itemContainer}>
-      <View style={{ flexDirection: "row", alignContent: "center" }}>
-        <View style={{ flexDirection: "row", flex: 1 }}>
-          <Avatar
-            source={{
-              uri: item?.UploadByProfilePictureUrl,
-            }}
-            rounded
-            size={40}
-          />
-          <View style={{ marginLeft: 10 }}>
-            {item?.uploadedBy ? (
-              <Text style={styles.username}>
-                {item?.uploadedBy?.includes("@")
-                  ? item.uploadedBy.substring(0, item.uploadedBy.indexOf("@"))
-                  : item.uploadedBy}
-              </Text>
-            ) : null}
-            {item?.cities?.length ? (
-              <View style={styles.row}>
-                <Icon name="location-on" size={14} type={"material"} />
-                <Text style={styles.location}>{item.cities.join(",")}</Text>
-              </View>
-            ) : null}
-          </View>
-        </View>
-      </View>
 
-      <MapView
-        style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
-        provider={PROVIDER_GOOGLE}
-        showsCompass={true}
-        toolbarEnabled={false}
-        zoomEnabled={true}
-        scrollEnabled={false}
-        region={calculatedRegion(item)}
-      >
-        {item.pinnedLocations?.day1?.length > 0 &&
-          item.pinnedLocations?.day1.map((pinnedLocation) => (
-            <Marker
-              coordinate={{
-                latitude: pinnedLocation?.contentData?.locationDTO.latitude,
-                longitude: pinnedLocation?.contentData?.locationDTO?.longitude,
-              }}
-              title={pinnedLocation?.contentData?.descriptionDTO}
-            />
-          ))}
-        {
-          <Polyline
-            coordinates={item.locations?.day1 || []}
-            strokeColor="#FF0000"
-            strokeWidth={3}
-          />
-        }
-      </MapView>
-
-      {item.description ? (
-        <ReadMore
-          numberOfLines={3}
-          style={styles.description}
-          wrapperStyle={{ marginTop: 10 }}
-          seeMoreStyle={{ color: Colors.main }}
-          seeLessStyle={{ color: Colors.main }}
-          seeMoreText={"Read More"}
-        >
-          {item.description}
-        </ReadMore>
-      ) : null}
-
-      <View style={[styles.row, { marginTop: 10 }]}>
-        <Text style={styles.location}>
-          {item.totalDuration || 0} hours | {item.totalDistance || 0} Km |
-        </Text>
-      </View>
-    </View>
-  );
-};
-
-const calculatedRegion = (data: SuggestedRoute): Region => {
-  if (!data.locations?.day1?.length) return null;
-  const minLatitude = Math.min(
-    ...data.locations?.day1?.map((coord) => coord.latitude)
-  );
-  const maxLatitude = Math.max(
-    ...data.locations?.day1?.map((coord) => coord.latitude)
-  );
-  const minLongitude = Math.min(
-    ...data.locations?.day1.map((coord) => coord.longitude)
-  );
-  const maxLongitude = Math.max(
-    ...data.locations?.day1.map((coord) => coord.longitude)
-  );
-
-  const padding = 0.01; // Adjust the padding as needed
-
-  const calculatedRegion: Region = {
-    latitude: (minLatitude + maxLatitude) / 2,
-    longitude: (minLongitude + maxLongitude) / 2,
-    latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
-    longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
-  };
-
-  return calculatedRegion;
-};
 
 export default function RecommendedPlansScreen({ route }) {
+  const numOfDays = route.params.numOfDays;
+  const city = route.params.city;
+
   const navigation = useNavigation();
-  const [suggestions, setSuggestions] = React.useState([] as SuggestedRoute[]);
+  const [suggestions, setSuggestions] = React.useState([] as RouteDTO[]);
+
+  const showItem = ({ item }: { item: RouteDTO }) => {
+    return (
+      <View style={styles.itemContainer}>
+        <View style={{ flexDirection: "row", alignContent: "center" }}>
+          <View style={{ flexDirection: "row", flex: 1 }}>
+            <Avatar
+              avatarStyle={{borderWidth: 1}}
+              rounded
+              size={40}
+            />
+            <View style={{ marginLeft: 10,
+                        width: "70%",
+                        justifyContent: "space-evenly", }}>
+              {/* {item?.uploadedBy ? (
+                <Text style={styles.username}>
+                  {item?.uploadedBy?.includes("@")
+                    ? item.uploadedBy.substring(0, item.uploadedBy.indexOf("@"))
+                    : item.uploadedBy}
+                </Text>
+              ) : null} */}
+              {/* {item?.cities?.length ? ( */}
+                <View style={styles.row}>
+                  <Icon name="location-on" size={14} type={"material"} />
+                  <Text style={styles.location}>{city}</Text>
+                </View>
+              {/* ) : null} */}
+            </View>
+            <Button
+              type="clear"
+              style={{
+                width: 48,
+                height: 48,
+                borderColor: "black",
+                alignContent: "flex-end",
+              }}
+              onPress={() => {
+  // const tripLocations = route.params.tripLocations;
+  // const totalTripLocations = route.params.totalTripLocations;
+  // const path = route.params.path;
+                let totalTripLocations = findTotalLocations(item.pinnedLocationsDTO)
+                let tripLocations = item.pinnedLocationsDTO
+                let path = item.locationsDTO
+                let region = calculatedRegion(item)
+                navigation.navigate("TripOverviewScreen", {region, numOfDays, city, totalTripLocations, tripLocations, path})
+              }}
+            >
+              <MaterialCommunityIcons
+                name="map-search-outline"
+                style={{color: "black",
+                fontSize: 30,}}
+              />
+            </Button>
+          </View>
+        </View>
+  
+        <MapView
+          style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
+          provider={PROVIDER_GOOGLE}
+          showsCompass={true}
+          toolbarEnabled={false}
+          zoomEnabled={true}
+          scrollEnabled={false}
+          region={calculatedRegion(item)}
+        >
+          {item.pinnedLocationsDTO[1].length > 0 &&
+            item.pinnedLocationsDTO[1].map((pinnedLocation) => (
+              <Marker
+                coordinate={{
+                  latitude: pinnedLocation?.contentData?.locationDTO.longitude,
+                  longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+                }}
+                title={pinnedLocation?.contentData?.descriptionDTO}
+              />
+            ))}
+          {
+            <Polyline
+              coordinates={item.locationsDTO[1] || []}
+              strokeColor="#FF0000"
+              strokeWidth={3}
+            />
+          }
+        </MapView>
+  
+        {item.descriptionDTO ? (
+          <ReadMore
+            numberOfLines={3}
+            style={styles.description}
+            wrapperStyle={{ marginTop: 10 }}
+            seeMoreStyle={{ color: Colors.main }}
+            seeLessStyle={{ color: Colors.main }}
+            seeMoreText={"Read More"}
+          >
+            {item.descriptionDTO}
+          </ReadMore>
+        ) : null}
+  
+        <View style={[styles.row, { marginTop: 10 }]}>
+          <Text style={styles.location}>
+            {item.totalDurationDTO || 0} hours | {item.totalDistanceDTO || 0} Km |
+          </Text>
+        </View>
+      </View>
+    );
+  };
+  
+  const calculatedRegion = (data: RouteDTO): Region => {
+    if (!data.locationsDTO[1].length) return null;
+    const minLatitude = Math.min(
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
+    );
+    const maxLatitude = Math.max(
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
+    );
+    const minLongitude = Math.min(
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
+    );
+    const maxLongitude = Math.max(
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
+    );
+  
+    const padding = 0.01; // Adjust the padding as needed
+  
+    const calculatedRegion: Region = {
+      latitude: (minLatitude + maxLatitude) / 2,
+      longitude: (minLongitude + maxLongitude) / 2,
+      latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
+      longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
+    };
+  
+    return calculatedRegion;
+  };
+
+  const findTotalLocations = (pinnedLocations) => {
+    let returnValue = [];
+
+    for (let index = 1; index <= Object.keys(pinnedLocations).length; index++) {
+      const dayLocations = pinnedLocations[index];
+
+      for (let index = 0; index < dayLocations.length; index++) {
+        const element = dayLocations[index];
+        returnValue.push(element)
+      }
+    }
+
+    return (returnValue)
+  };
 
   React.useEffect(() => {
     const numOfDays = route.params?.numOfDays;
@@ -145,8 +191,6 @@ export default function RecommendedPlansScreen({ route }) {
       }
     );
   }, []);
-
-  const buttonPressed = () => {};
 
   return (
     <View style={styles.iphone1313Pro7}>

@@ -57,7 +57,6 @@ export default function PlanDaysScreen({route}) {
 
   const city = route.params.city;
   let numOfDays = route.params.numOfDays;
-  // let currDay = route.params.currDay;
   const updatedRoute = route.params.updatedRoute;
 
   const [region, setRegion] = useState({ latitude: 37.7749, longitude: -122.4194, latitudeDelta: 0.0922, longitudeDelta: 0.0421 });
@@ -110,19 +109,19 @@ export default function PlanDaysScreen({route}) {
     let newTotalPath = [];
       if (updatedRoute) {
 
-        for (let index = 1; index <= Object.keys(updatedRoute.pinnedLocations).length; index++) {
-          const dayLocations = updatedRoute.pinnedLocations[index];
+        for (let index = 1; index <= Object.keys(updatedRoute.pinnedLocationsDTO).length; index++) {
+          const dayLocations = updatedRoute.pinnedLocationsDTO[index];
 
           for (let index = 0; index < dayLocations.length; index++) {
             const element = dayLocations[index];
-            savedLocations.filter(location => location.dataID == element).forEach(location => {newTripLocations.push(location)})
+            newTripLocations.push(element)
           }
         }
         // updatedRoute.pinnedLocations.foreach(dayLocations => { dayLocations.forEach(element => {
         // (savedLocations.filter(location => location.dataID == element).forEach(location => {newTripLocations.push(location)}))})});
       
-        for (let index = 1; index <= Object.keys(updatedRoute.locations).length; index++) {
-          const dayPath = updatedRoute.locations[index];
+        for (let index = 1; index <= Object.keys(updatedRoute.locationsDTO).length; index++) {
+          const dayPath = updatedRoute.locationsDTO[index];
 
           for (let index = 0; index < dayPath.length; index++) {
             const element = dayPath[index];
@@ -133,8 +132,8 @@ export default function PlanDaysScreen({route}) {
 
         setTotalTripLocations(newTripLocations)
         setTotalPath(newTotalPath.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
-        setTripLocations(updatedRoute.pinnedLocations)
-        setPath(updatedRoute.locations)
+        setTripLocations(updatedRoute.pinnedLocationsDTO)
+        setPath(updatedRoute.locationsDTO)
     }
   };
 

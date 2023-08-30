@@ -16,8 +16,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Colors } from "../../theme/Colors";
 
 export default function ChooseCategoriesScreen({ route }) {
-  const city = route.params?.selectedValue;
-  const key = route.params?.key;
+  const city = route.params?.city;
   const numOfDays = route.params?.numOfDays;
 
   const navigation = useNavigation();
@@ -26,7 +25,7 @@ export default function ChooseCategoriesScreen({ route }) {
     {
       label: "Coffee",
       icon: <Feather name="coffee" size={30} />,
-      name: "coffee",
+      name: "coffee shops",
     },
     {
       label: "Restaurant",
