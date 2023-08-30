@@ -167,7 +167,7 @@ export const GetSavedLocations = (
 ) => {
   const headers = {
     Authorization:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
+      getToken(),
   };
   const params = {
     city: city,
@@ -189,7 +189,7 @@ export const StartPlanRoute = (
 ) => {
   const headers = {
     Authorization:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
+    getToken(),
   };
   Axios.post(BASE_URL + "/routes/startRoutePlan", null, { headers })
     .then((res) => {
@@ -210,7 +210,7 @@ export const AddLocationToRoute = (
 ) => {
   const headers = {
     Authorization:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
+    getToken(),
   };
   Axios.post(BASE_URL + "/routes/addLocationToPlanedRoute", data, { headers })
     .then((res) => {
@@ -230,7 +230,7 @@ export const saveRoute = (
 ) => {
   const headers = {
     Authorization:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
+    getToken(),
   };
   Axios.post(BASE_URL + "/routes/savePlanedRoute", data, { headers })
     .then((res) => {
@@ -312,7 +312,7 @@ export const getSuggestedRoutes = (
   callback: (data?: RouteDTO[]) => void
 ) => {
   const headers = {
-    Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGU0OTlhNTQzZWY2YWU2YWQ5MjUyNDYiLCJlbWFpbCI6Im9maXJAZ21haWwuY29tIiwiaWF0IjoxNjkzMDU4MzkzfQ.A68j4XPrFo7mRdtckwbCCo_8wLFjpy_kxPx_kD5UkkM",
+    Authorization: getToken(),
   };
 
   let url = BASE_URL + "/routes/suggestedRoutes?";
@@ -334,6 +334,7 @@ export const getSuggestedRoutes = (
     .then((res) => {
       console.log("success", JSON.stringify(res));
       callback(res.data?.suggestedRoutesDTOS);
+      console.log("\n\n\n" + res.data?.suggestedRoutesDTOS)
     })
     .catch((e) => {
       console.log("error", JSON.stringify(e));

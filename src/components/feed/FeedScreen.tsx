@@ -29,6 +29,7 @@ import MapView, {
 } from "react-native-maps";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { RouteDTO } from "../../actions/tripActions";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
@@ -90,22 +91,21 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
           toolbarEnabled={false}
           zoomEnabled={true}
           scrollEnabled={false}
-          region={calculatedRegion(data)}
+          region={calculatedRegion(data.contentData)}
         >
-          {data.contentData?.pinnedLocationsDTO?.day1?.length > 0 &&
-            data.contentData.pinnedLocationsDTO.day1.map((pinnedLocation) => (
+          {data.contentData?.pinnedLocationsDTO[1].length > 0 &&
+            data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
-                  longitude:
-                    pinnedLocation?.contentData?.locationDTO?.longitude,
+                  latitude: pinnedLocation?.contentData?.locationDTO.longitude,
+                  longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
                 }}
                 title={pinnedLocation?.contentData?.descriptionDTO}
               />
             ))}
           {
             <Polyline
-              coordinates={data.contentData?.locationsDTO?.day1 || []}
+              coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -168,14 +168,14 @@ function RouteDetailsScreen({ route }) {
           showsCompass={true}
           toolbarEnabled={false}
           zoomEnabled={true}
-          region={calculatedRegion(data)}
+          region={calculatedRegion(data.contentData)}
         >
           {data.contentData?.pinnedLocationsDTO?.length > 0 &&
             data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.locationDTO.latitude,
-                  longitude: pinnedLocation.locationDTO.longitude,
+                  latitude: pinnedLocation.locationDTO.longitude,
+                  longitude: pinnedLocation.locationDTO.latitude,
                 }}
                 title={pinnedLocation.descriptionDTO}
               />
@@ -198,7 +198,7 @@ function RouteDetailsScreen({ route }) {
           </Text>
         </View>
         <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO?.day1?.map((item) => (
+        {data.contentData.pinnedLocationsDTO[1].map((item) => (
           <View>
             <Image
               source={{
@@ -228,19 +228,48 @@ function RouteDetailsScreen({ route }) {
   );
 }
 
-const calculatedRegion = (data: PostType): Region => {
-  if (!data.contentData?.locationsDTO?.day1.length) return null;
+// const calculatedRegion = (data: PostType): Region => {
+//   if (!data.contentData?.locationsDTO?.day1.length) return null;
+//   const minLatitude = Math.min(
+//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
+//   );
+//   const maxLatitude = Math.max(
+//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
+//   );
+//   const minLongitude = Math.min(
+//     ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
+//   );
+//   const maxLongitude = Math.max(
+//     ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
+//   );
+
+//   const padding = 0.01; // Adjust the padding as needed
+
+//   const calculatedRegion: Region = {
+//     latitude: (minLatitude + maxLatitude) / 2,
+//     longitude: (minLongitude + maxLongitude) / 2,
+//     latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
+//     longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
+//   };
+
+//   return calculatedRegion;
+// };
+
+export const calculatedRegion = (data: RouteDTO): Region => {
+  console.log(data.locationsDTO[1])
+
+  if (!data.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
-    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
+    ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
   const maxLatitude = Math.max(
-    ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
+    ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
   const minLongitude = Math.min(
-    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
+    ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
   const maxLongitude = Math.max(
-    ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
+    ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed
@@ -265,14 +294,14 @@ export default function FeedScreen({ navigation }) {
   const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
 
-  const getData = () => {
+  const getData = (page) => {
     setLoading(true);
-    getExploreFeed({ page: 1 }, (data) => {
+    getExploreFeed({ page: page }, (data) => {
       if (data?.allPosts) {
         setFilteredPosts(data.allPosts);
         setPosts(data.allPosts);
         setLoading(false);
-        setPage(1);
+        setPage((page)=>page+1);
         setHasMore(true);
       }
     });
@@ -280,34 +309,38 @@ export default function FeedScreen({ navigation }) {
 
   //todo: change pull list from BE
   const getUniqueCities = useCallback(() => {
-    let citySet = new Set<string>();
-    let cityImageMap = new Map<string, string>();
-    posts.forEach((post) => {
-      post.cities.forEach((city) => {
+    // Initialize with current cities or a new Set if uniqueCities is null or undefined
+    let citySet = uniqueCities ? new Set<string>(uniqueCities) : new Set<string>();
+
+    // Initialize with current images or a new Map if cityImages is null or undefined
+    let cityImageMap = cityImages ? new Map<string, string>(cityImages) : new Map<string, string>();
+
+    posts?.forEach((post) => {
+      post?.cities?.forEach((city) => {
         if (
-          city &&
-          !citySet.has(city) &&
-          city !== "Undefined" &&
-          post.contentData?.imageFileNameDTO
+            city &&
+            !citySet.has(city) &&
+            city !== "Undefined" &&
+            post.contentData?.imageFileNameDTO
         ) {
           citySet.add(city);
-          cityImageMap.set(city, post.contentData?.imageFileNameDTO);
-          console.log(
-            "not all posts have post type ? : " +
-              post.contentData?.imageFileNameDTO
-          );
+          // Only set a new image for a city if it doesn't already have one
+          if (!cityImageMap.has(city)) {
+            cityImageMap.set(city, post.contentData?.imageFileNameDTO);
+          }
         }
       });
     });
+
     setCities(Array.from(citySet));
     setCityImages(cityImageMap);
-  }, [posts]);
+  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
 
   useEffect(() => {
     getUniqueCities();
   }, [getUniqueCities]);
   const handleCityFilter = (activeCities) => {
-    if (activeCities.length > 0) {
+    if (activeCities?.length > 0) {
       const filtered = posts.filter((post) =>
         post.cities.some((city) => activeCities.includes(city))
       );
@@ -319,7 +352,8 @@ export default function FeedScreen({ navigation }) {
   const handleRefresh = () => {
     if (!loading && !loadingMore) {
       setLoading(true);
-      getData();
+      setPage((page)=>page+1);
+      getData(page);
     }
   };
 
@@ -327,7 +361,7 @@ export default function FeedScreen({ navigation }) {
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
     const updateEvent = DeviceEventEmitter.addListener("update_feed", getData);
-    getData();
+    getData(page);
 
     return () => {
       updateEvent.remove();
@@ -335,24 +369,26 @@ export default function FeedScreen({ navigation }) {
   }, []);
 
   const handleLoadMore = () => {
-    if (!loading && !loadingMore && hasMore) {
-      setLoadingMore(true);
-      getExploreFeed({ page: page + 1 }, (data) => {
-        if (data?.allPosts?.length) {
-          const currentPostIds = new Set(posts.map((post) => post.dataID));
-          const uniquePosts = data.allPosts.filter(
-            (post) => !currentPostIds.has(post.dataID)
-          );
-          const newPosts = [...posts, ...uniquePosts];
-          setPosts(newPosts);
-          setPage(page + 1);
-          setLoadingMore(false);
-        } else {
-          setHasMore(false);
-          setLoadingMore(false);
-        }
-      });
-    }
+    setLoading(true);
+    console.log(`page is ${page}`)
+    setPage((page)=> page+1);
+    console.log(`new page is ${page}`)
+    console.log(`posts are ${posts?.map((post)=> post.dataID)}`)
+    console.log(`filtered posts are ${filteredPosts?.map((post)=> post.dataID)}`)
+   getExploreFeed({ page: page }, (data) => {
+      if (data?.allPosts) {
+        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
+        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
+        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+        setLoading(false);
+        setHasMore(true);
+        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
+        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
+      }else{
+        setPage((page)=>page-1);
+      }
+    });
   };
 
   const ListFooter = () => {

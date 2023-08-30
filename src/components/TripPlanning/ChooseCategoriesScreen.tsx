@@ -25,7 +25,7 @@ export default function ChooseCategoriesScreen({ route }) {
     {
       label: "Coffee",
       icon: <Feather name="coffee" size={30} />,
-      name: "coffee shops",
+      name: "coffee-shops",
     },
     {
       label: "Restaurant",
@@ -35,7 +35,7 @@ export default function ChooseCategoriesScreen({ route }) {
     {
       label: "Bars",
       icon: <MaterialIcons name="local-bar" size={30} />,
-      name: "Bars",
+      name: "bars",
     },
     {
       label: "Shopping",
