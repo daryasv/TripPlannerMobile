@@ -22,10 +22,11 @@ const CitiesPanel = ({ uniqueCities , cityImages, onCityClick }) => {
                 <View style={styles.buttonContainer} key={city}>
                     <TouchableOpacity
                         style={[styles.button, activeCities.includes(city) && styles.activeButton]}
-                        onPress={() => handleCityClick(city)}
+                        onPress={() => {
+                            handleCityClick(city)}}
                     >
                         <Image
-                            source={{ uri: cityImages.get(city) }}
+                            source={{ uri: cityImages[city] }}
                             style={{ width: '100%', height: '100%', borderRadius: 8,marginTop:5 }}
                         />
                     </TouchableOpacity>

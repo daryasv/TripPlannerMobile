@@ -30,6 +30,7 @@ import MapView, {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
+import {getCitiesToImages} from "../../actions/cityPanelActions";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
@@ -293,7 +294,7 @@ export default function FeedScreen({ navigation }) {
   const [uniqueCities, setCities] = useState([] as string[]);
   const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
-
+  const [finishedFetchCities,setFinishedFetchCities] = useState(false);
   const getData = (page) => {
     setLoading(true);
     getExploreFeed({ page: page }, (data) => {
@@ -307,38 +308,29 @@ export default function FeedScreen({ navigation }) {
     });
   };
 
-  //todo: change pull list from BE
-  const getUniqueCities = useCallback(() => {
-    // Initialize with current cities or a new Set if uniqueCities is null or undefined
-    let citySet = uniqueCities ? new Set<string>(uniqueCities) : new Set<string>();
-
-    // Initialize with current images or a new Map if cityImages is null or undefined
-    let cityImageMap = cityImages ? new Map<string, string>(cityImages) : new Map<string, string>();
-
-    posts?.forEach((post) => {
-      post?.cities?.forEach((city) => {
-        if (
-            city &&
-            !citySet.has(city) &&
-            city !== "Undefined" &&
-            post.contentData?.imageFileNameDTO
-        ) {
-          citySet.add(city);
-          // Only set a new image for a city if it doesn't already have one
-          if (!cityImageMap.has(city)) {
-            cityImageMap.set(city, post.contentData?.imageFileNameDTO);
-          }
-        }
+  const getUniqueCitiesAndImages = useCallback(async () => {
+    try {
+      const citiesToImageArr = await getCitiesToImages();
+      const uniqueCitiesSet = new Set<string>();
+      const cityImagesMap: Map<string, string> = new Map<string, string>();
+      citiesToImageArr.forEach(cityImage => {
+        uniqueCitiesSet.add(cityImage.cityName);
+        cityImagesMap[cityImage.cityName] = cityImage.imageUrl;
       });
-    });
 
-    setCities(Array.from(citySet));
-    setCityImages(cityImageMap);
-  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
+      setCities(Array.from(uniqueCitiesSet));
+      setCityImages(cityImagesMap);
+      setFinishedFetchCities(true);
+    } catch (error) {
+      console.error('Error updating unique cities and images:', error);
+      // Optionally set an error state here
+    }
+  }, []); // Empty dependency list, because we aren't using any external variables
 
   useEffect(() => {
-    getUniqueCities();
-  }, [getUniqueCities]);
+    getUniqueCitiesAndImages();
+  }, [getUniqueCitiesAndImages]); // Make sure to include getUniqueCitiesAndImages in the dependency list
+
   const handleCityFilter = (activeCities) => {
     if (activeCities?.length > 0) {
       const filtered = posts.filter((post) =>
@@ -379,12 +371,12 @@ export default function FeedScreen({ navigation }) {
       if (data?.allPosts) {
         console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
         console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
-        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+        setFilteredPosts((prevPosts)=> [...prevPosts,...data?.allPosts]);
+        setPosts((prevPosts)=> [...prevPosts,...data?.allPosts]);
         setLoading(false);
         setHasMore(true);
-        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
+        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
+        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
       }else{
         setPage((page)=>page-1);
       }
@@ -427,12 +419,19 @@ export default function FeedScreen({ navigation }) {
     >
       <FlatList
         ListHeaderComponent={
-          <CitiesPanel
-            uniqueCities={uniqueCities}
-            cityImages={cityImages}
-            onCityClick={handleCityFilter}
-          />
-        }
+          <View style={{ padding: 10 }}>
+            {!finishedFetchCities ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <CitiesPanel
+                    uniqueCities={uniqueCities}
+                    cityImages={cityImages}
+                    onCityClick={()=>
+                  handleCityFilter}
+                />
+            )}
+          </View>
+      }
         data={filteredPosts}
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => item.dataID + "_" + index}
@@ -440,7 +439,7 @@ export default function FeedScreen({ navigation }) {
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
         }
-        onEndReached={handleLoadMore}
+        onEndReached={()=> {handleLoadMore}}
         onEndReachedThreshold={0.1}
         ListFooterComponent={<ListFooter />}
       />
