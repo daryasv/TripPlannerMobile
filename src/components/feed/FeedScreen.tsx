@@ -32,7 +32,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
 import { getCitiesToImages } from "../../actions/cityPanelActions";
 
-const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
+export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
   const onSaveLocation = () => {
     if (saved) {

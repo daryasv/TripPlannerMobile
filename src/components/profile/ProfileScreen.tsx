@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
 import { Logout } from "../../actions/security";
@@ -13,6 +14,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GetUserProfile, User } from "../../actions/profileActions";
 import { postGenreEnum } from "../../types/postTypes";
+import { Item } from "../feed/FeedScreen";
+import { Button } from "@rneui/base";
 
 const styles = StyleSheet.create({
   Avatar: {
@@ -21,6 +24,7 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 50,
+    borderWidth: 1,
   },
   UserName: {
     marginTop: 10,
@@ -50,6 +54,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
+    marginVertical: 15,
   },
   actionRow: {
     flexDirection: "row",
@@ -104,6 +109,7 @@ const styles = StyleSheet.create({
 
 let allLocations = [];
 let allRoutes = [];
+const locationsToSlice = 6;
 
 const Stack = createNativeStackNavigator();
 
@@ -128,7 +134,7 @@ export function ProfileHomeScreen({ navigation }) {
   const [locations, setLocations] = useState([]);
   const [routes, setRoutes] = useState([]);
   const [numLocations, setLocationsNum] = useState(0);
-  const [numRoutes, setRoutesNum] = useState(0);
+  const [numOfSaved, setNumOfSaved] = useState(0);
   type displayFields = "flex" | "none";
   const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
 
@@ -158,23 +164,19 @@ export function ProfileHomeScreen({ navigation }) {
   }
 
   useEffect(() => {
-    // GetUserProfile((success) => {
-    //   if (success) {
-    //     success.posts.forEach(function (value) {
-    //       if (value.postGenre == postGenreEnum.Location) {
-    //         allLocations.push(value);
-    //       } else {
-    //         allRoutes.push(value);
-    //       }
-    //     });
-    //     setLocations(allLocations.slice(-6));
-    //     setLocationsNum(allLocations.length);
-    //     setRoutes(allRoutes.slice(-6));
-    //     setRoutesNum(success.posts.length - allLocations.length);
-    //     setShowNoPosts(success.posts.length ? "none" : "flex");
-    //     setUser(success.user);
-    //   }
-    // });
+    GetUserProfile((success) => {
+      if (success) {
+        allLocations = [];
+        success.posts.forEach(function (value) {
+          allLocations.push(value);
+        });
+        setLocations(allLocations.slice(-locationsToSlice));
+        setLocationsNum(allLocations.length);
+        setShowNoPosts(success.posts.length ? "none" : "flex");
+        setNumOfSaved(success.user.savedRoutes?.length || 0);
+        setUser(success.user);
+      }
+    });
   }, []);
 
   return (
@@ -187,152 +189,32 @@ export function ProfileHomeScreen({ navigation }) {
         {user.userFirstName + " " + user.userLastName}
       </Text>
       <View style={styles.row}>
-        <View>
+        <TouchableOpacity>
           <Text style={styles.LocationsNum}>{numLocations}</Text>
-          <Text style={styles.LocationsText}>Locations</Text>
-        </View>
-        <View>
-          <Text style={styles.RoutesNum}>{numRoutes}</Text>
-          <Text style={styles.RoutesText}>Routes</Text>
-        </View>
+          <Text style={styles.LocationsText}>My Posts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.RoutesNum}>{numOfSaved}</Text>
+          <Text style={styles.RoutesText}>Saved</Text>
+        </TouchableOpacity>
       </View>
-      <View>
-        <View style={styles.actionRow}>
-          <Text style={styles.LocationsHeader}>Locations</Text>
-          <Pressable
-            onPress={() => navigation.navigate("Locations")}
-            style={{ display: showViewAll() }}
-          >
-            <Text style={styles.ViewAll}>View all</Text>
-          </Pressable>
-        </View>
-        <View
-          style={{
-            borderBottomColor: Colors.LightBlack,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            margin: 10,
-          }}
+      {locations.map((location) => {
+        return (
+          <Item
+            data={location}
+            type={
+              location.postGenre == postGenreEnum.Location ? "image" : "route"
+            }
+          />
+        );
+      })}
+      {allLocations.length > locationsToSlice ? (
+        <Button
+          title={"View all"}
+          containerStyle={{ margin: 20, borderRadius: 8 }}
+          onPress={() => navigation.navigate("Locations")}
         />
-        <View
-          style={{
-            width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row",
-            paddingVertical: 5,
-            justifyContent: "space-between",
-            display: "flex",
-          }}
-        >
-          <View style={{ display: showNoPosts }}>
-            <Text style={styles.NoPostsMsg}>no posts :(</Text>
-          </View>
-          {locations.map((location) => (
-            <View key={location.dataID}>
-              <Image
-                style={{
-                  width: 100,
-                  height: 100,
-                  marginVertical: 0.5,
-                  marginBottom: 15,
-                  marginHorizontal: 12,
-                  borderRadius: 10,
-                }}
-                source={{ uri: location.contentData.imageFileNameDTO }}
-              />
-            </View>
-          ))}
-        </View>
-      </View>
-      <View>
-        <View style={styles.actionRow}>
-          <Text style={styles.LocationsHeader}>Routes</Text>
-          <Pressable onPress={() => navigation.navigate("Routes")}>
-            <Text style={styles.ViewAll}>View all</Text>
-          </Pressable>
-        </View>
-        <View
-          style={{
-            borderBottomColor: Colors.LightBlack,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            margin: 10,
-          }}
-        />
-        <View
-          style={{
-            width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row",
-            paddingVertical: 5,
-            justifyContent: "space-between",
-          }}
-        >
-          {routes.map((route) => (
-            <View
-              style={{
-                width: 100,
-                height: 100,
-                marginVertical: 0.5,
-                backgroundColor: "black",
-                opacity: 0.1,
-                marginBottom: 15,
-                marginHorizontal: 12,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontWeight: "bold", color: "white" }}>
-                {route.cities.join(",")}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
-      <View>
-        <View style={styles.actionRow}>
-          <Text style={styles.LocationsHeader}>Saved Locations</Text>
-          <Pressable onPress={() => navigation.navigate("Saved")}>
-            <Text style={styles.ViewAll}>View all</Text>
-          </Pressable>
-        </View>
-        <View
-          style={{
-            borderBottomColor: Colors.LightBlack,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            margin: 10,
-          }}
-        />
-        <View
-          style={{
-            width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row",
-            paddingVertical: 5,
-            justifyContent: "space-between",
-          }}
-        >
-          {[].map((route) => (
-            <View
-              style={{
-                width: 100,
-                height: 100,
-                marginVertical: 0.5,
-                backgroundColor: "black",
-                opacity: 0.1,
-                marginBottom: 15,
-                marginHorizontal: 12,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontWeight: "bold", color: "white" }}>
-                {route.cities.join(",")}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -340,31 +222,16 @@ export function ProfileHomeScreen({ navigation }) {
 export function ProfileLocationsScreen() {
   return (
     <ScrollView showsVerticalScrollIndicator={true}>
-      <View
-        style={{
-          width: "100%",
-          flexWrap: "wrap",
-          flexDirection: "row",
-          paddingVertical: 5,
-          justifyContent: "space-between",
-        }}
-      >
-        {allLocations.map((location) => (
-          <View key={location.dataID}>
-            <Image
-              style={{
-                width: 100,
-                height: 100,
-                marginVertical: 0.5,
-                marginBottom: 15,
-                marginHorizontal: 12,
-                borderRadius: 10,
-              }}
-              source={{ uri: location.contentData.imageFileNameDTO }}
-            />
-          </View>
-        ))}
-      </View>
+      {allLocations.map((location) => {
+        return (
+          <Item
+            data={location}
+            type={
+              location.postGenre == postGenreEnum.Location ? "image" : "route"
+            }
+          />
+        );
+      })}
     </ScrollView>
   );
 }
