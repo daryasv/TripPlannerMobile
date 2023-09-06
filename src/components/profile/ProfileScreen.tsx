@@ -8,9 +8,7 @@ import {
   Pressable,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
-import {
-  Logout,
-} from "../../actions/security";
+import { Logout } from "../../actions/security";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GetUserProfile, User } from "../../actions/profileActions";
@@ -37,41 +35,38 @@ const styles = StyleSheet.create({
   },
   LocationsNum: {
     color: Colors.LightBlack,
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-    paddingHorizontal: 8,
-    paddingVertical: 15,
     borderRadius: 4,
-    marginHorizontal: "20%",
-    minWidth: "30%",
   },
   RoutesNum: {
     color: Colors.LightBlack,
-    textAlign: "right",
+    textAlign: "center",
     fontSize: 20,
-    paddingVertical: 15,
     fontWeight: "bold",
   },
   row: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "space-evenly",
+  },
+  actionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   LocationsText: {
     color: Colors.LightBlack,
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 18,
     borderRadius: 4,
-    marginHorizontal: "17%",
-    marginTop: -10,
     marginBottom: 20,
-    minWidth: "31%",
   },
   RoutesText: {
     color: Colors.LightBlack,
-    textAlign: "right",
+    textAlign: "center",
     fontSize: 18,
-    marginTop: -10,
   },
   imageContainerStyle: {
     flex: 1,
@@ -88,7 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderRadius: 4,
     marginHorizontal: "7%",
-    minWidth: "31%",
     fontWeight: "bold",
   },
   ViewAll: {
@@ -97,7 +91,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderRadius: 4,
     marginHorizontal: "7%",
-    minWidth: "41%",
   },
   Logout: {
     color: Colors.main,
@@ -125,6 +118,7 @@ export default function ProfileScreen() {
         />
         <Stack.Screen name="Locations" component={ProfileLocationsScreen} />
         <Stack.Screen name="Routes" component={ProfileRoutesScreen} />
+        <Stack.Screen name="Saved" component={ProfileRoutesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -139,22 +133,22 @@ export function ProfileHomeScreen({ navigation }) {
   const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
 
   const defaultUser: User = {
-    _id: '',
-    userFirstName: '',
-    userLastName: '',
-    userEmail: '',
-    password: '',
-    profilePictureId: '',
+    _id: "",
+    userFirstName: "",
+    userLastName: "",
+    userEmail: "",
+    password: "",
+    profilePictureId: "",
     userPicturesIds: [],
     savedPicturesIds: [],
     savedRoutes: [],
-    createdAt: '',
-    updatedAt: '',
+    createdAt: "",
+    updatedAt: "",
     __v: 0,
   };
 
   const [user, setUser] = useState<User>(defaultUser);
-  
+
   function showViewAll() {
     if (showNoPosts == "flex") {
       return "none";
@@ -188,23 +182,22 @@ export function ProfileHomeScreen({ navigation }) {
       <Text style={styles.Logout} onPress={() => Logout()}>
         Logout
       </Text>
-      <Image
-        style={styles.Avatar}
-        source={{ uri: user.profilePictureId }}
-      />
+      <Image style={styles.Avatar} source={{ uri: user.profilePictureId }} />
       <Text style={styles.UserName}>
         {user.userFirstName + " " + user.userLastName}
       </Text>
       <View style={styles.row}>
-        <Text style={styles.LocationsNum}>{numLocations}</Text>
-        <Text style={styles.RoutesNum}>{numRoutes}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.LocationsText}>Locations</Text>
-        <Text style={styles.RoutesText}>Routes</Text>
+        <View>
+          <Text style={styles.LocationsNum}>{numLocations}</Text>
+          <Text style={styles.LocationsText}>Locations</Text>
+        </View>
+        <View>
+          <Text style={styles.RoutesNum}>{numRoutes}</Text>
+          <Text style={styles.RoutesText}>Routes</Text>
+        </View>
       </View>
       <View>
-        <View style={styles.row}>
+        <View style={styles.actionRow}>
           <Text style={styles.LocationsHeader}>Locations</Text>
           <Pressable
             onPress={() => navigation.navigate("Locations")}
@@ -251,7 +244,7 @@ export function ProfileHomeScreen({ navigation }) {
         </View>
       </View>
       <View>
-        <View style={styles.row}>
+        <View style={styles.actionRow}>
           <Text style={styles.LocationsHeader}>Routes</Text>
           <Pressable onPress={() => navigation.navigate("Routes")}>
             <Text style={styles.ViewAll}>View all</Text>
@@ -275,7 +268,7 @@ export function ProfileHomeScreen({ navigation }) {
         >
           {routes.map((route) => (
             <View
-                style={{
+              style={{
                 width: 100,
                 height: 100,
                 marginVertical: 0.5,
@@ -284,11 +277,58 @@ export function ProfileHomeScreen({ navigation }) {
                 marginBottom: 15,
                 marginHorizontal: 12,
                 borderRadius: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                }}
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
-                 <Text style={{fontWeight: 'bold', color: 'white'}}>{route.cities.join(',')}</Text>
+              <Text style={{ fontWeight: "bold", color: "white" }}>
+                {route.cities.join(",")}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+      <View>
+        <View style={styles.actionRow}>
+          <Text style={styles.LocationsHeader}>Saved Locations</Text>
+          <Pressable onPress={() => navigation.navigate("Saved")}>
+            <Text style={styles.ViewAll}>View all</Text>
+          </Pressable>
+        </View>
+        <View
+          style={{
+            borderBottomColor: Colors.LightBlack,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            margin: 10,
+          }}
+        />
+        <View
+          style={{
+            width: "100%",
+            flexWrap: "wrap",
+            flexDirection: "row",
+            paddingVertical: 5,
+            justifyContent: "space-between",
+          }}
+        >
+          {[].map((route) => (
+            <View
+              style={{
+                width: 100,
+                height: 100,
+                marginVertical: 0.5,
+                backgroundColor: "black",
+                opacity: 0.1,
+                marginBottom: 15,
+                marginHorizontal: 12,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontWeight: "bold", color: "white" }}>
+                {route.cities.join(",")}
+              </Text>
             </View>
           ))}
         </View>
@@ -342,23 +382,25 @@ export function ProfileRoutesScreen() {
         }}
       >
         {allRoutes.map((route) => (
-            <View
-                style={{
-                width: 100,
-                height: 100,
-                marginVertical: 0.5,
-                backgroundColor: "black",
-                opacity: 0.1,
-                marginBottom: 15,
-                marginHorizontal: 12,
-                borderRadius: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                }}
-            >
-                 <Text style={{fontWeight: 'bold', color: 'white'}}>{route.cities.join(',')}</Text>
-            </View>
-          ))}
+          <View
+            style={{
+              width: 100,
+              height: 100,
+              marginVertical: 0.5,
+              backgroundColor: "black",
+              opacity: 0.1,
+              marginBottom: 15,
+              marginHorizontal: 12,
+              borderRadius: 10,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", color: "white" }}>
+              {route.cities.join(",")}
+            </Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
