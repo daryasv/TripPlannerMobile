@@ -105,7 +105,10 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
             ))}
           {
             <Polyline
-              coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
+              coordinates={data.contentData?.locationsDTO[1].map((item) => ({
+                latitude: item.longitude,
+                longitude: item.latitude,
+              }))}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -256,7 +259,7 @@ function RouteDetailsScreen({ route }) {
 // };
 
 export const calculatedRegion = (data: RouteDTO): Region => {
-  console.log(data.locationsDTO[1])
+  console.log(data.locationsDTO[1]);
 
   if (!data.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
@@ -288,10 +291,10 @@ export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([] as PostType[]);
   const [loading, setLoading] = useState(true as boolean);
   const [loadingMore, setLoadingMore] = useState(false as boolean);
-  const [hasMore, setHasMore] = useState(true as boolean);
+  const [hasMore, setHasMore] = useState(false as boolean);
   const [page, setPage] = useState(1 as number);
   const [uniqueCities, setCities] = useState([] as string[]);
-  const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
+  const [filteredPosts, setFilteredPosts] = useState<PostType[]>([]);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
 
   const getData = (page) => {
@@ -301,7 +304,7 @@ export default function FeedScreen({ navigation }) {
         setFilteredPosts(data.allPosts);
         setPosts(data.allPosts);
         setLoading(false);
-        setPage((page)=>page+1);
+        setPage((page) => page + 1);
         setHasMore(true);
       }
     });
@@ -310,18 +313,22 @@ export default function FeedScreen({ navigation }) {
   //todo: change pull list from BE
   const getUniqueCities = useCallback(() => {
     // Initialize with current cities or a new Set if uniqueCities is null or undefined
-    let citySet = uniqueCities ? new Set<string>(uniqueCities) : new Set<string>();
+    let citySet = uniqueCities
+      ? new Set<string>(uniqueCities)
+      : new Set<string>();
 
     // Initialize with current images or a new Map if cityImages is null or undefined
-    let cityImageMap = cityImages ? new Map<string, string>(cityImages) : new Map<string, string>();
+    let cityImageMap = cityImages
+      ? new Map<string, string>(cityImages)
+      : new Map<string, string>();
 
     posts?.forEach((post) => {
       post?.cities?.forEach((city) => {
         if (
-            city &&
-            !citySet.has(city) &&
-            city !== "Undefined" &&
-            post.contentData?.imageFileNameDTO
+          city &&
+          !citySet.has(city) &&
+          city !== "Undefined" &&
+          post.contentData?.imageFileNameDTO
         ) {
           citySet.add(city);
           // Only set a new image for a city if it doesn't already have one
@@ -334,7 +341,7 @@ export default function FeedScreen({ navigation }) {
 
     setCities(Array.from(citySet));
     setCityImages(cityImageMap);
-  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
+  }, [posts]); // I also added uniqueCities and cityImages to the dependency list
 
   useEffect(() => {
     getUniqueCities();
@@ -352,7 +359,7 @@ export default function FeedScreen({ navigation }) {
   const handleRefresh = () => {
     if (!loading && !loadingMore) {
       setLoading(true);
-      setPage((page)=>page+1);
+      setPage((page) => page + 1);
       getData(page);
     }
   };
@@ -369,24 +376,43 @@ export default function FeedScreen({ navigation }) {
   }, []);
 
   const handleLoadMore = () => {
-    setLoading(true);
-    console.log(`page is ${page}`)
-    setPage((page)=> page+1);
-    console.log(`new page is ${page}`)
-    console.log(`posts are ${posts?.map((post)=> post.dataID)}`)
-    console.log(`filtered posts are ${filteredPosts?.map((post)=> post.dataID)}`)
-   getExploreFeed({ page: page }, (data) => {
-      if (data?.allPosts) {
-        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
-        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setLoading(false);
+    if (loadingMore || loading) return;
+    setLoadingMore(true);
+    console.log(`page is ${page}`);
+    setPage((page) => page + 1);
+    // console.log(`new page is ${page}`);
+    // console.log(`posts are ${posts?.map((post) => post.dataID)}`);
+    // console.log(
+    //   `filtered posts are ${filteredPosts?.map((post) => post.dataID)}`
+    // );
+    getExploreFeed({ page: page }, (data) => {
+      if (data?.allPosts?.length) {
+        console.log(
+          `posts after request and before setFilteredPosts are ${posts?.map(
+            (post) => post.dataID
+          )}`
+        );
+        console.log(
+          `filtered posts after request and before setFilteredPosts are ${filteredPosts?.map(
+            (post) => post.dataID
+          )}`
+        );
+        setFilteredPosts((prevPosts) => [...prevPosts, ...data.allPosts]);
+        setPosts((prevPosts) => [...prevPosts, ...data.allPosts]);
+        setLoadingMore(false);
         setHasMore(true);
-        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
-      }else{
-        setPage((page)=>page-1);
+        console.log(
+          `posts after request and before setFilteredPosts are ${posts.map(
+            (post) => post.dataID
+          )}`
+        );
+        console.log(
+          `filtered posts after request and before setFilteredPosts are ${filteredPosts.map(
+            (post) => post.dataID
+          )}`
+        );
+      } else {
+        setPage((page) => page - 1);
       }
     });
   };
