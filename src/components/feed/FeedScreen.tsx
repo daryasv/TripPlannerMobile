@@ -443,7 +443,7 @@ export default function FeedScreen({ navigation }) {
         ListHeaderComponent={
           <View style={{ padding: 10 }}>
             {!finishedFetchCities ? (
-              <ActivityIndicator size="large" color="#0000ff" />
+              loading ? null :  <ActivityIndicator size="large" color="#0000ff" />
             ) : (
               <CitiesPanel
                 uniqueCities={uniqueCities}
