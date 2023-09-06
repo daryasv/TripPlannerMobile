@@ -441,17 +441,19 @@ export default function FeedScreen({ navigation }) {
     >
       <FlatList
         ListHeaderComponent={
-          <View style={{ padding: 10 }}>
-            {!finishedFetchCities ? (
-              loading ? null :  <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <CitiesPanel
-                uniqueCities={uniqueCities}
-                cityImages={cityImages}
-                onCityClick={() => handleCityFilter}
-              />
-            )}
-          </View>
+          loading ? null : (
+            <View style={{ padding: 10 }}>
+              {!finishedFetchCities ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <CitiesPanel
+                  uniqueCities={uniqueCities}
+                  cityImages={cityImages}
+                  onCityClick={() => handleCityFilter}
+                />
+              )}
+            </View>
+          )
         }
         data={filteredPosts}
         renderItem={({ item }) => showItem({ item })}
