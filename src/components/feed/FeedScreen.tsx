@@ -30,6 +30,7 @@ import MapView, {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
+import {getCitiesToImages} from "../../actions/cityPanelActions";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
@@ -256,7 +257,7 @@ function RouteDetailsScreen({ route }) {
 // };
 
 export const calculatedRegion = (data: RouteDTO): Region => {
-  console.log(data.locationsDTO[1])
+  //console.log(data.locationsDTO[1])
 
   if (!data.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
@@ -286,48 +287,73 @@ export const calculatedRegion = (data: RouteDTO): Region => {
 
 export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([] as PostType[]);
+  const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
+  const [isFiltering,setIsFiltering] = useState(false);
+  const [filteringPage, setFilteringPage] = useState(1);
+  const [postsPage, setPostsPage] = useState(1 as number);
+  const [prevActiveCities, setPrevActiveCities] = useState([]);
   const [loading, setLoading] = useState(true as boolean);
   const [loadingMore, setLoadingMore] = useState(false as boolean);
   const [hasMore, setHasMore] = useState(true as boolean);
-  const [page, setPage] = useState(1 as number);
   const [uniqueCities, setCities] = useState([] as string[]);
-  const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
+  const [finishedFetchCities,setFinishedFetchCities] = useState(false);
+  const [isFetchingPosts, setIsFetchingPosts] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const getData = (page) => {
+
+  // ----------------------------- POSTS AND FILTERING START ------------------------------//
+
+  const getPosts = (page) => {
     setLoading(true);
+    setIsFiltering((prevState)=> false);
     getExploreFeed({ page: page }, (data) => {
       if (data?.allPosts) {
-        setFilteredPosts(data.allPosts);
         setPosts(data.allPosts);
         setLoading(false);
-        setPage((page)=>page+1);
+        setPostsPage((page)=>page+1);
         setHasMore(true);
       }
     });
   };
 
-  //todo: change pull list from BE
-  const getUniqueCities = useCallback(() => {
-    // Initialize with current cities or a new Set if uniqueCities is null or undefined
-    let citySet = uniqueCities ? new Set<string>(uniqueCities) : new Set<string>();
+  const handleCityFilter = (activeCities) => {
+    console.log("Inside parent handleCityFilter");
+    console.log(`!!! WE ARE IN HANDLE CITY FILTER WITH ACTIVECITIES = ${activeCities}`);
 
-    // Initialize with current images or a new Map if cityImages is null or undefined
-    let cityImageMap = cityImages ? new Map<string, string>(cityImages) : new Map<string, string>();
+    if (activeCities.length > 0) {
+      setIsFiltering(true);
 
-    posts?.forEach((post) => {
-      post?.cities?.forEach((city) => {
-        if (
-            city &&
-            !citySet.has(city) &&
-            city !== "Undefined" &&
-            post.contentData?.imageFileNameDTO
-        ) {
-          citySet.add(city);
-          // Only set a new image for a city if it doesn't already have one
-          if (!cityImageMap.has(city)) {
-            cityImageMap.set(city, post.contentData?.imageFileNameDTO);
+
+      // Check if activeCities has changed from the previous value
+      if (JSON.stringify(prevActiveCities) !== JSON.stringify(activeCities)) {
+        setFilteringPage((prevState) => 1); // Reset the page to 1
+        setPrevActiveCities(activeCities); // Update the previous state with the current value
+
+        setFilteredPosts(prevPosts => {
+          if (prevPosts) {
+            return prevPosts.filter(post =>
+                post.cities.some(city => activeCities.includes(city))
+            );
           }
+          return null; // or return an empty array [] based on your application's needs
+        });
+      }
+
+      getExploreFeed({ page: filteringPage, cities: activeCities }, (data) => {
+        if (data.allPosts !== null) {
+          console.log(`!!! WE ARE IN HANDLE CITY THATS THE FILTERED POSTS WE GOT = ${JSON.stringify(data?.allPosts)}`);
+          const postsToAdd = data?.allPosts || []; // Default to empty array if null or undefined
+
+          setFilteredPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
+          setPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
+          setFilteringPage((prevState)=> prevState+1);
+          setLoading(false);
+          setHasMore(true);
+          console.log('WE ARE DONE WITH THE FILTERED POSTS WE GOT!!');
+        } else {
+          console.log(`!!! WE ARE IN HANDLE CITY if (data?.allPosts)`);
+          resetToDefault();
         }
       });
     });
@@ -346,23 +372,102 @@ export default function FeedScreen({ navigation }) {
       );
       setFilteredPosts(filtered);
     } else {
-      setFilteredPosts(posts);
+      console.log(`!!! WE ARE IN HANDLE CITY  } else {`);
+      resetToDefault();
     }
   };
+
+  const resetToDefault = () => {
+    setIsFiltering(false);
+    setFilteringPage(()=> 1);
+    setPostsPage(()=> 1);
+    setPrevActiveCities(()=> []);
+    getPosts(postsPage);
+  }
+
+
   const handleRefresh = () => {
     if (!loading && !loadingMore) {
       setLoading(true);
-      setPage((page)=>page+1);
-      getData(page);
+      setPosts(()=> []);
+      setFilteredPosts(()=> []);
+      getUniqueCitiesAndImages();
+
+      resetToDefault();
     }
   };
+
+
+  const handleLoadMore = () => {
+    if (isFetchingPosts) return;
+
+    setIsFetchingPosts(true);
+    console.log("Loading more posts...");
+
+    // Increment the page number to fetch the next set of posts.
+    setPostsPage(prevPage => prevPage + 1);
+
+    getExploreFeed({ page: postsPage, cities: prevActiveCities }, (data) => {
+      if (data.allPosts !== null) {
+        console.log(`Loaded more posts: ${JSON.stringify(data?.allPosts)}`);
+        const postsToAdd = data?.allPosts || []; // Default to an empty array if null or undefined
+
+        // Add the new posts to the existing posts.
+        setFilteredPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
+        setPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
+
+        // Check if there are fewer posts than expected, indicating it may be the last page.
+        if (data.sentAllPostsIndicator == true) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+
+        setIsFetchingPosts(false); // Reset the fetching flag
+      } else {
+        console.log("No more posts to load.");
+        setHasMore(false);
+        setIsFetchingPosts(false); // Reset the fetching flag
+      }
+    });
+  };
+
+
+
+  // ----------------------------- POSTS AND FILTERING END ------------------------------//
+
+
+
+  const getUniqueCitiesAndImages = useCallback(async () => {
+    setRefreshKey(prevKey => prevKey + 1);
+    try {
+      const citiesToImageArr = await getCitiesToImages();
+      const uniqueCitiesSet = new Set<string>();
+      const cityImagesMap: Map<string, string> = new Map<string, string>();
+      citiesToImageArr.forEach(cityImage => {
+        uniqueCitiesSet.add(cityImage.cityName);
+        cityImagesMap[cityImage.cityName] = cityImage.imageUrl;
+      });
+
+      setCities(Array.from(uniqueCitiesSet));
+      setCityImages(cityImagesMap);
+      setFinishedFetchCities(true);
+    } catch (error) {
+      console.error('Error updating unique cities and images:', error);
+      // Optionally set an error state here
+    }
+  }, []); // Empty dependency list, because we aren't using any external variables
+
+  useEffect(() => {
+    getUniqueCitiesAndImages();
+  }, [getUniqueCitiesAndImages]); // Make sure to include getUniqueCitiesAndImages in the dependency list
+
 
   //initial
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
-    const updateEvent = DeviceEventEmitter.addListener("update_feed", getData);
-    getData(page);
-
+    const updateEvent = DeviceEventEmitter.addListener("update_feed", getPosts);
+    getPosts(postsPage);
     return () => {
       updateEvent.remove();
     };
@@ -418,6 +523,7 @@ export default function FeedScreen({ navigation }) {
     }
   }
 
+
   return (
     <View
       style={{
@@ -427,21 +533,32 @@ export default function FeedScreen({ navigation }) {
     >
       <FlatList
         ListHeaderComponent={
-          <CitiesPanel
-            uniqueCities={uniqueCities}
-            cityImages={cityImages}
-            onCityClick={handleCityFilter}
-          />
-        }
-        data={filteredPosts}
+          <View style={{ padding: 10 }}>
+            {!finishedFetchCities ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <CitiesPanel
+                    key={refreshKey}
+                    uniqueCities={uniqueCities}
+                    cityImages={cityImages}
+                    onCityClick={handleCityFilter}
+                />
+            )}
+          </View>
+      }
+        data={ isFiltering? filteredPosts : posts}
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => item.dataID + "_" + index}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={loading} onRefresh={()=> {handleRefresh()}}/>
         }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
+        onEndReached={() => {
+          if (!loading && !isFetchingPosts) {
+            handleLoadMore();
+          }
+        }}
+        onEndReachedThreshold={0.5}
         ListFooterComponent={<ListFooter />}
       />
     </View>

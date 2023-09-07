@@ -8,7 +8,7 @@ import * as FileSystem from "expo-file-system";
 const POSTS_URL = BASE_URL + "/posts";
 
 export function getExploreFeed(
-  params: { page?: number; cities?: string },
+  params: { page?: number; cities?: string[] },
   callback: (data?: { allPosts: PostType[] }) => void
 ) {
   axios
@@ -17,10 +17,11 @@ export function getExploreFeed(
       headers: { Authorization: getToken() },
     })
     .then((res) => {
+      console.log(`~~ This is the res inside getExploreFeed ~~ ${JSON.stringify(res)}`);
       callback(res.data);
     })
     .catch((e) => {
-      console.log("e", e);
+      console.log(`~~~ The ERROR IS ~~~ : ${JSON.stringify(e)}`, );
       callback(null);
     });
 }

@@ -3,16 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 
 const CitiesPanel = ({ uniqueCities , cityImages, onCityClick }) => {
     const [activeCities, setActiveCities] = useState([]);
+
     const handleCityClick = (city) => {
-        // Check if the city is already active
         if (activeCities.includes(city)) {
-            // If the city is active, remove it from the active cities
-            setActiveCities(activeCities.filter(c => c !== city));
-            onCityClick(activeCities.filter(c => c !== city));
+            const newActiveCities = activeCities.filter(c => c !== city);
+            setActiveCities(newActiveCities);
+            onCityClick(newActiveCities);
         } else {
-            // If the city is not active, add it to the active cities
-            setActiveCities([...activeCities, city]);
-            onCityClick([...activeCities, city]);
+            const newActiveCities = [...activeCities, city];
+            setActiveCities(newActiveCities);
+            onCityClick(newActiveCities);
         }
     };
 
@@ -22,10 +22,11 @@ const CitiesPanel = ({ uniqueCities , cityImages, onCityClick }) => {
                 <View style={styles.buttonContainer} key={city}>
                     <TouchableOpacity
                         style={[styles.button, activeCities.includes(city) && styles.activeButton]}
-                        onPress={() => handleCityClick(city)}
+                        onPress={() => {
+                            handleCityClick(city)}}
                     >
                         <Image
-                            source={{ uri: cityImages.get(city) }}
+                            source={{ uri: cityImages[city] }}
                             style={{ width: '100%', height: '100%', borderRadius: 8,marginTop:5 }}
                         />
                     </TouchableOpacity>
