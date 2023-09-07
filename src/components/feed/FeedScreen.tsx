@@ -356,6 +356,21 @@ export default function FeedScreen({ navigation }) {
           resetToDefault();
         }
       });
+    });
+
+    setCities(Array.from(citySet));
+    setCityImages(cityImageMap);
+  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
+
+  useEffect(() => {
+    getUniqueCities();
+  }, [getUniqueCities]);
+  const handleCityFilter = (activeCities) => {
+    if (activeCities?.length > 0) {
+      const filtered = posts.filter((post) =>
+        post.cities.some((city) => activeCities.includes(city))
+      );
+      setFilteredPosts(filtered);
     } else {
       console.log(`!!! WE ARE IN HANDLE CITY  } else {`);
       resetToDefault();
@@ -458,6 +473,28 @@ export default function FeedScreen({ navigation }) {
     };
   }, []);
 
+  const handleLoadMore = () => {
+    setLoading(true);
+    console.log(`page is ${page}`)
+    setPage((page)=> page+1);
+    console.log(`new page is ${page}`)
+    console.log(`posts are ${posts?.map((post)=> post.dataID)}`)
+    console.log(`filtered posts are ${filteredPosts?.map((post)=> post.dataID)}`)
+   getExploreFeed({ page: page }, (data) => {
+      if (data?.allPosts) {
+        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
+        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
+        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+        setLoading(false);
+        setHasMore(true);
+        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
+        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
+      }else{
+        setPage((page)=>page-1);
+      }
+    });
+  };
 
   const ListFooter = () => {
     if (loadingMore || hasMore) {
