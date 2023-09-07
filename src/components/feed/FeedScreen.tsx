@@ -30,7 +30,7 @@ import MapView, {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
-import {getCitiesToImages} from "../../actions/cityPanelActions";
+import { getCitiesToImages } from "../../actions/cityPanelActions";
 
 const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
@@ -106,7 +106,10 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
             ))}
           {
             <Polyline
-              coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
+              coordinates={data.contentData?.locationsDTO[1].map((item) => ({
+                latitude: item.longitude,
+                longitude: item.latitude,
+              }))}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
@@ -311,7 +314,7 @@ export default function FeedScreen({ navigation }) {
       if (data?.allPosts) {
         setPosts(data.allPosts);
         setLoading(false);
-        setPostsPage((page)=>page+1);
+        setPage((page) => page + 1);
         setHasMore(true);
       }
     });
@@ -444,7 +447,7 @@ export default function FeedScreen({ navigation }) {
       const citiesToImageArr = await getCitiesToImages();
       const uniqueCitiesSet = new Set<string>();
       const cityImagesMap: Map<string, string> = new Map<string, string>();
-      citiesToImageArr.forEach(cityImage => {
+      citiesToImageArr.forEach((cityImage) => {
         uniqueCitiesSet.add(cityImage.cityName);
         cityImagesMap[cityImage.cityName] = cityImage.imageUrl;
       });
@@ -453,7 +456,7 @@ export default function FeedScreen({ navigation }) {
       setCityImages(cityImagesMap);
       setFinishedFetchCities(true);
     } catch (error) {
-      console.error('Error updating unique cities and images:', error);
+      console.error("Error updating unique cities and images:", error);
       // Optionally set an error state here
     }
   }, []); // Empty dependency list, because we aren't using any external variables
@@ -474,13 +477,16 @@ export default function FeedScreen({ navigation }) {
   }, []);
 
   const handleLoadMore = () => {
-    setLoading(true);
-    console.log(`page is ${page}`)
-    setPage((page)=> page+1);
-    console.log(`new page is ${page}`)
-    console.log(`posts are ${posts?.map((post)=> post.dataID)}`)
-    console.log(`filtered posts are ${filteredPosts?.map((post)=> post.dataID)}`)
-   getExploreFeed({ page: page }, (data) => {
+    if (loading || loadingMore) return;
+    setLoadingMore(true);
+    console.log(`page is ${page}`);
+    setPage((page) => page + 1);
+    console.log(`new page is ${page}`);
+    console.log(`posts are ${posts?.map((post) => post.dataID)}`);
+    console.log(
+      `filtered posts are ${filteredPosts?.map((post) => post.dataID)}`
+    );
+    getExploreFeed({ page: page }, (data) => {
       if (data?.allPosts) {
         console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
         console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
@@ -533,10 +539,11 @@ export default function FeedScreen({ navigation }) {
     >
       <FlatList
         ListHeaderComponent={
-          <View style={{ padding: 10 }}>
-            {!finishedFetchCities ? (
+          loading ? null : (
+            <View style={{ padding: 10 }}>
+              {!finishedFetchCities ? (
                 <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
+              ) : (
                 <CitiesPanel
                     key={refreshKey}
                     uniqueCities={uniqueCities}
