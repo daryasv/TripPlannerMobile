@@ -4,6 +4,8 @@ import {
   StyleSheet,
   Text,
   FlatList,
+  ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { Avatar, Button, Icon } from "@rneui/themed";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,68 +19,71 @@ import {
 import ReadMore from "@fawazahmed/react-native-read-more";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
 import { PostType } from "../../types/postTypes";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useEffect, useState } from "react";
+import { saveLocation, unSaveLocation } from "../../actions/feedActions";
 
 
 
 export default function RecommendedPlansScreen({ route }) {
   const numOfDays = route.params.numOfDays;
   const city = route.params.city;
-
+  
+  const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
-  const [suggestions, setSuggestions] = React.useState([] as RouteDTO[]);
+  const [suggestions, setSuggestions] = React.useState([] as PostType[]);
 
-  const showItem = ({ item }: { item: RouteDTO }) => {
+  const Item =  ({ item }: { item: PostType }) => {
+    const [saved, setSaved] = useState(false);
+    const onSaveLocation = () => {
+      if (saved) {
+        unSaveLocation(item.dataID)
+          .then(() => {
+            setSaved(false);
+          })
+          .catch((e) => {});
+      } else {
+        saveLocation(item.dataID)
+          .then((response) => {
+            setSaved(true);
+          })
+          .catch((e) => {});
+      }
+    };
     return (
       <View style={styles.itemContainer}>
         <View style={{ flexDirection: "row", alignContent: "center" }}>
           <View style={{ flexDirection: "row", flex: 1 }}>
             <Avatar
-              avatarStyle={{borderWidth: 1}}
+            source={{
+              uri: item.UploadByProfilePictureUrl,
+            }}
+              avatarStyle={{borderWidth: 0}}
               rounded
-              size={40}
+              size={45}
             />
             <View style={{ marginLeft: 10,
                         width: "70%",
                         justifyContent: "space-evenly", }}>
-              {/* {item?.uploadedBy ? (
+              {item?.uploadedBy ? (
                 <Text style={styles.username}>
                   {item?.uploadedBy?.includes("@")
                     ? item.uploadedBy.substring(0, item.uploadedBy.indexOf("@"))
                     : item.uploadedBy}
                 </Text>
-              ) : null} */}
-              {/* {item?.cities?.length ? ( */}
+              ) : null}
+              {item?.cities?.length ? (
                 <View style={styles.row}>
                   <Icon name="location-on" size={14} type={"material"} />
                   <Text style={styles.location}>{city}</Text>
                 </View>
-              {/* ) : null} */}
+               ) : null}
             </View>
-            <Button
-              type="clear"
-              style={{
-                width: 48,
-                height: 48,
-                borderColor: "black",
-                alignContent: "flex-end",
-              }}
-              onPress={() => {
-  // const tripLocations = route.params.tripLocations;
-  // const totalTripLocations = route.params.totalTripLocations;
-  // const path = route.params.path;
-                let totalTripLocations = findTotalLocations(item.pinnedLocationsDTO)
-                let tripLocations = item.pinnedLocationsDTO
-                let path = item.locationsDTO
-                let region = calculatedRegion(item)
-                navigation.navigate("TripOverviewScreen", {region, numOfDays, city, totalTripLocations, tripLocations, path})
-              }}
-            >
-              <MaterialCommunityIcons
-                name="map-search-outline"
-                style={{color: "black",
-                fontSize: 30,}}
-              />
-            </Button>
+            <Ionicons
+              name={saved ? "bookmark" : "bookmark-outline"}
+              size={30}
+              onPress={() => onSaveLocation()}
+            />
           </View>
         </View>
   
@@ -89,10 +94,10 @@ export default function RecommendedPlansScreen({ route }) {
           toolbarEnabled={false}
           zoomEnabled={true}
           scrollEnabled={false}
-          region={calculatedRegion(item)}
+          region={calculatedRegion(item.contentData)}
         >
-          {item.pinnedLocationsDTO[1].length > 0 &&
-            item.pinnedLocationsDTO[1].map((pinnedLocation) => (
+          {item.contentData.pinnedLocationsDTO[1].length > 0 &&
+            item.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
               <Marker
                 coordinate={{
                   latitude: pinnedLocation?.contentData?.locationDTO.longitude,
@@ -103,14 +108,14 @@ export default function RecommendedPlansScreen({ route }) {
             ))}
           {
             <Polyline
-              coordinates={item.locationsDTO[1] || []}
+              coordinates={item.contentData.locationsDTO[1] || []}
               strokeColor="#FF0000"
               strokeWidth={3}
             />
           }
         </MapView>
   
-        {item.descriptionDTO ? (
+        {item.contentData.descriptionDTO ? (
           <ReadMore
             numberOfLines={3}
             style={styles.description}
@@ -119,18 +124,30 @@ export default function RecommendedPlansScreen({ route }) {
             seeLessStyle={{ color: Colors.main }}
             seeMoreText={"Read More"}
           >
-            {item.descriptionDTO}
+            {item.contentData.descriptionDTO}
           </ReadMore>
         ) : null}
   
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {item.totalDurationDTO || 0} hours | {item.totalDistanceDTO || 0} Km |
+            {item.contentData.totalDurationDTO || 0} hours | {item.contentData.totalDistanceDTO || 0} Km
           </Text>
         </View>
       </View>
     );
   };
+
+  function showItem({ item }) {
+    return (
+      <Pressable
+        onPress={() => {
+          navigation.navigate("RouteDetails", { item });
+        }}
+      >
+        <Item item={item}/>
+      </Pressable>
+    );
+  }
   
   const calculatedRegion = (data: RouteDTO): Region => {
     if (!data.locationsDTO[1].length) return null;
@@ -174,7 +191,7 @@ export default function RecommendedPlansScreen({ route }) {
     return (returnValue)
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const numOfDays = route.params?.numOfDays;
     const categories = route.params?.categories;
     const city = route.params?.city;
@@ -185,8 +202,11 @@ export default function RecommendedPlansScreen({ route }) {
         city: city,
       },
       (data) => {
+        setIsLoading(false);
         if (data) {
           setSuggestions(data);
+        } else {
+          setSuggestions([]);
         }
       }
     );
@@ -194,50 +214,82 @@ export default function RecommendedPlansScreen({ route }) {
 
   return (
     <View style={styles.iphone1313Pro7}>
-      <View style={styles.frame}>
-        <View style={styles.frame1}>
-          <Button
-            radius={5}
-            iconPosition="left"
-            type="clear"
-            color={Colors.Whitesmoke}
-            onPress={() => navigation.goBack()}
-            containerStyle={styles.arrowLeft1IconBtn}
-          >
-            <MaterialCommunityIcons
-              name="chevron-left"
-              color={Colors.LightBlack}
-              size={30}
-            />
-          </Button>
-          <Text style={styles.planATrip}>Plan a trip</Text>
-        </View>
+      {isLoading ? (
+      <View style={{flex: 1, alignItems: "center", justifyContent: "center",}}>
+      <ActivityIndicator size="small" color="#000" />
       </View>
-      <FlatList
-        data={suggestions}
-        renderItem={({ item }) => showItem({ item })}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      {/* <Button
-        title="Next"
-        radius={5}
-        type="solid"
-        color="#000"
-        titleStyle={styles.frameButtonBtn}
-        onPress={() => buttonPressed()}
-        containerStyle={styles.frameButtonBtn1}
-        buttonStyle={styles.frameButtonBtn2}
-      /> */}
+    ) : (
+      <><View style={styles.frame}>
+            <View style={styles.frame1}>
+              <Button
+                radius={5}
+                iconPosition="left"
+                type="clear"
+                color={Colors.Whitesmoke}
+                onPress={() => navigation.goBack()}
+                containerStyle={styles.arrowLeft1IconBtn}
+              >
+                <MaterialCommunityIcons
+                  name="chevron-left"
+                  color={Colors.LightBlack}
+                  size={30} />
+              </Button>
+              <Text style={styles.planATrip}>Plan a trip</Text>
+            </View>
+          </View>
+          {suggestions.length == 0 &&
+            <View style={styles.whereAreYouTravelingParent}>
+              <MaterialCommunityIcons
+              name= "emoticon-confused-outline"
+              size={45}
+            />
+              <Text style={styles.planATripTypo}>No suggestions Found</Text>
+              <Text style={styles.submessage}>Try planning your own trip!</Text>
+            </View>
+          }
+          <FlatList
+              data={suggestions}
+              renderItem={({ item }) => showItem({ item })}
+              keyExtractor={(item, index) => index.toString()}/>
+          <Button
+            title="Done"
+            radius={5}
+            type="solid"
+            color="#000"
+            titleStyle={styles.frameButtonBtn}
+            onPress={() => navigation.navigate("Main")}
+            containerStyle={styles.frameButtonBtn1}
+            buttonStyle={styles.frameButtonBtn2}
+          /></>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   frameButtonBtn1: {
-   height:"auto"
+    top: "90%",
+    position: "absolute",
+    width: "90%",
+    height: "10%",
+    marginLeft: "6%",
   },
   container: {
     width: "100%",
+  },
+  doneButtonTitle: {
+    color: "#fff",
+    fontSize: 32,
+    fontWeight: "700",
+    textAlign: "left",
+  },
+  doneButton: {
+    borderRadius: 8,
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedIndicator: {
     position: "absolute",
@@ -269,6 +321,7 @@ const styles = StyleSheet.create({
   frameButtonBtn2: {
     borderRadius: 8,
     width: "100%",
+    height: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -292,10 +345,18 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   planATripTypo: {
+    marginTop: 10,
     textAlign: "left",
     color: Colors.LightBlack,
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: "500",
+  },
+  submessage: {
+    marginTop: 10,
+    textAlign: "left",
+    color: Colors.LightBlack,
+    fontSize: 16,
+    fontWeight: "300",
   },
   frameChild: {
     borderRadius: 5,
@@ -316,10 +377,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   whereAreYouTravelingParent: {
-    marginTop: "10%",
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
-    height: "100%",
   },
   planATrip: {
     fontSize: 24,
@@ -345,7 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     paddingHorizontal: "1%",
-    paddingVertical: "5%",
+    paddingVertical: "1%",
     overflow: "hidden",
   },
   itemContainer: {

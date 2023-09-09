@@ -43,18 +43,18 @@ export default function ChooseCategoriesScreen({ route }) {
       name: "shopping",
     },
     {
-      label: "Sport",
-      icon: <MaterialIcons name="sports-basketball" size={30} />,
-      name: "sport",
+      label: "Hotels",
+      icon: <MaterialCommunityIcons name="bed" size={30} />,
+      name: "hotels",
     },
     {
       label: "Museums",
-      icon: <MaterialIcons name="museum" size={30} />,
+      icon: <MaterialCommunityIcons name="bank" size={30} />,
       name: "museums",
     },
     {
       label: "Tourist Sites",
-      icon: <MaterialIcons name="location-city" size={30} />,
+      icon: <MaterialCommunityIcons name="pillar" size={30} />,
       name: "tourist sites",
     },
     {
@@ -102,8 +102,10 @@ export default function ChooseCategoriesScreen({ route }) {
           <Text style={styles.planATrip}>Plan a trip</Text>
         </View>
       </View>
-      <ScrollView contentContainerStyle={styles.whereAreYouTravelingParent}>
+      <View style={styles.whereAreYouTravelingParent}>
         <Text style={styles.planATripTypo}>What would you like to do?</Text>
+      </View>
+      <ScrollView contentContainerStyle={{ alignItems: 'center', marginTop: 10, width: "100%"}}>
         <View
           style={{
             justifyContent: "flex-start",
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
     color: Colors.LightBlack,
     fontSize: 24,
     fontWeight: "700",
+    marginBottom: 10,
   },
   frameChild: {
     borderRadius: 5,
@@ -247,10 +250,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   whereAreYouTravelingParent: {
-    marginTop: "10%",
+    marginTop: "5%",
     alignItems: "center",
     width: "100%",
-    height: "100%",
   },
   planATrip: {
     fontSize: 24,
@@ -285,6 +287,7 @@ const styles = StyleSheet.create({
   cube: {
     backgroundColor: "white",
     width: itemWidth,
+    height: itemWidth,
     maxWidth: maxItemWidth,
     maxHeight: maxItemWidth,
     aspectRatio: 1,
@@ -295,6 +298,7 @@ const styles = StyleSheet.create({
   selectedCube: {
     backgroundColor: "black",
     width: itemWidth,
+    height: itemWidth,
     maxWidth: maxItemWidth,
     maxHeight: maxItemWidth,
     aspectRatio: 1,

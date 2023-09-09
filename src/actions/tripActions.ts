@@ -1,7 +1,7 @@
 import Axios from "axios";
 import { BASE_URL, MAPS_KEY_IOS } from "./actionsConfig";
 import { getToken, getUserEmail, getUserId } from "./security";
-import { LocationDay, PinnedLocationsDto, PostType } from "../types/postTypes";
+import { PostType } from "../types/postTypes";
 
 let newRouteId = "";
 
@@ -262,8 +262,8 @@ export const getRegion = (
         callback({
           latitude: location.lat,
           longitude: location.lng,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.07,
         });
       }
     })
@@ -309,7 +309,7 @@ export interface PinnedLocationcategories {
 
 export const getSuggestedRoutes = (
   data: SuggestedRoutesParams,
-  callback: (data?: RouteDTO[]) => void
+  callback: (data?: PostType[]) => void
 ) => {
   const headers = {
     Authorization: getToken(),

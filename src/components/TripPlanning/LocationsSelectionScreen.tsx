@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, FlatList, StyleSheet, Text, ScrollView } from "react-native";
+import { View, FlatList, StyleSheet, Text, ScrollView, ActivityIndicator } from "react-native";
 import { Avatar, Button, Icon, Image } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -13,43 +13,47 @@ export default function LocationsSelectionScreen({ route }) {
   const currDay = route.params.currDay;
   const city = route.params.city;
   const locations = route.params.categoryLocations;
-  const selectedLocations = route.params.selectedLocations;
   const region = route.params.region;
   const numOfDays = route.params.numOfDays;
 
-  const [updatedRoute, setNewRoute] = useState(null);
-  const [selected, setSelected] = useState([]);
+  const [updatedRoute, setNewRoute] = useState(route.params.updatedRoute);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selected, setSelected] = useState(route.params.selected ? route.params.selected.map(location => location.dataID) : []);
   const navigation = useNavigation();
   const temp = new Date();
 
   const iconPressed = (item) => {
     if (selected.includes(item.dataID)) {
       setSelected(selected.filter((id) => id !== item.dataID));
+      // RemoveLocationFromRoute
     } else {
-      setSelected([...selected, item.dataID]);
-    }
-
-    AddLocationToRoute(
-      {
-        routeId: getRouteId(),
-        day: currDay,
-        newPinnedLocationId: item.dataID,
-      },
-      (success) => {
-        if (success) {
-          setNewRoute(success.RouteDto);
+      setIsLoading(true);
+      AddLocationToRoute(
+        {
+          routeId: getRouteId(),
+          day: currDay,
+          newPinnedLocationId: item.dataID,
+        },
+        (success) => {
+          if (success) {
+            setNewRoute(success.RouteDto);
+            setIsLoading(false);
+            setSelected([...selected, item.dataID]);
+          }
         }
-      }
-    );
+      );
+    }
   };
 
   const handleGoBack = () => {
+    let needsToRender = false;
     navigation.navigate("PlanDaysScreen", {
       updatedRoute,
       city,
       currDay,
       region,
       numOfDays,
+      needsToRender,
     });
   };
 
@@ -157,13 +161,17 @@ export default function LocationsSelectionScreen({ route }) {
                       iconPressed(item);
                     }}
                   >
-                    <MaterialCommunityIcons
+                    {isLoading ?
+                      <ActivityIndicator size="small" color="#000"/>
+                      :
+                      <MaterialCommunityIcons
                       name="plus-circle-outline"
                       style={[
                         styles.addToTrip,
-                        selected.includes(item.dataID) && styles.selectedIcon,
+                        selected?.includes(item.dataID) && styles.selectedIcon,
                       ]}
                     />
+                    }
                   </Button>
                 </View>
                 <Image
