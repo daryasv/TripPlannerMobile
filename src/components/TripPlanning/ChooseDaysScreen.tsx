@@ -16,10 +16,11 @@ export default function ChooseDaysScreen({route}) {
   const navigation = useNavigation();
 
   const buttonPressed = () => {
+    const needsToRender = true;
     let numOfDays = selectedIndex + 1;
 
     if (key == 1) {
-      navigation.navigate("PlanDaysScreen", {city, numOfDays, currDay})
+      navigation.navigate("PlanDaysScreen", {city, numOfDays, currDay, needsToRender})
     } else {
       navigation.navigate("ChooseCategoriesScreen", {city, numOfDays, currDay})
     }   

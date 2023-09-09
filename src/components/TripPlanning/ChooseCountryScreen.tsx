@@ -23,20 +23,15 @@ const handleInputChange = (text) => {
     setOptions([])
   }
   else if (fullOptions) {
-    let temp = fullOptions.filter(option =>
-      option.toLowerCase().includes(text.toLowerCase()));
-    if (temp.length == 1 && text == temp) {
-      setOptions([]);
-    } else {
-      setOptions(fullOptions.filter(option =>
-        option.toLowerCase().includes(text.toLowerCase())))
-    }
+    setOptions(fullOptions.filter(option =>
+      option.toLowerCase().includes(text.toLowerCase())))
   }
 };
 
 const handleSelectItem = (item) => {
   setSelectedValue(item);
-  handleInputChange(item);
+  setQuery(item);
+  setOptions([]);
 
   if (item != "") {
     setNextDisabled(false);

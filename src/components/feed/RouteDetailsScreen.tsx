@@ -1,163 +1,565 @@
-import { Avatar, Card, Icon, Image } from "@rneui/themed";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  DeviceEventEmitter,
-  Dimensions,
+  View,
   FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
-  View,
+  ScrollView,
+  TextInput,
+  Alert,
+  TouchableOpacity
 } from "react-native";
-import ReadMore from "@fawazahmed/react-native-read-more";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { getExploreFeed } from "../../actions/feedActions";
+import { Avatar, Button, Icon, Image } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
-import { postGenreEnum, PostType } from "../../types/postTypes";
-import CitiesPanel from "./CitiesPanel";
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  Region,
-} from "react-native-maps";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from "react-native-maps";
+import { saveRoute, getRouteId } from "../../actions/tripActions";
 import { calculatedRegion } from "./FeedScreen";
 
 export default function RouteDetailsScreen({ route }) {
-  const data: PostType = route.params.item;
-  console.log("\n\n\ndata", JSON.stringify(data.contentData.pinnedLocationsDTO[1][1].contentData.imageFileNameDTO));
+
+  const data = route.params.item.contentData;
+  const user = route.params.item.uploadedBy;
+  const numOfDays = Object.keys(data.pinnedLocationsDTO).length;
+  const [daySelected, setDaySelected] = useState("Day 1")
+  const [categorySelected, setCategorySelected] = useState("")
+  const [shownLocations, setShownLocations] = useState([]);
+  const [shownPath, setShownPath] = useState(data.pinnedLocationsDTO[1]);
+  
+  const navigation = useNavigation();
+
+  const createDaysArray = (num) => {
+    const dayArray: string[] = [];
+
+    for (let i = 1; i <= num; i++) {
+      dayArray.push("Day " + i.toString());
+    }
+
+    return dayArray;
+  };
+
+  const days = createDaysArray(numOfDays);
+
+  const clickedCategory = (title) => {
+    if (categorySelected != title) {
+      setCategorySelected(title)
+      updateFilter(daySelected, title)
+    } else {
+      setCategorySelected("")
+      updateFilter(daySelected, "")
+    }
+  };
+
+  const clickedSave = (item) => {
+    saveRoute({routeId: item.dataID, description: item.contentData.descriptionDTO,cities: item.cities[0]},(success) => {
+      if (success) {
+        Alert.alert('Your new trip is saved!', '', [
+          {text: 'OK', onPress: () => navigation.navigate("Main")},
+        ]);
+      }
+    });
+  };
+
+  const clickedDay= (item) => {
+    setDaySelected(item)
+    updateFilter(item, categorySelected)
+  };
+
+  const updateFilter = (day, category) => {
+    if (category != "") {
+      setShownLocations(data.pinnedLocationsDTO[parseInt(day.slice(4))]?.filter(location => location.categories.includes(category.toLowerCase())))
+    } else {
+      setShownLocations(data.pinnedLocationsDTO[parseInt(day.slice(4))])
+    }
+
+    setShownPath(data.locationsDTO[parseInt(day.slice(4))]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+  };
+
+  useEffect(() => {
+    setShownLocations(data.pinnedLocationsDTO[1])
+    setShownPath(data.locationsDTO[1]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+  }, []);
+
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
-      <View style={styles.itemContainer}>
-        {/* <Text>Item ID: {data}</Text> */}
-        <MapView
-          style={{
-            height: Dimensions.get("window").height / 2,
-            width: "100%",
-            borderRadius: 15,
-          }}
+    <View style={styles.iphone1313Pro16}>
+      <View style={[styles.frameParent]}>
+        <View>
+          <View style={styles.days}>
+            <FlatList
+              horizontal= {true}
+              style={styles.frameChild}
+              data={days}
+              renderItem={({ item }) => <TouchableOpacity onPress={() => {clickedDay(item)}}><Text style={[styles.day, daySelected == item && styles.selectedDay]}>{item}</Text></TouchableOpacity>}
+              contentContainerStyle={styles.frameFlatListContent}
+              extraData={daySelected}
+            />
+            </View>
+            <View style={styles.mapView}>
+            <MapView
+          style={styles.image29Icon}
           provider={PROVIDER_GOOGLE}
           showsCompass={true}
           toolbarEnabled={false}
           zoomEnabled={true}
-          region={calculatedRegion(data.contentData)}
+          region={calculatedRegion(data, daySelected.slice(4))}
         >
-          {data.contentData?.pinnedLocationsDTO[1].length > 0 &&
-            data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
+          {shownLocations?.length > 0 &&
+            shownLocations?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation?.contentData?.locationDTO.longitude,
-                  longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+                  latitude: pinnedLocation.contentData.locationDTO.longitude,
+                  longitude: pinnedLocation.contentData.locationDTO.latitude,
                 }}
-                title={pinnedLocation?.contentData?.descriptionDTO}
+                title={pinnedLocation.contentData.descriptionDTO}
               />
             ))}
-          {
+          {shownPath?.length > 1 &&
             <Polyline
-              coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
+              coordinates={shownPath}
               strokeColor="#FF0000"
-              strokeWidth={3}
+              strokeWidth={5}
             />
           }
         </MapView>
-        <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-          <Icon name="routes" type={"material-community"} size={18} />
-          <Text style={styles.location}>
-            {" "}
-            {data.contentData.totalDurationDTO} hours |{" "}
-            {data.contentData.totalDistanceDTO} Km | Created at{" "}
-            {data.dateUploaded}
-          </Text>
-        </View>
-        <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO[1].map((item, index) => (
-          <View key={index}>
-            <Image
-              source={{
-                uri: item.contentData?.imageFileNameDTO,
-              }}
-              style={{
-                width: "100%",
-                aspectRatio: 1.5,
-                marginTop: 15,
-                borderRadius: 15,
-                resizeMode: "cover",
-              }}
+          </View>
+          <View style={styles.foodDrinksCoffeeMugCoffeeParent}>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.leftButton}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Coffee Shops" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Coffee Shops")}
+            >
+            <MaterialCommunityIcons
+              name= "coffee-outline"
+              size={30}
+              style={[styles.icon, categorySelected == "Coffee Shops" && styles.iconPressed]}
             />
-            <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-              <Icon
-                name="map-marker"
-                type={"material-community"}
-                size={18}
-                color={"#FF0000"}
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.travelAirportBaggageCheckBtn}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Resturants" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Resturants")}
+            >
+              <MaterialCommunityIcons
+              name= "silverware-fork-knife"
+              size={30}
+              style={[styles.icon, categorySelected == "Resturants" && styles.iconPressed]}
+            />
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.travelAirportBaggageCheckBtn}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Shopping" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Shopping")}
+            >
+              <MaterialCommunityIcons
+                name= "shopping-outline"
+                size={30}
+                style={[styles.icon, categorySelected == "Shopping" && styles.iconPressed]}
               />
-              <Text style={styles.location}>
-                {data.contentData.descriptionDTO}
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.travelAirportBaggageCheckBtn}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Bars" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Bars")}
+            >
+              <MaterialCommunityIcons
+                name= "glass-cocktail"
+                size={30}
+                style={[styles.icon, categorySelected == "Bars" && styles.iconPressed]}
+              />
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.travelAirportBaggageCheckBtn}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Tourist Sites" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Tourist Sites")}
+            >
+              <MaterialCommunityIcons
+                name= "pillar"
+                size={30}
+                style={[styles.icon, categorySelected == "Tourist Sites" && styles.iconPressed]}
+              />
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.travelAirportBaggageCheckBtn}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Museums" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Museums")}
+            >
+              <MaterialCommunityIcons
+                name= "bank"
+                size={30}
+                style={[styles.icon, categorySelected == "Museums" && styles.iconPressed]}
+              />
+            </Button>
+            <Button
+              radius="5"
+              iconPosition="left"
+              type="outline"
+              color="#fff"
+              containerStyle={styles.rightButton}
+              buttonStyle={[styles.travelAirportBaggageCheckBtn1, categorySelected == "Hotels" && styles.buttonPressed]}
+              onPress={() => clickedCategory("Hotels")}
+            >
+              <MaterialCommunityIcons
+                name= "bed"
+                size={30}
+                style={[styles.icon, categorySelected == "Hotels" && styles.iconPressed]}
+              />
+            </Button>
+          </View>
+          <View style={styles.inputText}>
+              <Text>{data.descriptionDTO}</Text>
+          </View>
+        </View>
+      </View>
+      <ScrollView style={styles.frameParent2} contentContainerStyle={{ paddingBottom: 180 }}>
+      {shownLocations.map((item, index) => (
+          <View key={index} style={styles.locationFrame}>
+          <View style={{ flexDirection: "row"}}>
+            <Avatar
+              source={{
+                uri: item.UploadByProfilePictureUrl,
+              }}
+              rounded
+              size={40}
+              containerStyle={{paddingTop: 5, paddingLeft: 5}}
+            />
+            <View style={{ marginLeft: 8, width: "70%", justifyContent: "space-evenly"}}>
+              <Text style={styles.username}>
+                {item.uploadedBy.includes("@")
+                  ? item.uploadedBy.substring(0, item.uploadedBy.indexOf("@"))
+                  : item.uploadedBy}
               </Text>
             </View>
           </View>
+          <Image
+            source={{
+              uri: item.contentData.imageFileNameDTO,
+            }}
+            style={{
+              marginTop: 8,
+              width: "100%",
+              aspectRatio: 1.5,
+              borderRadius: 15,
+              resizeMode: "cover",
+            }}
+          />
+          <View style={[styles.row, { marginTop: 10, marginStart: 10}]}>
+            <Icon
+              name="map-marker"
+              type={"material-community"}
+              size={20}
+              color={"#FF0000"}
+            />
+            <Text style={styles.location}>{item.contentData.descriptionDTO}</Text>
+          </View>
+        </View>
         ))}
+      </ScrollView>
+      <View style={[styles.frame, styles.foodFlexBox]}>
+        <View style={styles.frame1}>
+        <Button
+            radius={5}
+            iconPosition="left"
+            type="clear"
+            color={Colors.Whitesmoke}
+            onPress={() => navigation.goBack()}
+            containerStyle={styles.arrowLeft1Icon}
+          ><MaterialCommunityIcons
+          name="chevron-left"
+          color={Colors.LightBlack}
+          size={30}
+        /></Button>
+          {/* <View style={styles.frame2}> */}
+            <Text style={[styles.yourTrip, styles.saveFlexBox]}>
+            {user.includes("@")
+                  ? user.substring(0, user.indexOf("@"))
+                  : user}'s Trip
+            </Text>
+            <TouchableOpacity onPress={() => clickedSave(route.params.item)}><Text style={[styles.save, styles.saveFlexBox]}>Save</Text></TouchableOpacity>
+          {/* </View> */}
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
-}
-
-// const calculatedRegion = (data: PostType): Region => {
-//   const minLatitude = Math.min(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
-//   );
-//   const maxLatitude = Math.max(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
-//   );
-//   const minLongitude = Math.min(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.longitude)
-//   );
-//   const maxLongitude = Math.max(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.longitude)
-//   );
-
-//   const padding = 0.01; // Adjust the padding as needed
-
-//   const calculatedRegion: Region = {
-//     latitude: (minLatitude + maxLatitude) / 2,
-//     longitude: (minLongitude + maxLongitude) / 2,
-//     latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
-//     longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
-//   };
-
-//   return calculatedRegion;
-// };
+};
 
 const styles = StyleSheet.create({
-  itemContainer: {
-    padding: 20,
-    height: "auto",
+  locationFrame: {
+    borderWidth: 0,
+    marginTop:5,
+    borderColor: Colors.main,
+    padding: 10,
+    backgroundColor: "#fff",
+    marginHorizontal: "2%",
+    borderRadius: 10,
+    width: "96%"
+  },
+  username: {
+    color: "black",
+    fontWeight: "bold",
+  },
+  iconPressed: {
+    color: "#fff",
+  },
+  icon: {
+    color: Colors.LightBlack,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
   },
-  username: {
-    color: Colors.Orange,
-    fontWeight: "bold",
-  },
   location: {
     fontSize: 11,
     fontWeight: "300",
     marginLeft: 5,
+    top: 5,
   },
-  description: {
+  frameParent2: {
+    top: "20%",
+    height: "100%",
+    width: "100%",
+  },
+  leftButton: {
+    padding: 1,
+    paddingLeft: 10,
+  },
+  rightButton: {
+    padding: 1,
+    paddingRight: 10,
+  },
+  mapView:
+  {
+    width: "100%",
+    height: "60%",
+  },
+  day: {
+    width: 70,
+    height: 30,
+    fontSize: 20,
+    textAlign: "center",
+    fontWeight: "500"
+  },
+  selectedDay: {
+    width: 70,
+    height: 30,
+    fontSize: 20,
+    textAlign: "center",
+    fontWeight: "700"
+  },
+  days: {
+    width: "100%",
+    height: 40,
+  },
+  frameFlatListContent: {
+    flexDirection: "row",
+    width: "100%",
+    height: "50%",
+    alignContent: "center",
+    justifyContent: "center"
+  },
+  foodDrinksCoffeeMugCoffeeBtn: {
+    paddingLeft: 8,
+  },
+  foodDrinksCoffeeMugCoffeeBtn1: {
+    borderRadius: 4,
+    backgroundColor: "#fff",
+    borderWidth: 0,
+    width: "100%",
+    height: "10%",
+    overflow: "hidden",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  travelAirportBaggageCheckBtn: {
+    padding: 1,
+  },
+  buttonPressed: {
+    borderRadius: 4,
+    width: 48,
+    height: 48,
+    overflow: "hidden",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "black",
+    borderWidth: 0,
+  },
+  travelAirportBaggageCheckBtn1: {
+    borderRadius: 4,
+    width: 48,
+    height: 48,
+    overflow: "hidden",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    borderWidth: 0,
+  },
+  travelHotelOneStarOneStaBtn: {
+    padding: 1,
+  },
+  travelHotelOneStarOneStaBtn1: {
+    borderRadius: 4,
+    width: 48,
+    height: 48,
+    overflow: "hidden",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  frameFlatList1Content: {
+    flexDirection: "column",
+  },
+  framePosition: {
+    position: "absolute",
+  },
+  foodFlexBox: {
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  saveFlexBox: {
+    textAlign: "left",
+    color: Colors.LightBlack,
+  },
+  frameChild: {
+    width: "100%",
+    flex: 1,
+  },
+  image29Icon: {
+    height: "100%",
+    borderRadius: 5,
+    width: "96%",
+    marginLeft: "2%"
+  },
+  foodKitchenwareForkSpoonF: {
+    paddingHorizontal: 2,
+    alignItems: "center",
+    paddingVertical: 1,
+    justifyContent: "center",
+    height: 48,
+    width: 48,
+    flexDirection: "row",
+    borderRadius: 4,
+  },
+  foodDrinksCocktailGlassCo: {
+    paddingHorizontal: 3,
+    alignItems: "center",
+    paddingVertical: 1,
+    justifyContent: "center",
+    height: 48,
+    width: 48,
+    flexDirection: "row",
+    borderRadius: 4,
+  },
+  travelPlacesColumn1Pillar: {
+    paddingHorizontal: 1,
+    paddingVertical: 2,
+    alignItems: "center",
+    height: 48,
+    width: 48,
+    justifyContent: "center",
+    borderRadius: 4,
+  },
+  foodDrinksCoffeeMugCoffeeParent: {
+    justifyContent: "space-between",
     marginTop: 10,
+    flexDirection: "row",
+    width: "100%",
+    height: 50,
   },
-  pinnedLocations: {
-    marginTop: 20,
-    marginBottom: 5,
-    fontWeight: "bold",
+  inputText: {
+    justifyContent: "space-between",
+    marginTop: 10,
+    flexDirection: "row",
+    width: "96%",
+    marginLeft: "2%",
+    height: 75,
+    borderColor: "black",
+    borderRadius: 10,
+    paddingLeft: 5
+  },
+  frameItem: {
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    padding: 8,
+    marginTop: 12,
+    width: "100%",
+    height: "100%",
+    flex: 1,
+  },
+  frameParent: {
+    top: "10%",
+    height: "40%",
+    width: "100%",
+  },
+  arrowLeft1Icon: {
+    width: 50,
+    height: 50,
+    overflow: "hidden",
+    bottom: 6,
+  },
+  yourTrip: {
+    fontSize: 24,
+    fontWeight: "700",
+  },
+  save: {
     fontSize: 18,
+    fontWeight: "800",
+    marginTop: 6,
+    marginRight: 10,
+    // marginLeft: "35%",
+  },
+  frame2: {
+    width: "65%",
+    height: "80%",
+    // marginLeft: "10%",
+    alignItems: "center",
+    flexDirection: "row",
+    overflow: "hidden",
+  },
+  frame1: {
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
+    overflow: "hidden",
+    justifyContent: "space-between",
+  },
+  frame: {
+    top: "2%",
+    width: "100%",
+    alignItems: "flex-end",
+    position: "absolute",
+  },
+  iphone1313Pro16: {
+    backgroundColor: Colors.Whitesmoke,
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    flex: 1,
   },
 });

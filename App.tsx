@@ -77,6 +77,7 @@ export default function App() {
               <Stack.Screen
                 name="RouteDetails"
                 component={RouteDetailsScreen}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="TripPlanning"

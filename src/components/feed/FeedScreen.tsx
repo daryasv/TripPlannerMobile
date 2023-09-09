@@ -76,11 +76,11 @@ const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
             ) : null}
           </View>
         </View>
-        <Ionicons
+        {/* <Ionicons
           name={saved ? "bookmark" : "bookmark-outline"}
           size={30}
           onPress={() => onSaveLocation()}
-        />
+        /> */}
       </View>
 
       {type === "route" ? (

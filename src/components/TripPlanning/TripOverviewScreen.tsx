@@ -6,7 +6,8 @@ import {
   Text,
   ScrollView,
   TextInput,
-  Alert
+  Alert,
+  TouchableOpacity
 } from "react-native";
 import { Avatar, Button, Icon, Image } from "@rneui/themed";
 import { Colors } from "../../theme/Colors";
@@ -71,17 +72,17 @@ export default function TripOverViewScreen({ route }) {
 
   const updateFilter = (day, category) => {
     if (category != "") {
-      setShownLocations(tripLocations[parseInt(day.slice(4))].filter(location => location.categories.includes(category.toLowerCase())))
+      setShownLocations(tripLocations[parseInt(day.slice(4))]?.filter(location => location.categories.includes(category.toLowerCase())))
     } else {
       setShownLocations(tripLocations[parseInt(day.slice(4))])
     }
 
-    setShownPath(path[parseInt(day.slice(4))].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(path[parseInt(day.slice(4))]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
   };
 
   useEffect(() => {
     setShownLocations(tripLocations[1])
-    setShownPath(path[1].map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(path[1]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
   }, []);
 
   return (
@@ -93,7 +94,7 @@ export default function TripOverViewScreen({ route }) {
               horizontal= {true}
               style={styles.frameChild}
               data={days}
-              renderItem={({ item }) => <Text style={[styles.day, daySelected == item && styles.selectedDay]} onPress={() => {clickedDay(item)}}>{item}</Text>}
+              renderItem={({ item }) => <TouchableOpacity onPress={() => {clickedDay(item)}}><Text style={[styles.day, daySelected == item && styles.selectedDay]}>{item}</Text></TouchableOpacity>}
               contentContainerStyle={styles.frameFlatListContent}
               extraData={daySelected}
             />
@@ -107,8 +108,8 @@ export default function TripOverViewScreen({ route }) {
           zoomEnabled={true}
           region={region}
         >
-          {shownLocations.length > 0 &&
-            shownLocations.map((pinnedLocation) => (
+          {shownLocations?.length > 0 &&
+            shownLocations?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
                   latitude: pinnedLocation.contentData.locationDTO.longitude,
@@ -117,7 +118,7 @@ export default function TripOverViewScreen({ route }) {
                 title={pinnedLocation.contentData.descriptionDTO}
               />
             ))}
-          {shownPath.length > 1 &&
+          {shownPath?.length > 1 &&
             <Polyline
               coordinates={shownPath}
               strokeColor="#FF0000"
@@ -239,7 +240,7 @@ export default function TripOverViewScreen({ route }) {
         </View>
       </View>
       <ScrollView style={styles.frameParent2} contentContainerStyle={{ paddingBottom: 180 }}>
-      {shownLocations.map((item, index) => (
+      {shownLocations?.map((item, index) => (
           <View key={index} style={styles.locationFrame}>
           <View style={{ flexDirection: "row"}}>
             <Avatar

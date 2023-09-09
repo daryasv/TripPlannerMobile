@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
+  ActivityIndicator,
   FlatList,
 } from "react-native";
 import { Button } from "@rneui/themed";
@@ -58,6 +58,7 @@ export default function PlanDaysScreen({route}) {
   const city = route.params.city;
   let numOfDays = route.params.numOfDays;
   const updatedRoute = route.params.updatedRoute;
+  const needsToRender = route.params.needsToRender;
 
   const [region, setRegion] = useState({ latitude: 37.7749, longitude: -122.4194, latitudeDelta: 0.0922, longitudeDelta: 0.0421 });
   const [currDay, setDay] = useState(route.params.currDay);
@@ -68,25 +69,41 @@ export default function PlanDaysScreen({route}) {
   const [totalTripLocations, setTotalTripLocations] = useState([]);
   const [frameFlatListData, setFrameFlatListData] = useState(DATA);
   const [buttonTitle, setButtonTitle] = useState("Next Day");
+  const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
   const test = useRoute();
 
   useEffect(() => {
-    // const updatedParameter = test.params?.updatedRoute;
-    if (getRouteId() == "") {
-      StartPlanRoute((success) => {
-        if (success) {
-          // setRoute(success)
-        }
-      });
-
-      GetSavedLocations(city, (success) => {
-        if (success) {
-          setSavedLocations(success)
-          console.log("Saved locations:" + {success});
-        }
-      });
+    if (needsToRender) {
+      render();
     }
+
+    const unsubscribe = navigation.addListener('focus', ListenerFunc);
+    return unsubscribe;
+  }, [test.params]);
+
+  const ListenerFunc = () => {
+    if (needsToRender) {
+      render();
+    }
+
+    FindTripLocationsAndTotalPath()
+  };
+
+  const render = () => {
+    StartPlanRoute((success) => {
+      if (success) {
+        // setRoute(success)
+      }
+    });
+
+    GetSavedLocations(city, (success) => {
+      if (success) {
+        setSavedLocations(success)
+        console.log("Saved locations:" + {success});
+        setIsLoading(false);
+      }
+    });
 
     getRegion(city, (success) => {
       if (success) {
@@ -95,13 +112,6 @@ export default function PlanDaysScreen({route}) {
     });
 
     CheckDays()
-
-    const unsubscribe = navigation.addListener('focus', ListenerFunc);
-    return unsubscribe;
-  }, [test.params]);
-
-  const ListenerFunc = () => {
-    FindTripLocationsAndTotalPath()
   };
 
   const FindTripLocationsAndTotalPath = () => {
@@ -112,23 +122,20 @@ export default function PlanDaysScreen({route}) {
         for (let index = 1; index <= Object.keys(updatedRoute.pinnedLocationsDTO).length; index++) {
           const dayLocations = updatedRoute.pinnedLocationsDTO[index];
 
-          for (let index = 0; index < dayLocations.length; index++) {
+          for (let index = 0; index < dayLocations?.length; index++) {
             const element = dayLocations[index];
             newTripLocations.push(element)
           }
         }
-        // updatedRoute.pinnedLocations.foreach(dayLocations => { dayLocations.forEach(element => {
-        // (savedLocations.filter(location => location.dataID == element).forEach(location => {newTripLocations.push(location)}))})});
-      
+
         for (let index = 1; index <= Object.keys(updatedRoute.locationsDTO).length; index++) {
           const dayPath = updatedRoute.locationsDTO[index];
 
-          for (let index = 0; index < dayPath.length; index++) {
+          for (let index = 0; index < dayPath?.length; index++) {
             const element = dayPath[index];
             newTotalPath.push(element)
           }
         }
-        // updatedRoute.locations.forEach(dayPath => dayPath.forEach(position => newTotalPath.push(position)));
 
         setTotalTripLocations(newTripLocations)
         setTotalPath(newTotalPath.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
@@ -146,7 +153,9 @@ export default function PlanDaysScreen({route}) {
   const ChooseLocations = (title) => {
     if(title == "Restaurants") {title = "resturants"}
     let categoryLocations = savedLocations.filter(location => location.categories.includes(title.toLowerCase()))
-    navigation.navigate("LocationsSelectionScreen", {city, title, categoryLocations, region, currDay, numOfDays})
+    let selected = tripLocations[currDay]?.filter(location => location.categories.includes(title.toLowerCase()))
+    navigation.navigate("LocationsSelectionScreen",
+      {city, title, categoryLocations, region, currDay, numOfDays, selected, updatedRoute})
   };
 
   const buttonPressed = () => {
@@ -182,75 +191,72 @@ export default function PlanDaysScreen({route}) {
       </View>
     </Button>
   );
-
+    
   return (
     <View style={styles.iphone1313Pro13}>
-      <View style={styles.frame}>
-        <View style={styles.frame1}>
-          <Button
-            radius={5}
-            iconPosition="left"
-            type="clear"
-            color={Colors.Whitesmoke}
-            onPress={() => navigation.goBack()}
-            containerStyle={styles.arrowLeft1IconBtn}
-          ><MaterialCommunityIcons
-          name="chevron-left"
-          color={Colors.LightBlack}
-          size={30}
-        /></Button>
-          <Text style={styles.day1}>Day {currDay}</Text>
-        </View>
+    {isLoading ? (
+      <View style={{flex: 1, alignItems: "center", justifyContent: "center",}}>
+      <ActivityIndicator size="small" color="#000" />
       </View>
-      <View style={styles.frame2}>
-      <MapView
-          style={styles.image27Icon}
-          provider={PROVIDER_GOOGLE}
-          showsCompass={true}
-          toolbarEnabled={false}
-          zoomEnabled={true}
-          region={region}
-        >
-          {totalTripLocations.length > 0 &&
-            totalTripLocations.map((pinnedLocation) => (
-              <Marker
-                coordinate={{
-                  latitude: pinnedLocation.contentData.locationDTO.longitude,
-                  longitude: pinnedLocation.contentData.locationDTO.latitude,
-                }}
-                title={pinnedLocation.contentData.descriptionDTO}
-              />
-            ))}
-          {totalPath.length > 1 &&
-            <Polyline
-              coordinates={totalPath}
-              strokeColor="#FF0000"
-              strokeWidth={3}
-            />
-          }
-        </MapView>
-      </View>
-      <View style={styles.frame3}>
-          <FlatList
-            style={styles.frameChild}
-            data={frameFlatListData}
-            renderItem={({item}) => <Item title={item.title} icon={item.icon}/>}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.frameFlatListContent}
-          />
-      </View>
-      <Button
-        title={buttonTitle}
-        radius={5}
-        iconPosition="left"
-        type="solid"
-        color="#000"
-        titleStyle={styles.doneButtonTitle}
-        containerStyle={styles.frameButtonBtn1}
-        buttonStyle={styles.doneButton}
-        onPress={() => buttonPressed()}
-      />
-    </View>
+    ) : (
+      <><View style={styles.frame}>
+            <View style={styles.frame1}>
+              <Button
+                radius={5}
+                iconPosition="left"
+                type="clear"
+                color={Colors.Whitesmoke}
+                onPress={() => navigation.goBack()}
+                containerStyle={styles.arrowLeft1IconBtn}
+              ><MaterialCommunityIcons
+                  name="chevron-left"
+                  color={Colors.LightBlack}
+                  size={30} /></Button>
+              <Text style={styles.day1}>Day {currDay}</Text>
+            </View>
+          </View><View style={styles.frame2}>
+              <MapView
+                style={styles.image27Icon}
+                provider={PROVIDER_GOOGLE}
+                showsCompass={true}
+                toolbarEnabled={false}
+                zoomEnabled={true}
+                region={region}
+              >
+                {totalTripLocations.length > 0 &&
+                  totalTripLocations.map((pinnedLocation) => (
+                    <Marker
+                      coordinate={{
+                        latitude: pinnedLocation.contentData.locationDTO.longitude,
+                        longitude: pinnedLocation.contentData.locationDTO.latitude,
+                      }}
+                      title={pinnedLocation.contentData.descriptionDTO} />
+                  ))}
+                {totalPath.length > 1 &&
+                  <Polyline
+                    coordinates={totalPath}
+                    strokeColor="#FF0000"
+                    strokeWidth={3} />}
+              </MapView>
+            </View><View style={styles.frame3}>
+              <FlatList
+                style={styles.frameChild}
+                data={frameFlatListData}
+                renderItem={({ item }) => <Item title={item.title} icon={item.icon} />}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.frameFlatListContent} />
+            </View><Button
+              title={buttonTitle}
+              radius={5}
+              iconPosition="left"
+              type="solid"
+              color="#000"
+              titleStyle={styles.doneButtonTitle}
+              containerStyle={styles.frameButtonBtn1}
+              buttonStyle={styles.doneButton}
+              onPress={() => buttonPressed()} /></>
+    )}
+  </View>
   );
 };
 
@@ -377,6 +383,12 @@ const styles = StyleSheet.create({
     height: "100%",
     overflow: "hidden",
     flex: 1,
+    backgroundColor: Colors.Whitesmoke,
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.Whitesmoke,
   },
 });
