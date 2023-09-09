@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Colors } from "../../theme/Colors";
 import { Logout } from "../../actions/security";
@@ -149,6 +150,7 @@ export function ProfileHomeScreen({ navigation }) {
   );
   const [locations, setLocations] = useState([]);
   const [savedRoutes, setSavedRoutes] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [numLocations, setLocationsNum] = useState(0);
   const [numOfSaved, setNumOfSaved] = useState(0);
 
@@ -169,27 +171,41 @@ export function ProfileHomeScreen({ navigation }) {
 
   const [user, setUser] = useState<User>(defaultUser);
 
-  useEffect(() => {
-    GetUserProfile((success) => {
-      if (success) {
-        allLocations = [];
-        success.posts.forEach(function (value) {
-          allLocations.push(value);
-        });
-        setLocations(allLocations.slice(-locationsToSlice));
-        setLocationsNum(allLocations.length);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
-        setNumOfSaved(success.user.savedRoutes?.length || 0);
-        setUser(success.user);
-      }
-    });
-  }, []);
+  useEffect(() => {
+    getData();
+  }, [currentView]);
+
+  const getData = () => {
+    setLoading(true);
+    if (currentView === "my_posts") {
+      GetUserProfile((success) => {
+        if (success) {
+          allLocations = [];
+          success.posts.forEach(function (value) {
+            allLocations.push(value);
+          });
+          setLocations(allLocations.slice(-locationsToSlice));
+          setLocationsNum(allLocations.length);
+
+          setNumOfSaved(success.user.savedRoutes?.length || 0);
+          setUser(success.user);
+          setLoading(false);
+        }
+      });
+    } else {
+      getSavedRoutes((res) => {
+        setSavedRoutes(res || []);
+        setLoading(false);
+      });
+    }
+  };
 
   const showSaved = () => {
     setCurrentView("saved");
-    getSavedRoutes((res) => {
-      setSavedRoutes(res || []);
-    });
   };
 
   const showMyPosts = () => {
@@ -199,7 +215,10 @@ export function ProfileHomeScreen({ navigation }) {
   const items = currentView === "my_posts" ? locations : savedRoutes;
 
   return (
-    <ScrollView showsVerticalScrollIndicator={true}>
+    <ScrollView
+      showsVerticalScrollIndicator={true}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={getData}/>}
+    >
       <Text style={styles.Logout} onPress={() => Logout()}>
         Logout
       </Text>
