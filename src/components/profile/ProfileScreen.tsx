@@ -12,7 +12,11 @@ import { Colors } from "../../theme/Colors";
 import { Logout } from "../../actions/security";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { GetUserProfile, User } from "../../actions/profileActions";
+import {
+  GetUserProfile,
+  User,
+  getSavedRoutes,
+} from "../../actions/profileActions";
 import { postGenreEnum } from "../../types/postTypes";
 import { Item } from "../feed/FeedScreen";
 import { Button } from "@rneui/base";
@@ -61,13 +65,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  LocationsText: {
-    color: Colors.LightBlack,
-    textAlign: "center",
-    fontSize: 18,
-    borderRadius: 4,
-    marginBottom: 20,
-  },
+  LocationsText: {},
   RoutesText: {
     color: Colors.LightBlack,
     textAlign: "center",
@@ -105,6 +103,21 @@ const styles = StyleSheet.create({
     marginTop: "2%",
     fontWeight: "bold",
   },
+  selectedTab: {
+    fontWeight: "bold",
+    color: Colors.LightBlack,
+    textAlign: "center",
+    fontSize: 18,
+    borderRadius: 4,
+    marginBottom: 10,
+  },
+  tab: {
+    color: Colors.LightBlack,
+    textAlign: "center",
+    fontSize: 18,
+    borderRadius: 4,
+    marginBottom: 10,
+  },
 });
 
 let allLocations = [];
@@ -131,12 +144,13 @@ export default function ProfileScreen() {
 }
 
 export function ProfileHomeScreen({ navigation }) {
+  const [currentView, setCurrentView] = useState(
+    "my_posts" as "my_posts" | "saved"
+  );
   const [locations, setLocations] = useState([]);
-  const [routes, setRoutes] = useState([]);
+  const [savedRoutes, setSavedRoutes] = useState([]);
   const [numLocations, setLocationsNum] = useState(0);
   const [numOfSaved, setNumOfSaved] = useState(0);
-  type displayFields = "flex" | "none";
-  const [showNoPosts, setShowNoPosts] = useState("none" as displayFields);
 
   const defaultUser: User = {
     _id: "",
@@ -155,14 +169,6 @@ export function ProfileHomeScreen({ navigation }) {
 
   const [user, setUser] = useState<User>(defaultUser);
 
-  function showViewAll() {
-    if (showNoPosts == "flex") {
-      return "none";
-    } else {
-      return "flex";
-    }
-  }
-
   useEffect(() => {
     GetUserProfile((success) => {
       if (success) {
@@ -172,12 +178,25 @@ export function ProfileHomeScreen({ navigation }) {
         });
         setLocations(allLocations.slice(-locationsToSlice));
         setLocationsNum(allLocations.length);
-        setShowNoPosts(success.posts.length ? "none" : "flex");
+
         setNumOfSaved(success.user.savedRoutes?.length || 0);
         setUser(success.user);
       }
     });
   }, []);
+
+  const showSaved = () => {
+    setCurrentView("saved");
+    getSavedRoutes((res) => {
+      setSavedRoutes(res || []);
+    });
+  };
+
+  const showMyPosts = () => {
+    setCurrentView("my_posts");
+  };
+
+  const items = currentView === "my_posts" ? locations : savedRoutes;
 
   return (
     <ScrollView showsVerticalScrollIndicator={true}>
@@ -189,16 +208,28 @@ export function ProfileHomeScreen({ navigation }) {
         {user.userFirstName + " " + user.userLastName}
       </Text>
       <View style={styles.row}>
-        <TouchableOpacity>
-          <Text style={styles.LocationsNum}>{numLocations}</Text>
-          <Text style={styles.LocationsText}>My Posts</Text>
+        <TouchableOpacity
+          style={currentView === "my_posts" ? styles.selectedTab : styles.tab}
+          onPress={showMyPosts}
+        >
+          {/* <Text style={styles.LocationsNum}>{numLocations}</Text> */}
+          <Text
+            style={currentView === "my_posts" ? styles.selectedTab : styles.tab}
+          >
+            My Posts
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.RoutesNum}>{numOfSaved}</Text>
-          <Text style={styles.RoutesText}>Saved</Text>
+        <TouchableOpacity onPress={showSaved}>
+          {/* <Text style={styles.RoutesNum}>{numOfSaved}</Text> */}
+          <Text
+            style={currentView === "saved" ? styles.selectedTab : styles.tab}
+          >
+            Saved
+          </Text>
         </TouchableOpacity>
       </View>
-      {locations.map((location) => {
+
+      {items.map((location) => {
         return (
           <Item
             data={location}
