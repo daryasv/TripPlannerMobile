@@ -32,7 +32,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
 import { getCitiesToImages } from "../../actions/cityPanelActions";
 
-export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
+export const Item = ({
+  data,
+  type,
+  canSave,
+}: {
+  data: PostType;
+  type: "image" | "route";
+  canSave?: boolean;
+}) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
   const onSaveLocation = () => {
     if (saved) {
@@ -77,11 +85,13 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
             ) : null}
           </View>
         </View>
-        <Ionicons
-          name={saved ? "bookmark" : "bookmark-outline"}
-          size={30}
-          onPress={() => onSaveLocation()}
-        />
+        {canSave ? (
+          <Ionicons
+            name={saved ? "bookmark" : "bookmark-outline"}
+            size={30}
+            onPress={() => onSaveLocation()}
+          />
+        ) : null}
       </View>
 
       {type === "route" ? (
@@ -418,7 +428,7 @@ export default function FeedScreen({ navigation }) {
 
   function showItem({ item }) {
     if (item.postGenre == postGenreEnum.Location) {
-      return <Item type="image" data={item} />;
+      return <Item canSave={true} type="image" data={item} />;
     } else {
       return (
         <Pressable
@@ -426,7 +436,7 @@ export default function FeedScreen({ navigation }) {
             navigation.navigate("RouteDetails", { item });
           }}
         >
-          <Item data={item} type="route" />
+          <Item canSave={true} data={item} type="route" />
         </Pressable>
       );
     }
