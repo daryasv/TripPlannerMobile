@@ -299,7 +299,7 @@ export default function RouteDetailsScreen({ route }) {
                   ? user.substring(0, user.indexOf("@"))
                   : user}'s Trip
             </Text>
-            <TouchableOpacity onPress={() => clickedSave(route.params.item)}><Text style={[styles.save, styles.saveFlexBox]}>Save</Text></TouchableOpacity>
+            <Text style={[styles.save, styles.saveFlexBox, {color:Colors.Whitesmoke}]}>Save</Text>
           {/* </View> */}
         </View>
       </View>

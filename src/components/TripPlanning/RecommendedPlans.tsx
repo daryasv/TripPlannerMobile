@@ -5,6 +5,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { Avatar, Button, Icon } from "@rneui/themed";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -18,7 +19,9 @@ import {
 import ReadMore from "@fawazahmed/react-native-read-more";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
 import { PostType } from "../../types/postTypes";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { useEffect, useState } from "react";
+import { saveLocation, unSaveLocation } from "../../actions/feedActions";
 
 
 
@@ -30,7 +33,23 @@ export default function RecommendedPlansScreen({ route }) {
   const navigation = useNavigation();
   const [suggestions, setSuggestions] = React.useState([] as PostType[]);
 
-  const showItem = ({ item }: { item: PostType }) => {
+  const Item =  ({ item }: { item: PostType }) => {
+    const [saved, setSaved] = useState(false);
+    const onSaveLocation = () => {
+      if (saved) {
+        unSaveLocation(item.dataID)
+          .then(() => {
+            setSaved(false);
+          })
+          .catch((e) => {});
+      } else {
+        saveLocation(item.dataID)
+          .then((response) => {
+            setSaved(true);
+          })
+          .catch((e) => {});
+      }
+    };
     return (
       <View style={styles.itemContainer}>
         <View style={{ flexDirection: "row", alignContent: "center" }}>
@@ -60,31 +79,11 @@ export default function RecommendedPlansScreen({ route }) {
                 </View>
                ) : null}
             </View>
-            <Button
-              type="clear"
-              style={{
-                width: 48,
-                height: 48,
-                borderColor: "black",
-                alignContent: "flex-end",
-              }}
-              onPress={() => {
-  // const tripLocations = route.params.tripLocations;
-  // const totalTripLocations = route.params.totalTripLocations;
-  // const path = route.params.path;
-                let totalTripLocations = findTotalLocations(item.contentData.pinnedLocationsDTO)
-                let tripLocations = item.contentData.pinnedLocationsDTO
-                let path = item.contentData.locationsDTO
-                let region = calculatedRegion(item.contentData)
-                navigation.navigate("RouteDetails", {item})
-              }}
-            >
-              <MaterialCommunityIcons
-                name="map-search-outline"
-                style={{color: "black",
-                fontSize: 30,}}
-              />
-            </Button>
+            <Ionicons
+              name={saved ? "bookmark" : "bookmark-outline"}
+              size={30}
+              onPress={() => onSaveLocation()}
+            />
           </View>
         </View>
   
@@ -137,6 +136,18 @@ export default function RecommendedPlansScreen({ route }) {
       </View>
     );
   };
+
+  function showItem({ item }) {
+    return (
+      <Pressable
+        onPress={() => {
+          navigation.navigate("RouteDetails", { item });
+        }}
+      >
+        <Item item={item}/>
+      </Pressable>
+    );
+  }
   
   const calculatedRegion = (data: RouteDTO): Region => {
     if (!data.locationsDTO[1].length) return null;
@@ -239,7 +250,17 @@ export default function RecommendedPlansScreen({ route }) {
           <FlatList
               data={suggestions}
               renderItem={({ item }) => showItem({ item })}
-              keyExtractor={(item, index) => index.toString()} /></>
+              keyExtractor={(item, index) => index.toString()}/>
+          <Button
+            title="Done"
+            radius={5}
+            type="solid"
+            color="#000"
+            titleStyle={styles.frameButtonBtn}
+            onPress={() => navigation.navigate("Main")}
+            containerStyle={styles.frameButtonBtn1}
+            buttonStyle={styles.frameButtonBtn2}
+          /></>
       )}
     </View>
   );
@@ -247,10 +268,28 @@ export default function RecommendedPlansScreen({ route }) {
 
 const styles = StyleSheet.create({
   frameButtonBtn1: {
-   height:"auto"
+    top: "90%",
+    position: "absolute",
+    width: "90%",
+    height: "10%",
+    marginLeft: "6%",
   },
   container: {
     width: "100%",
+  },
+  doneButtonTitle: {
+    color: "#fff",
+    fontSize: 32,
+    fontWeight: "700",
+    textAlign: "left",
+  },
+  doneButton: {
+    borderRadius: 8,
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedIndicator: {
     position: "absolute",
@@ -282,6 +321,7 @@ const styles = StyleSheet.create({
   frameButtonBtn2: {
     borderRadius: 8,
     width: "100%",
+    height: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -366,7 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     paddingHorizontal: "1%",
-    paddingVertical: "5%",
+    paddingVertical: "1%",
     overflow: "hidden",
   },
   itemContainer: {
