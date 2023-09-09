@@ -1,55 +1,50 @@
 import Axios from "axios";
 import { BASE_URL } from "./actionsConfig";
 import { getToken, getUserEmail, getUserId } from "./security";
+import { ContentData } from "../types/postTypes";
 
 export interface UserLocation {
-  "contentData": {
-    "location": {
-      "longitude": number,
-      "latitude": number
-    },
-    "_id": string,
-    "imageFileNameDTO": string,
-    "description": string,
-    "__v": number },
-    "postGenre": number,
-    "dateUploaded": string,
-    "uploadedBy": string,
-    "cities": Array<string>,
-    "categories": Array<string>,
-    "comments": Array<string>,
-    "views": number,
-    "dataID": string
+  contentData: ContentData;
+  postGenre: number;
+  dateUploaded: string;
+  uploadedBy: string;
+  cities: string[];
+  categories: string[];
+  numOfSaves: number;
+  comments: any[];
+  views: number;
+  dataID: string;
+  UploadByProfilePictureUrl: string;
 }
 
 export interface User {
-  "_id": string,
-  "userFirstName": string,
-  "userLastName": string,
-  "userEmail": string,
-  "password": string,
-  "profilePictureId": string,
-  "userPicturesIds": string[],
-  "savedPicturesIds": string[],
-  "savedRoutes": string[],
-  "createdAt": string,
-  "updatedAt": string,
-  "__v": number
+  _id: string;
+  userFirstName: string;
+  userLastName: string;
+  userEmail: string;
+  password: string;
+  profilePictureId: string;
+  userPicturesIds: any[];
+  savedPicturesIds: string[];
+  savedRoutes: UserLocation[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface ProfileData {
-  "user": User,
-  "posts": Array<UserLocation>
+  user: User;
+  posts: Array<UserLocation>;
 }
 
 export const GetUserProfile = (
   callback: (success: ProfileData | false) => void
 ) => {
   const headers = {
-    'Authorization': getToken()
+    Authorization: getToken(),
   };
   const params = {
-    'userName' : getUserEmail()
+    userName: getUserEmail(),
   };
   Axios.get(BASE_URL + "/posts/profile", { params, headers })
     .then((res) => {
@@ -59,6 +54,18 @@ export const GetUserProfile = (
     .catch((e) => {
       console.log("error", JSON.stringify(e));
       //todo: Return errors from BE
+      callback(false);
+    });
+};
+
+export const getSavedRoutes = (callback: (success) => void) => {
+  Axios.get(BASE_URL + "/routes/getSavedRoutes", {
+    headers: { Authorization: getToken() },
+  })
+    .then((res) => {
+      callback(res.data);
+    })
+    .catch((e) => {
       callback(false);
     });
 };
