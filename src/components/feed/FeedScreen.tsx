@@ -302,7 +302,6 @@ export default function FeedScreen({ navigation }) {
   const [postsPage, setPostsPage] = useState(1 as number);
   const [prevActiveCities, setPrevActiveCities] = useState([]);
   const [loading, setLoading] = useState(true as boolean);
-  const [loadingMore, setLoadingMore] = useState(false as boolean);
   const [hasMore, setHasMore] = useState(true as boolean);
   const [uniqueCities, setCities] = useState([] as string[]);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
@@ -403,7 +402,7 @@ export default function FeedScreen({ navigation }) {
   };
 
   const handleRefresh = () => {
-    if (!loading && !loadingMore) {
+    if (!loading && !isFetchingPosts) {
       setLoading(true);
       setPosts(() => []);
       setFilteredPosts(() => []);
@@ -414,7 +413,7 @@ export default function FeedScreen({ navigation }) {
   };
 
   const handleLoadMore = () => {
-    if (isFetchingPosts) return;
+    if (isFetchingPosts || loading) return;
 
     setIsFetchingPosts(true);
     console.log("Loading more posts...");
@@ -510,7 +509,7 @@ export default function FeedScreen({ navigation }) {
   // };
 
   const ListFooter = () => {
-    if (loadingMore || hasMore) {
+    if (!loading && (isFetchingPosts || hasMore)) {
       return <ActivityIndicator />;
     }
     return null;
