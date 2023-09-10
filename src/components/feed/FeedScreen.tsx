@@ -301,30 +301,28 @@ export const calculatedRegion = (data: RouteDTO): Region => {
 export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([] as PostType[]);
   const [filteredPosts, setFilteredPosts] = useState<PostType[] | null>(null);
-  const [isFiltering,setIsFiltering] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
   const [filteringPage, setFilteringPage] = useState(1);
   const [postsPage, setPostsPage] = useState(1 as number);
   const [prevActiveCities, setPrevActiveCities] = useState([]);
   const [loading, setLoading] = useState(true as boolean);
-  const [loadingMore, setLoadingMore] = useState(false as boolean);
   const [hasMore, setHasMore] = useState(true as boolean);
   const [uniqueCities, setCities] = useState([] as string[]);
   const [cityImages, setCityImages] = useState(new Map<string, string>());
-  const [finishedFetchCities,setFinishedFetchCities] = useState(false);
-  const [isFetchingPosts, setIsFetchingPosts] = useState(false)
+  const [finishedFetchCities, setFinishedFetchCities] = useState(false);
+  const [isFetchingPosts, setIsFetchingPosts] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-
 
   // ----------------------------- POSTS AND FILTERING START ------------------------------//
 
   const getPosts = (page) => {
     setLoading(true);
-    setIsFiltering((prevState)=> false);
+    setIsFiltering((prevState) => false);
     getExploreFeed({ page: page }, (data) => {
       if (data?.allPosts) {
         setPosts(data.allPosts);
         setLoading(false);
-        setPage((page) => page + 1);
+        setPostsPage((page) => page + 1);
         setHasMore(true);
       }
     });
@@ -332,21 +330,22 @@ export default function FeedScreen({ navigation }) {
 
   const handleCityFilter = (activeCities) => {
     console.log("Inside parent handleCityFilter");
-    console.log(`!!! WE ARE IN HANDLE CITY FILTER WITH ACTIVECITIES = ${activeCities}`);
+    console.log(
+      `!!! WE ARE IN HANDLE CITY FILTER WITH ACTIVECITIES = ${activeCities}`
+    );
 
     if (activeCities.length > 0) {
       setIsFiltering(true);
 
-
       // Check if activeCities has changed from the previous value
       if (JSON.stringify(prevActiveCities) !== JSON.stringify(activeCities)) {
-        setFilteringPage((prevState) => 1); // Reset the page to 1
+        setFilteringPage(1); // Reset the page to 1
         setPrevActiveCities(activeCities); // Update the previous state with the current value
 
-        setFilteredPosts(prevPosts => {
+        setFilteredPosts((prevPosts) => {
           if (prevPosts) {
-            return prevPosts.filter(post =>
-                post.cities.some(city => activeCities.includes(city))
+            return prevPosts.filter((post) =>
+              post.cities.some((city) => activeCities.includes(city))
             );
           }
           return null; // or return an empty array [] based on your application's needs
@@ -355,70 +354,76 @@ export default function FeedScreen({ navigation }) {
 
       getExploreFeed({ page: filteringPage, cities: activeCities }, (data) => {
         if (data.allPosts !== null) {
-          console.log(`!!! WE ARE IN HANDLE CITY THATS THE FILTERED POSTS WE GOT = ${JSON.stringify(data?.allPosts)}`);
+          console.log(
+            `!!! WE ARE IN HANDLE CITY THATS THE FILTERED POSTS WE GOT = ${JSON.stringify(
+              data?.allPosts
+            )}`
+          );
           const postsToAdd = data?.allPosts || []; // Default to empty array if null or undefined
 
-          setFilteredPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
+          setFilteredPosts((prevPosts) => [
+            ...(prevPosts || []),
+            ...postsToAdd,
+          ]);
           setPosts((prevPosts) => [...(prevPosts || []), ...postsToAdd]);
-          setFilteringPage((prevState)=> prevState+1);
+          setFilteringPage((prevState) => prevState + 1);
           setLoading(false);
           setHasMore(true);
-          console.log('WE ARE DONE WITH THE FILTERED POSTS WE GOT!!');
+          console.log("WE ARE DONE WITH THE FILTERED POSTS WE GOT!!");
         } else {
           console.log(`!!! WE ARE IN HANDLE CITY if (data?.allPosts)`);
           resetToDefault();
         }
       });
-    });
-
-    setCities(Array.from(citySet));
-    setCityImages(cityImageMap);
-  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
-
-  useEffect(() => {
-    getUniqueCities();
-  }, [getUniqueCities]);
-  const handleCityFilter = (activeCities) => {
-    if (activeCities?.length > 0) {
-      const filtered = posts.filter((post) =>
-        post.cities.some((city) => activeCities.includes(city))
-      );
-      setFilteredPosts(filtered);
-    } else {
-      console.log(`!!! WE ARE IN HANDLE CITY  } else {`);
-      resetToDefault();
     }
   };
 
+  //     setCities(Array.from(citySet));
+  //     setCityImages(cityImageMap);
+  //   }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
+
+  // useEffect(() => {
+  //   getUniqueCities();
+  // }, [getUniqueCities]);
+  // const handleCityFilter = (activeCities) => {
+  //   if (activeCities?.length > 0) {
+  //     const filtered = posts.filter((post) =>
+  //       post.cities.some((city) => activeCities.includes(city))
+  //     );
+  //     setFilteredPosts(filtered);
+  //   } else {
+  //     console.log(`!!! WE ARE IN HANDLE CITY  } else {`);
+  //     resetToDefault();
+  //   }
+  // };
+
   const resetToDefault = () => {
     setIsFiltering(false);
-    setFilteringPage(()=> 1);
-    setPostsPage(()=> 1);
-    setPrevActiveCities(()=> []);
+    setFilteringPage(() => 1);
+    setPostsPage(() => 1);
+    setPrevActiveCities(() => []);
     getPosts(postsPage);
-  }
-
+  };
 
   const handleRefresh = () => {
-    if (!loading && !loadingMore) {
+    if (!loading && !isFetchingPosts) {
       setLoading(true);
-      setPosts(()=> []);
-      setFilteredPosts(()=> []);
+      setPosts(() => []);
+      setFilteredPosts(() => []);
       getUniqueCitiesAndImages();
 
       resetToDefault();
     }
   };
 
-
   const handleLoadMore = () => {
-    if (isFetchingPosts) return;
+    if (isFetchingPosts || loading) return;
 
     setIsFetchingPosts(true);
     console.log("Loading more posts...");
 
     // Increment the page number to fetch the next set of posts.
-    setPostsPage(prevPage => prevPage + 1);
+    setPostsPage((prevPage) => prevPage + 1);
 
     getExploreFeed({ page: postsPage, cities: prevActiveCities }, (data) => {
       if (data.allPosts !== null) {
@@ -445,14 +450,10 @@ export default function FeedScreen({ navigation }) {
     });
   };
 
-
-
   // ----------------------------- POSTS AND FILTERING END ------------------------------//
 
-
-
   const getUniqueCitiesAndImages = useCallback(async () => {
-    setRefreshKey(prevKey => prevKey + 1);
+    setRefreshKey((prevKey) => prevKey + 1);
     try {
       const citiesToImageArr = await getCitiesToImages();
       const uniqueCitiesSet = new Set<string>();
@@ -475,7 +476,6 @@ export default function FeedScreen({ navigation }) {
     getUniqueCitiesAndImages();
   }, [getUniqueCitiesAndImages]); // Make sure to include getUniqueCitiesAndImages in the dependency list
 
-
   //initial
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -486,34 +486,34 @@ export default function FeedScreen({ navigation }) {
     };
   }, []);
 
-  const handleLoadMore = () => {
-    if (loading || loadingMore) return;
-    setLoadingMore(true);
-    console.log(`page is ${page}`);
-    setPage((page) => page + 1);
-    console.log(`new page is ${page}`);
-    console.log(`posts are ${posts?.map((post) => post.dataID)}`);
-    console.log(
-      `filtered posts are ${filteredPosts?.map((post) => post.dataID)}`
-    );
-    getExploreFeed({ page: page }, (data) => {
-      if (data?.allPosts) {
-        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
-        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setLoading(false);
-        setHasMore(true);
-        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
-      }else{
-        setPage((page)=>page-1);
-      }
-    });
-  };
+  // const handleLoadMore = () => {
+  //   if (loading || loadingMore) return;
+  //   setLoadingMore(true);
+  //   console.log(`page is ${page}`);
+  //   setPage((page) => page + 1);
+  //   console.log(`new page is ${page}`);
+  //   console.log(`posts are ${posts?.map((post) => post.dataID)}`);
+  //   console.log(
+  //     `filtered posts are ${filteredPosts?.map((post) => post.dataID)}`
+  //   );
+  //   getExploreFeed({ page: page }, (data) => {
+  //     if (data?.allPosts) {
+  //       console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
+  //       console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
+  //       setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+  //       setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
+  //       setLoading(false);
+  //       setHasMore(true);
+  //       console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
+  //       console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
+  //     }else{
+  //       setPage((page)=>page-1);
+  //     }
+  //   });
+  // };
 
   const ListFooter = () => {
-    if (loadingMore || hasMore) {
+    if (!loading && (isFetchingPosts || hasMore)) {
       return <ActivityIndicator />;
     }
     return null;
@@ -539,7 +539,6 @@ export default function FeedScreen({ navigation }) {
     }
   }
 
-
   return (
     <View
       style={{
@@ -555,20 +554,26 @@ export default function FeedScreen({ navigation }) {
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
                 <CitiesPanel
-                    key={refreshKey}
-                    uniqueCities={uniqueCities}
-                    cityImages={cityImages}
-                    onCityClick={handleCityFilter}
+                  key={refreshKey}
+                  uniqueCities={uniqueCities}
+                  cityImages={cityImages}
+                  onCityClick={handleCityFilter}
                 />
-            )}
-          </View>
-      }
-        data={ isFiltering? filteredPosts : posts}
+              )}
+            </View>
+          )
+        }
+        data={isFiltering ? filteredPosts : posts}
         renderItem={({ item }) => showItem({ item })}
         keyExtractor={(item, index) => item.dataID + "_" + index}
         // refreshControl={<ActivityIndicator />}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={()=> {handleRefresh()}}/>
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => {
+              handleRefresh();
+            }}
+          />
         }
         onEndReached={() => {
           if (!loading && !isFetchingPosts) {
