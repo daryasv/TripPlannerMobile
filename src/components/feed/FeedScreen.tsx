@@ -460,7 +460,7 @@ export default function FeedScreen({ navigation }) {
 
 
   const ListFooter = () => {
-    if (loadingMore || hasMore) {
+    if ((!loading) && (loadingMore || hasMore)) {
       return <ActivityIndicator />;
     }
     return null;
@@ -495,7 +495,9 @@ export default function FeedScreen({ navigation }) {
           }}
       >
         <FlatList
-            ListHeaderComponent={
+        ListHeaderComponent={
+          loading ? null
+            :
               <View style={{ padding: 10 }}>
                 {!finishedFetchCities ? (
                     <ActivityIndicator size="large" color="#0000ff" />
