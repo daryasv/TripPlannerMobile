@@ -466,8 +466,18 @@ export default function FeedScreen({ navigation }) {
     return null;
   };
 
-  if (!posts) {
-    return <RefreshControl refreshing={loading} />;
+  if (!posts?.length) {
+    return(
+      <View
+        style={{
+          flex: 1,
+          paddingBottom: 20,
+          paddingTop:20
+        }}
+      >
+        {loading ? <ActivityIndicator size={"large"} color={"black"} /> : <Text>No posts found</Text>}
+      </View>
+    );
   }
 
   function showItem({ item }) {
