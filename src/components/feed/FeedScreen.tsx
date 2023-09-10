@@ -30,215 +30,202 @@ import MapView, {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RouteDTO } from "../../actions/tripActions";
-import { getCitiesToImages } from "../../actions/cityPanelActions";
+import {getCitiesToImages} from "../../actions/cityPanelActions";
 
-export const Item = ({
-  data,
-  type,
-  canSave,
-}: {
-  data: PostType;
-  type: "image" | "route";
-  canSave?: boolean;
-}) => {
+const Item = ({ data, type }: { data: PostType; type: "image" | "route" }) => {
   const [saved, setSaved] = useState(data.isSavedByUser);
   const onSaveLocation = () => {
     if (saved) {
       unSaveLocation(data.dataID)
-        .then(() => {
-          setSaved(false);
-        })
-        .catch((e) => {});
+          .then(() => {
+            setSaved(false);
+          })
+          .catch((e) => {});
     } else {
       saveLocation(data.dataID)
-        .then((response) => {
-          setSaved(true);
-        })
-        .catch((e) => {});
+          .then((response) => {
+            setSaved(true);
+          })
+          .catch((e) => {});
     }
   };
   if (type === "route") {
   }
 
   return (
-    <View style={styles.itemContainer}>
-      <View style={{ flexDirection: "row", alignContent: "center" }}>
-        <View style={{ flexDirection: "row", flex: 1 }}>
-          <Avatar
-            source={{
-              uri: data.UploadByProfilePictureUrl,
-            }}
-            rounded
-            size={40}
-          />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.username}>
-              {data.uploadedBy.includes("@")
-                ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
-                : data.uploadedBy}
-            </Text>
-            {data.cities?.length ? (
-              <View style={styles.row}>
-                <Icon name="location-on" size={14} type={"material"} />
-                <Text style={styles.location}>{data.cities.join(",")}</Text>
-              </View>
-            ) : null}
-          </View>
-        </View>
-        {canSave ? (
-          <Ionicons
-            name={saved ? "bookmark" : "bookmark-outline"}
-            size={30}
-            onPress={() => onSaveLocation()}
-          />
-        ) : null}
-      </View>
-
-      {type === "route" ? (
-        <MapView
-          style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
-          provider={PROVIDER_GOOGLE}
-          showsCompass={true}
-          toolbarEnabled={false}
-          zoomEnabled={true}
-          scrollEnabled={false}
-          region={calculatedRegion(data.contentData)}
-        >
-          {data.contentData?.pinnedLocationsDTO[1].length > 0 &&
-            data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
-              <Marker
-                coordinate={{
-                  latitude: pinnedLocation?.contentData?.locationDTO.longitude,
-                  longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+      <View style={styles.itemContainer}>
+        <View style={{ flexDirection: "row", alignContent: "center" }}>
+          <View style={{ flexDirection: "row", flex: 1 }}>
+            <Avatar
+                source={{
+                  uri: data.UploadByProfilePictureUrl,
                 }}
-                title={pinnedLocation?.contentData?.descriptionDTO}
-              />
-            ))}
-          {
-            <Polyline
-              coordinates={data.contentData?.locationsDTO[1].map((item) => ({
-                latitude: item.longitude,
-                longitude: item.latitude,
-              }))}
-              strokeColor="#FF0000"
-              strokeWidth={3}
+                rounded
+                size={40}
             />
-          }
-        </MapView>
-      ) : (
-        <Image
-          source={{
-            uri: data?.contentData?.imageFileNameDTO,
-          }}
-          style={{
-            width: "100%",
-            aspectRatio: 1.5,
-            marginTop: 15,
-            borderRadius: 8,
-            resizeMode: "cover",
-          }}
-        />
-      )}
-
-      {data.contentData?.descriptionDTO ? (
-        <ReadMore
-          numberOfLines={3}
-          style={styles.description}
-          wrapperStyle={{ marginTop: 10 }}
-          seeMoreStyle={{ color: Colors.main }}
-          seeLessStyle={{ color: Colors.main }}
-          seeMoreText={"Read More"}
-        >
-          {data.contentData.descriptionDTO}
-        </ReadMore>
-      ) : null}
-
-      {type === "route" ? (
-        <View style={[styles.row, { marginTop: 10 }]}>
-          <Text style={styles.location}>
-            {data.contentData?.totalDurationDTO || 0} hours |{" "}
-            {data.contentData?.totalDistanceDTO || 0} Km | Created at{" "}
-            {data.dateUploaded}
-          </Text>
+            <View style={{ marginLeft: 10 }}>
+              <Text style={styles.username}>
+                {data.uploadedBy.includes("@")
+                    ? data.uploadedBy.substring(0, data.uploadedBy.indexOf("@"))
+                    : data.uploadedBy}
+              </Text>
+              {data.cities?.length ? (
+                  <View style={styles.row}>
+                    <Icon name="location-on" size={14} type={"material"} />
+                    <Text style={styles.location}>{data.cities.join(",")}</Text>
+                  </View>
+              ) : null}
+            </View>
+          </View>
+          <Ionicons
+              name={saved ? "bookmark" : "bookmark-outline"}
+              size={30}
+              onPress={() => onSaveLocation()}
+          />
         </View>
-      ) : (
-        <View style={[styles.row, { marginTop: 10 }]}>
-          <Text style={styles.location}>{data.categories.join(" | ")}</Text>
-        </View>
-      )}
-    </View>
+
+        {type === "route" ? (
+            <MapView
+                style={{ height: 300, width: "100%", borderRadius: 8, marginTop: 10 }}
+                provider={PROVIDER_GOOGLE}
+                showsCompass={true}
+                toolbarEnabled={false}
+                zoomEnabled={true}
+                scrollEnabled={false}
+                region={calculatedRegion(data.contentData)}
+            >
+              {data.contentData?.pinnedLocationsDTO[1].length > 0 &&
+                  data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
+                      <Marker
+                          coordinate={{
+                            latitude: pinnedLocation?.contentData?.locationDTO.longitude,
+                            longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+                          }}
+                          title={pinnedLocation?.contentData?.descriptionDTO}
+                      />
+                  ))}
+              {
+                <Polyline
+                    coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
+                    strokeColor="#FF0000"
+                    strokeWidth={3}
+                />
+              }
+            </MapView>
+        ) : (
+            <Image
+                source={{
+                  uri: data?.contentData?.imageFileNameDTO,
+                }}
+                style={{
+                  width: "100%",
+                  aspectRatio: 1.5,
+                  marginTop: 15,
+                  borderRadius: 8,
+                  resizeMode: "cover",
+                }}
+            />
+        )}
+
+        {data.contentData?.descriptionDTO ? (
+            <ReadMore
+                numberOfLines={3}
+                style={styles.description}
+                wrapperStyle={{ marginTop: 10 }}
+                seeMoreStyle={{ color: Colors.main }}
+                seeLessStyle={{ color: Colors.main }}
+                seeMoreText={"Read More"}
+            >
+              {data.contentData.descriptionDTO}
+            </ReadMore>
+        ) : null}
+
+        {type === "route" ? (
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>
+                {data.contentData?.totalDurationDTO || 0} hours |{" "}
+                {data.contentData?.totalDistanceDTO || 0} Km | Created at{" "}
+                {data.dateUploaded}
+              </Text>
+            </View>
+        ) : (
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>{data.categories.join(" | ")}</Text>
+            </View>
+        )}
+      </View>
   );
 };
 
 function RouteDetailsScreen({ route }) {
   const data = route.params.item;
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
-      <View style={styles.itemContainer}>
-        {/* <Text>Item ID: {data}</Text> */}
-        <MapView
-          style={{ height: "100%", width: "100%", borderRadius: 15 }}
-          provider={PROVIDER_GOOGLE}
-          showsCompass={true}
-          toolbarEnabled={false}
-          zoomEnabled={true}
-          region={calculatedRegion(data.contentData)}
-        >
-          {data.contentData?.pinnedLocationsDTO?.length > 0 &&
-            data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
-              <Marker
-                coordinate={{
-                  latitude: pinnedLocation.locationDTO.longitude,
-                  longitude: pinnedLocation.locationDTO.latitude,
-                }}
-                title={pinnedLocation.descriptionDTO}
+      <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
+        <View style={styles.itemContainer}>
+          {/* <Text>Item ID: {data}</Text> */}
+          <MapView
+              style={{ height: "100%", width: "100%", borderRadius: 15 }}
+              provider={PROVIDER_GOOGLE}
+              showsCompass={true}
+              toolbarEnabled={false}
+              zoomEnabled={true}
+              region={calculatedRegion(data.contentData)}
+          >
+            {data.contentData?.pinnedLocationsDTO?.length > 0 &&
+                data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
+                    <Marker
+                        coordinate={{
+                          latitude: pinnedLocation.locationDTO.longitude,
+                          longitude: pinnedLocation.locationDTO.latitude,
+                        }}
+                        title={pinnedLocation.descriptionDTO}
+                    />
+                ))}
+            {
+              <Polyline
+                  coordinates={data.contentData.locationsDTO}
+                  strokeColor="#FF0000"
+                  strokeWidth={3}
               />
-            ))}
-          {
-            <Polyline
-              coordinates={data.contentData.locationsDTO}
-              strokeColor="#FF0000"
-              strokeWidth={3}
-            />
-          }
-        </MapView>
-        <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-          <Icon name="routes" type={"material-community"} size={18} />
-          <Text style={styles.location}>
-            {" "}
-            {data.contentData.totalDurationDTO} hours |{" "}
-            {data.contentData.totalDistanceDTO} Km | Created at{" "}
-            {data.dateUploaded}
-          </Text>
-        </View>
-        <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
-        {data.contentData.pinnedLocationsDTO[1].map((item) => (
-          <View>
-            <Image
-              source={{
-                uri: data.contentData.pinnedLocationsDTO.imageFileNameDTO,
-              }}
-              style={{
-                width: "100%",
-                aspectRatio: 1.5,
-                marginTop: 15,
-                borderRadius: 15,
-                resizeMode: "cover",
-              }}
-            />
-            <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
-              <Icon
-                name="map-marker"
-                type={"material-community"}
-                size={18}
-                color={"#FF0000"}
-              />
-              <Text style={styles.location}>{item.description}</Text>
-            </View>
+            }
+          </MapView>
+          <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
+            <Icon name="routes" type={"material-community"} size={18} />
+            <Text style={styles.location}>
+              {" "}
+              {data.contentData.totalDurationDTO} hours |{" "}
+              {data.contentData.totalDistanceDTO} Km | Created at{" "}
+              {data.dateUploaded}
+            </Text>
           </View>
-        ))}
-      </View>
-    </ScrollView>
+          <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
+          {data.contentData.pinnedLocationsDTO[1].map((item) => (
+              <View>
+                <Image
+                    source={{
+                      uri: data.contentData.pinnedLocationsDTO.imageFileNameDTO,
+                    }}
+                    style={{
+                      width: "100%",
+                      aspectRatio: 1.5,
+                      marginTop: 15,
+                      borderRadius: 15,
+                      resizeMode: "cover",
+                    }}
+                />
+                <View style={[styles.row, { marginTop: 10, marginStart: 10 }]}>
+                  <Icon
+                      name="map-marker"
+                      type={"material-community"}
+                      size={18}
+                      color={"#FF0000"}
+                  />
+                  <Text style={styles.location}>{item.description}</Text>
+                </View>
+              </View>
+          ))}
+        </View>
+      </ScrollView>
   );
 }
 
@@ -274,16 +261,16 @@ export const calculatedRegion = (data: RouteDTO): Region => {
 
   if (!data.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
-    ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
   const maxLatitude = Math.max(
-    ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
   const minLongitude = Math.min(
-    ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
   const maxLongitude = Math.max(
-    ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed
@@ -324,7 +311,7 @@ export default function FeedScreen({ navigation }) {
       if (data?.allPosts) {
         setPosts(data.allPosts);
         setLoading(false);
-        setPage((page) => page + 1);
+        setPostsPage((page)=>page+1);
         setHasMore(true);
       }
     });
@@ -369,21 +356,6 @@ export default function FeedScreen({ navigation }) {
           resetToDefault();
         }
       });
-    });
-
-    setCities(Array.from(citySet));
-    setCityImages(cityImageMap);
-  }, [posts]);  // I also added uniqueCities and cityImages to the dependency list
-
-  useEffect(() => {
-    getUniqueCities();
-  }, [getUniqueCities]);
-  const handleCityFilter = (activeCities) => {
-    if (activeCities?.length > 0) {
-      const filtered = posts.filter((post) =>
-        post.cities.some((city) => activeCities.includes(city))
-      );
-      setFilteredPosts(filtered);
     } else {
       console.log(`!!! WE ARE IN HANDLE CITY  } else {`);
       resetToDefault();
@@ -457,7 +429,7 @@ export default function FeedScreen({ navigation }) {
       const citiesToImageArr = await getCitiesToImages();
       const uniqueCitiesSet = new Set<string>();
       const cityImagesMap: Map<string, string> = new Map<string, string>();
-      citiesToImageArr.forEach((cityImage) => {
+      citiesToImageArr.forEach(cityImage => {
         uniqueCitiesSet.add(cityImage.cityName);
         cityImagesMap[cityImage.cityName] = cityImage.imageUrl;
       });
@@ -466,7 +438,7 @@ export default function FeedScreen({ navigation }) {
       setCityImages(cityImagesMap);
       setFinishedFetchCities(true);
     } catch (error) {
-      console.error("Error updating unique cities and images:", error);
+      console.error('Error updating unique cities and images:', error);
       // Optionally set an error state here
     }
   }, []); // Empty dependency list, because we aren't using any external variables
@@ -486,31 +458,6 @@ export default function FeedScreen({ navigation }) {
     };
   }, []);
 
-  const handleLoadMore = () => {
-    if (loading || loadingMore) return;
-    setLoadingMore(true);
-    console.log(`page is ${page}`);
-    setPage((page) => page + 1);
-    console.log(`new page is ${page}`);
-    console.log(`posts are ${posts?.map((post) => post.dataID)}`);
-    console.log(
-      `filtered posts are ${filteredPosts?.map((post) => post.dataID)}`
-    );
-    getExploreFeed({ page: page }, (data) => {
-      if (data?.allPosts) {
-        console.log(`posts after request and before setFilteredPosts are ${posts?.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts?.map((post)=> post.dataID)}`)
-        setFilteredPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setPosts((prevPosts)=> [...prevPosts,...data.allPosts]);
-        setLoading(false);
-        setHasMore(true);
-        console.log(`posts after request and before setFilteredPosts are ${posts.map((post)=> post.dataID)}`)
-        console.log(`filtered posts after request and before setFilteredPosts are ${filteredPosts.map((post)=> post.dataID)}`)
-      }else{
-        setPage((page)=>page-1);
-      }
-    });
-  };
 
   const ListFooter = () => {
     if (loadingMore || hasMore) {
@@ -525,60 +472,59 @@ export default function FeedScreen({ navigation }) {
 
   function showItem({ item }) {
     if (item.postGenre == postGenreEnum.Location) {
-      return <Item canSave={true} type="image" data={item} />;
+      return <Item type="image" data={item} />;
     } else {
       return (
-        <Pressable
-          onPress={() => {
-            navigation.navigate("RouteDetails", { item });
-          }}
-        >
-          <Item canSave={true} data={item} type="route" />
-        </Pressable>
+          <Pressable
+              onPress={() => {
+                navigation.navigate("RouteDetails", { item });
+              }}
+          >
+            <Item data={item} type="route" />
+          </Pressable>
       );
     }
   }
 
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingBottom: 20,
-      }}
-    >
-      <FlatList
-        ListHeaderComponent={
-          loading ? null : (
-            <View style={{ padding: 10 }}>
-              {!finishedFetchCities ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-              ) : (
-                <CitiesPanel
-                    key={refreshKey}
-                    uniqueCities={uniqueCities}
-                    cityImages={cityImages}
-                    onCityClick={handleCityFilter}
-                />
-            )}
-          </View>
-      }
-        data={ isFiltering? filteredPosts : posts}
-        renderItem={({ item }) => showItem({ item })}
-        keyExtractor={(item, index) => item.dataID + "_" + index}
-        // refreshControl={<ActivityIndicator />}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={()=> {handleRefresh()}}/>
-        }
-        onEndReached={() => {
-          if (!loading && !isFetchingPosts) {
-            handleLoadMore();
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={<ListFooter />}
-      />
-    </View>
+      <View
+          style={{
+            flex: 1,
+            paddingBottom: 20,
+          }}
+      >
+        <FlatList
+            ListHeaderComponent={
+              <View style={{ padding: 10 }}>
+                {!finishedFetchCities ? (
+                    <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                    <CitiesPanel
+                        key={refreshKey}
+                        uniqueCities={uniqueCities}
+                        cityImages={cityImages}
+                        onCityClick={handleCityFilter}
+                    />
+                )}
+              </View>
+            }
+            data={ isFiltering? filteredPosts : posts}
+            renderItem={({ item }) => showItem({ item })}
+            keyExtractor={(item, index) => item.dataID + "_" + index}
+            // refreshControl={<ActivityIndicator />}
+            refreshControl={
+              <RefreshControl refreshing={loading} onRefresh={()=> {handleRefresh()}}/>
+            }
+            onEndReached={() => {
+              if (!loading && !isFetchingPosts) {
+                handleLoadMore();
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={<ListFooter />}
+        />
+      </View>
   );
 }
 
