@@ -30,6 +30,7 @@ export default function CreateNewPostScreen() {
         (createLocationRef.current as any)
           .save()
           .then((r) => {
+            debugger
             if (r.status !== 200 && r.status !== 201) {
               setSaving(false);
               Toast.show({

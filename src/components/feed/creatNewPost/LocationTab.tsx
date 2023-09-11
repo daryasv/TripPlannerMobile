@@ -23,8 +23,8 @@ const LocationTab = forwardRef((props, ref) => {
 
   const [data, setData] = useState({
     description: "",
-    locationLat: "",
-    locationLong: "",
+    locationLat: "100",
+    locationLong: "200",
     postGen: "0",
     cities: "",
   } as CreateLocationData);

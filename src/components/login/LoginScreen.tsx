@@ -28,6 +28,7 @@ import {
 } from "../../actions/userActions";
 import { USER_DETAILS_STORAGE_NAME } from "../../actions/security";
 import { Image } from "react-native-elements";
+const Logo = require("../../images/logo.jpg");
 
 const theme = createTheme({
   components: {
@@ -53,13 +54,15 @@ export const OptionsContainer = ({ setMode }: CardContainer) => {
     <View>
       <Text style={styles.welcome}>Welcome</Text>
       <Button
-        buttonStyle={{ backgroundColor: Colors.main }}
+        buttonStyle={{ borderColor: "white", borderWidth: 1 }}
+        titleStyle={{ color: "white" }}
         title={"Login"}
+        type="outline"
         onPress={() => setMode("login")}
       />
       <Button
-        buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
-        titleStyle={{ color: Colors.LightBlack }}
+        buttonStyle={{ borderColor: "white", borderWidth: 1 }}
+        titleStyle={{ color: "white" }}
         title={"Sign Up"}
         type="outline"
         onPress={() => setMode("signup")}
@@ -182,50 +185,67 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
         </TouchableOpacity>
         <Input
           label="First Name"
+          labelStyle={{color:"white"}}
           placeholder="First name"
-          leftIcon={{ type: "feather", name: "user" }}
+          leftIcon={{ type: "feather", name: "user", color: "white" }}
           value={data.userFirstName}
           onChangeText={(text) => setData({ ...data, userFirstName: text })}
           errorMessage={errors.userFirstName}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
+          
         />
         <Input
           label="Last Name"
+          labelStyle={{color:"white"}}
           placeholder="Last Name"
-          leftIcon={{ type: "feather", name: "user" }}
+          leftIcon={{ type: "feather", name: "user" ,color:"white"}}
           value={data.userLastName}
           onChangeText={(text) => setData({ ...data, userLastName: text })}
           errorMessage={errors.userLastName}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
         <Input
           label="Username"
+          labelStyle={{color:"white"}}
           placeholder="Username"
-          leftIcon={{ type: "feather", name: "user" }}
+          leftIcon={{ type: "feather", name: "user",color:"white" }}
           //value={data.userFirstName}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
         <Input
           label="Email"
+          labelStyle={{color:"white"}}
           placeholder="Email"
-          leftIcon={{ type: "feather", name: "mail" }}
+          leftIcon={{ type: "feather", name: "mail",color:"white" }}
           autoComplete={"email"}
           inputMode={"email"}
           keyboardType={"email-address"}
           value={data.userEmail}
           onChangeText={(text) => setData({ ...data, userEmail: text })}
           errorMessage={errors.userEmail}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
         <Input
           label="Password"
+          labelStyle={{color:"white"}}
           placeholder="Password"
-          leftIcon={{ type: "feather", name: "lock" }}
+          leftIcon={{ type: "feather", name: "lock" ,color:"white"}}
           secureTextEntry={true}
           value={data.password}
           onChangeText={(text) => setData({ ...data, password: text })}
           errorMessage={errors.password}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
         <Input
           label="Confirm Password"
+          labelStyle={{color:"white"}}
           placeholder="Confirm Password"
-          leftIcon={{ type: "feather", name: "lock" }}
+          leftIcon={{ type: "feather", name: "lock" ,color:"white"}}
           secureTextEntry={true}
           onChangeText={(text) => setConfirmPassword(text)}
           value={confirmPassword}
@@ -234,6 +254,8 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
               ? "Passwords doesn't match"
               : null
           }
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
 
         {generalError ? (
@@ -243,7 +265,13 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
         ) : null}
 
         <Button
-          buttonStyle={{ backgroundColor: Colors.main }}
+          buttonStyle={{
+            borderColor: "white",
+            borderWidth: 1,
+            backgroundColor: Colors.LightBlack,
+          }}
+          titleStyle={{ color: "white" }}
+          type="outline"
           title={"Sign up"}
           onPress={() => onSignup()}
           disabled={
@@ -258,16 +286,16 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
         />
 
         <Button
-          buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
-          titleStyle={{ color: Colors.LightBlack }}
+          buttonStyle={{ borderColor: "white", borderWidth: 1 }}
+          titleStyle={{ color: "white" }}
           title={"Back"}
           type="outline"
           onPress={() => setMode("options")}
         />
       </View>
-      <Text style={{ alignSelf: "center" }}>
+      <Text style={{ alignSelf: "center",color:"white" }}>
         Already have an account?{" "}
-        <Text style={{ color: "#303C9A" }} onPress={() => setMode("login")}>
+        <Text style={{ color: "white" }} onPress={() => setMode("login")}>
           Login
         </Text>
       </Text>
@@ -311,16 +339,20 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
       <View>
         <Input
           placeholder="Email"
-          leftIcon={{ type: "feather", name: "mail" }}
+          leftIcon={{ type: "feather", name: "mail",color:"white" }}
           onChangeText={(text) => setData({ ...data, userEmail: text })}
           value={data.userEmail}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
         <Input
           placeholder="Password"
-          leftIcon={{ type: "feather", name: "lock" }}
+          leftIcon={{ type: "feather", name: "lock",color:"white" }}
           secureTextEntry={true}
           onChangeText={(text) => setData({ ...data, password: text })}
           value={data.password}
+          style={{ color: "white" }}
+          placeholderTextColor={"white"}
         />
 
         {generalError ? (
@@ -330,22 +362,28 @@ export const LoginContainer = ({ setMode }: CardContainer) => {
         ) : null}
 
         <Button
-          buttonStyle={{ backgroundColor: Colors.main }}
+          buttonStyle={{
+            borderColor: "white",
+            borderWidth: 1,
+            backgroundColor: Colors.LightBlack,
+          }}
+          titleStyle={{ color: "white" }}
+          type="outline"
           title={"Login"}
           loading={loading}
           onPress={() => onLogin()}
         />
         <Button
-          buttonStyle={{ borderColor: Colors.LightBlack, borderWidth: 1 }}
-          titleStyle={{ color: Colors.LightBlack }}
+          buttonStyle={{ borderColor: "white", borderWidth: 1 }}
+          titleStyle={{ color: "white" }}
           title={"Back"}
           type="outline"
           onPress={() => setMode("options")}
         />
       </View>
-      <Text style={{ alignSelf: "center" }}>
+      <Text style={{ alignSelf: "center",color:"white"}}>
         Don't have an account?{" "}
-        <Text style={{ color: "#303C9A" }} onPress={() => setMode("signup")}>
+        <Text onPress={() => setMode("signup")}>
           Sign Up
         </Text>
       </Text>
@@ -371,11 +409,7 @@ const LoginScreen = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <ImageBackground
-        style={{ flex: 1 }}
-        source={require("../../images/backgroundlogin.png")}
-        resizeMode="cover"
-      >
+      <View style={{ flex: 1, backgroundColor: "white" }}>
         <View style={styles.container}>
           <View
             style={{
@@ -385,9 +419,10 @@ const LoginScreen = () => {
               padding: 15,
             }}
           >
-            <Text h2 style={{ color: "white" }}>
-              Trip Planner
-            </Text>
+            <Image
+              source={Logo}
+              style={{ width: "60%", aspectRatio: 2, resizeMode: "contain" }}
+            />
           </View>
           <Card
             containerStyle={[styles.card, { flex: mode === "options" ? 0 : 1 }]}
@@ -395,7 +430,7 @@ const LoginScreen = () => {
             {CardContainer}
           </Card>
         </View>
-      </ImageBackground>
+      </View>
     </ThemeProvider>
   );
 };
@@ -407,7 +442,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   welcome: {
-    color: Colors.main,
+    color: "white",
     fontSize: 16,
   },
   card: {
@@ -418,5 +453,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     minHeight: 250,
     flex: 1,
+    backgroundColor: "#2b4961",
   },
 });

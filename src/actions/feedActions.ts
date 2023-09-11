@@ -69,6 +69,7 @@ export const createLocation = (
       "location.latitude": data.locationLat,
       cities: data.cities,
       postGenre: data.postGen,
+      user_id:"d"
     },
   });
 };
