@@ -75,12 +75,13 @@ const LocationTab = forwardRef((props, ref) => {
         duration: asset.duration,
       })
         .then((extraData) => {
+          console.log("extra", extraData);
           if (extraData?.location) {
-            setData({
-              ...data,
+            setData((prev) => ({
+              ...prev,
               locationLat: extraData.location.latitude.toString(),
               locationLong: extraData.location.longitude.toString(),
-            });
+            }));
             getLocationData(
               extraData.location.latitude,
               extraData.location.longitude
@@ -131,17 +132,17 @@ const LocationTab = forwardRef((props, ref) => {
       })
         .then((extraData) => {
           if (extraData?.location) {
-            setData({
-              ...data,
+            setData((prev) => ({
+              ...prev,
               locationLat: extraData.location.latitude.toString(),
               locationLong: extraData.location.longitude.toString(),
-            });
+            }));
             getLocationData(
               extraData.location.latitude,
               extraData.location.longitude
             ).then((address) => {
               if (address?.city) {
-                setData({ ...data, cities: address.city });
+                setData((prev) => ({ ...prev, cities: address.city }));
               }
             });
           } else {
@@ -179,6 +180,7 @@ const LocationTab = forwardRef((props, ref) => {
       }
     );
   };
+
 
   useImperativeHandle(ref, () => ({
     save() {
@@ -286,8 +288,7 @@ const LocationTab = forwardRef((props, ref) => {
                     setData((prev) => ({ ...prev, cities: address.city }));
                   }
                 })
-                .catch((e) => {
-                });
+                .catch((e) => {});
               // 'details' is provided when fetchDetails = true
             }}
             query={{
