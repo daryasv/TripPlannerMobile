@@ -65,11 +65,15 @@ const RouteTab = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     save() {
       if (description && timeLabel) {
+        const pinnedLocationsDictionary: { [key: string]: string[] } = {};
+        const locationsDictionary: { [key: string]: GeolocationCoordinates[] } = {};
+        pinnedLocationsDictionary["1"] = pins.map((p) => p.id);
+        locationsDictionary["1"] = locations.map((location) => location.coords);
         return createRoute({
           description: description,
           totalDuration: duration,
-          locations: locations.map((location) => location.coords),
-          pinnedLocations: pins.map((p) => p.id),
+          locations: locationsDictionary,
+          pinnedLocations: pinnedLocationsDictionary,
           totalDistance: 0,
           user_id: "",
           cities: city,
@@ -79,14 +83,30 @@ const RouteTab = forwardRef((props, ref) => {
   }));
 
   const handleStart = useCallback(() => {
+    // Clear any existing timer intervals
+    if (timerRef.current) {
+        clearInterval(timerRef.current);
+    }
+
     setRecording(true);
+
     const start = moment();
     setTimeLabel("00:00:00");
+
     timerRef.current = setInterval(() => {
-      const d = moment.duration(moment().diff(start)).asMilliseconds();
-      setDuration(d);
-      const label = moment.utc(d).format("HH:mm:ss");
-      setTimeLabel(label);
+        // Get the difference in milliseconds directly
+        const elapsedMilliseconds = moment().diff(start);
+
+        // Convert the milliseconds into a moment duration
+        const duration = moment.duration(elapsedMilliseconds);
+
+        // Convert duration to hours and set
+        const d = duration.asMilliseconds();
+        setDuration(d);
+
+        // Format the duration into HH:mm:ss and set
+        const label = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+        setTimeLabel(label);
     }, 1000);
 
     Location.getCurrentPositionAsync()
@@ -288,7 +308,7 @@ function PinLocation(props: { details: PinLocationProps }) {
         ) : null}
         <Text>{props.details.description}</Text>
       </View>
-      <Button
+      {/* <Button
         type="clear"
         titleStyle={{
           color: "red",
@@ -298,7 +318,7 @@ function PinLocation(props: { details: PinLocationProps }) {
         }}
       >
         Remove
-      </Button>
+      </Button> */}
     </Card>
   );
 }
@@ -420,7 +440,7 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
       <Button
         containerStyle={{ margin: 30 }}
         radius={50}
-        title={"Add new pinnded"}
+        title={"Add new pin"}
         onPress={() => setEditMode(true)}
       />
     );

@@ -29,6 +29,7 @@ import MapView, {
 } from "react-native-maps";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import moment from "moment";
 import { RouteDTO } from "../../actions/tripActions";
 import {getCitiesToImages} from "../../actions/cityPanelActions";
 
@@ -141,17 +142,29 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
         ) : null}
 
         {type === "route" ? (
+          <View>
             <View style={[styles.row, { marginTop: 10 }]}>
               <Text style={styles.location}>
-                {data.contentData?.totalDurationDTO || 0} hours |{" "}
-                {data.contentData?.totalDistanceDTO || 0} Km | Created at{" "}
+                {data.categories.join(" | ")}
+              </Text>
+            </View>
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>
+                {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
+                Created at{" "}
                 {data.dateUploaded}
               </Text>
             </View>
+          </View>
         ) : (
+          <View>
             <View style={[styles.row, { marginTop: 10 }]}>
               <Text style={styles.location}>{data.categories.join(" | ")}</Text>
             </View>
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>Created at{" "}{data.dateUploaded}</Text>
+            </View>
+          </View>
         )}
       </View>
   );
@@ -193,8 +206,8 @@ function RouteDetailsScreen({ route }) {
             <Icon name="routes" type={"material-community"} size={18} />
             <Text style={styles.location}>
               {" "}
-              {data.contentData.totalDurationDTO} hours |{" "}
-              {data.contentData.totalDistanceDTO} Km | Created at{" "}
+              {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss")} hours |{" "}
+              Created at{" "}
               {data.dateUploaded}
             </Text>
           </View>
