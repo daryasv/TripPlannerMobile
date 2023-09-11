@@ -21,6 +21,7 @@ import {
 import { postGenreEnum } from "../../types/postTypes";
 import { Item } from "../feed/FeedScreen";
 import { Button } from "@rneui/base";
+import * as ImagePicker from "expo-image-picker";
 
 const styles = StyleSheet.create({
   Avatar: {
@@ -153,6 +154,7 @@ export function ProfileHomeScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [numLocations, setLocationsNum] = useState(0);
   const [numOfSaved, setNumOfSaved] = useState(0);
+  const [image, setImage] = useState(null as ImagePicker.ImagePickerAsset);
 
   const defaultUser: User = {
     _id: "",
@@ -212,12 +214,26 @@ export function ProfileHomeScreen({ navigation }) {
     setCurrentView("my_posts");
   };
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0]);
+    }
+  };
+
   const items = currentView === "my_posts" ? locations : savedRoutes;
 
   return (
     <ScrollView
       showsVerticalScrollIndicator={true}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={getData}/>}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={getData} />}
     >
       <Text style={styles.Logout} onPress={() => Logout()}>
         Logout

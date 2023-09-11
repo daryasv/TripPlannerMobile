@@ -17,11 +17,13 @@ export function getExploreFeed(
       headers: { Authorization: getToken() },
     })
     .then((res) => {
-      console.log(`~~ This is the res inside getExploreFeed ~~ ${JSON.stringify(res)}`);
+      console.log(
+        `~~ This is the res inside getExploreFeed ~~ ${JSON.stringify(res)}`
+      );
       callback(res.data);
     })
     .catch((e) => {
-      console.log(`~~~ The ERROR IS ~~~ : ${JSON.stringify(e)}`, );
+      console.log(`~~~ The ERROR IS ~~~ : ${JSON.stringify(e)}`);
       callback(null);
     });
 }
@@ -67,7 +69,6 @@ export const createLocation = (
       "location.latitude": data.locationLat,
       cities: data.cities,
       postGenre: data.postGen,
-      user_id: "D@gmail.com",
     },
   });
 };
@@ -138,7 +139,6 @@ export const unSaveLocation = (locationId: string) => {
     { headers: { Authorization: getToken() } }
   );
 };
-
 
 export const saveLocation = (locationId: string) => {
   return axios.post(

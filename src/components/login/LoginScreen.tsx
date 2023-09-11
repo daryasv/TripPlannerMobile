@@ -107,7 +107,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       setErrors({});
       setLoading(true);
       setGeneralError("");
-      postUserRegister(data, (success) => {
+      postUserRegister(data, image, (success) => {
         if (success) {
           setMode("login");
         } else {
@@ -246,6 +246,14 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Sign up"}
           onPress={() => onSignup()}
+          disabled={
+            !image ||
+            !data.userEmail ||
+            !data.userFirstName ||
+            !data.userLastName ||
+            !data.password ||
+            !confirmPassword
+          }
           loading={loading}
         />
 
