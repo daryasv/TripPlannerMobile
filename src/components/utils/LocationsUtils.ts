@@ -12,6 +12,7 @@ interface Address {
 export async function getLocationData(lat, lng) {
   var address: Address;
   try {
+    
     const url = `https://maps.googleapis.com/maps/api/geocode/json?language=en&latlng=${lat},${lng}&key=AIzaSyAPwXe02EgSv0WmEHso2AjvE4VUhB-TOeU`;
     const response = await fetch(url)
       .then((response) => response.json())
