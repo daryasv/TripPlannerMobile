@@ -200,7 +200,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           label="Username"
           placeholder="Username"
           leftIcon={{ type: "feather", name: "user" }}
-        //value={data.userFirstName}
+          //value={data.userFirstName}
         />
         <Input
           label="Email"
@@ -246,6 +246,14 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           buttonStyle={{ backgroundColor: Colors.main }}
           title={"Sign up"}
           onPress={() => onSignup()}
+          disabled={
+            !image ||
+            !data.userEmail ||
+            !data.userFirstName ||
+            !data.userLastName ||
+            !data.password ||
+            !confirmPassword
+          }
           loading={loading}
         />
 
