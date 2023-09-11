@@ -8,7 +8,6 @@ import React, {
 import { Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
-import { } from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -17,6 +16,7 @@ import {
 } from "../../../actions/feedActions";
 import { getLocationData } from "../../utils/LocationsUtils";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import AutocompleteInput from "react-native-autocomplete-input";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
@@ -256,7 +256,7 @@ const LocationTab = forwardRef((props, ref) => {
         }
       >
         <View style={{ backgroundColor: "white", margin: 10, marginTop: 0 }}>
-          <Input></Input>
+        
         </View>
       </ListItem.Accordion>
     </KeyboardAwareScrollView>
