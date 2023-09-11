@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   DeviceEventEmitter,
+  Dimensions,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -20,6 +21,9 @@ export default function CreateNewPostScreen() {
   const [saving, setSaving] = useState(false as boolean);
   const createLocationRef = useRef();
   const createRouteRef = useRef();
+  const [indicatorX, setIndicatorX] = useState(0);
+  const windowWidth = Dimensions.get("window").width;
+  const tabWidth = windowWidth / 2; // Specify your tabs amount
 
   const nav = useNavigation();
 
@@ -30,7 +34,6 @@ export default function CreateNewPostScreen() {
         (createLocationRef.current as any)
           .save()
           .then((r) => {
-            
             if (r.status !== 200 && r.status !== 201) {
               setSaving(false);
               Toast.show({
@@ -100,8 +103,14 @@ export default function CreateNewPostScreen() {
     <View style={{ flex: 1 }}>
       <Tab
         value={currentTab}
-        onChange={setCurrentTab}
-        indicatorStyle={{ backgroundColor: "transparent" }}
+        onChange={(e) => {
+          setCurrentTab(e); // Whatever you do here
+          setIndicatorX(e * tabWidth); // Setting the right translateX value
+        }}
+        indicatorStyle={{
+          backgroundColor: "transparent",
+          transform: [{ translateX: indicatorX }], // Overriding the buggy string from the source
+        }}
         containerStyle={{ borderBottomWidth: 1, borderBottomColor: "#E6E7F2" }}
       >
         <Tab.Item
