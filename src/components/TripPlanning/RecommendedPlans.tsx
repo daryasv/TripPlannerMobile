@@ -22,8 +22,7 @@ import { PostType } from "../../types/postTypes";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import { saveLocation, unSaveLocation } from "../../actions/feedActions";
-
-
+import moment from "moment";
 
 export default function RecommendedPlansScreen({ route }) {
   const numOfDays = route.params.numOfDays;
@@ -130,7 +129,14 @@ export default function RecommendedPlansScreen({ route }) {
   
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {item.contentData.totalDurationDTO || 0} hours | {item.contentData.totalDistanceDTO || 0} Km
+            {item.categories.join(" | ")}
+          </Text>
+        </View>
+        <View style={[styles.row, { marginTop: 10 }]}>
+          <Text style={styles.location}>
+            {moment.utc(item.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
+            Created at{" "}
+            {item.dateUploaded.split("T")[0]}
           </Text>
         </View>
       </View>
