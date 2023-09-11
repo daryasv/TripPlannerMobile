@@ -87,7 +87,7 @@ const LocationTab = forwardRef((props, ref) => {
               extraData.location.longitude
             ).then((address) => {
               if (address?.city) {
-                setData({ ...data, cities: address.city });
+                setData(prev => ({ ...prev, cities: address.city }));
               }
             });
           }
