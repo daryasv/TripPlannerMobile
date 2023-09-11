@@ -109,8 +109,8 @@ export interface CreateRouteData {
   user_id: string;
   totalDistance: number;
   totalDuration: number;
-  pinnedLocations: string[];
-  locations: Location[];
+  pinnedLocations: { [day: string]: string[] };
+  locations: { [day: string]: GeolocationCoordinates[] };
   cities: string;
 }
 export interface pinnedLocationType {
