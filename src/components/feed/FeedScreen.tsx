@@ -99,7 +99,7 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
                   data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
                       <Marker
                           coordinate={{
-                            latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                            latitude: pinnedLocation?.contentData?.locationDTO?.latitude,
                             longitude: pinnedLocation?.contentData?.locationDTO?.longitude,
                           }}
                           title={pinnedLocation?.contentData?.descriptionDTO}
@@ -188,8 +188,8 @@ function RouteDetailsScreen({ route }) {
                 data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
                     <Marker
                         coordinate={{
-                          latitude: pinnedLocation.locationDTO.latitude,
-                          longitude: pinnedLocation.locationDTO.longitude,
+                          latitude: pinnedLocation?.locationDTO?.latitude,
+                          longitude: pinnedLocation?.locationDTO?.longitude,
                         }}
                         title={pinnedLocation.descriptionDTO}
                     />
@@ -245,7 +245,7 @@ function RouteDetailsScreen({ route }) {
 export const calculatedRegion = (data: RouteDTO): Region => {
   //console.log(data.locationsDTO[1])
 
-  if (!data.locationsDTO[1].length) return null;
+  if (!data?.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
       ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
