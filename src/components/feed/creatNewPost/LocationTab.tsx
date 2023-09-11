@@ -8,6 +8,7 @@ import React, {
 import { Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -17,14 +18,15 @@ import {
 import { getLocationData } from "../../utils/LocationsUtils";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import AutocompleteInput from "react-native-autocomplete-input";
+import { MAPS_KEY_IOS } from "../../../actions/actionsConfig";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
 
   const [data, setData] = useState({
     description: "",
-    locationLat: "100",
-    locationLong: "200",
+    locationLat: "0",
+    locationLong: "0",
     postGen: "0",
     cities: "",
   } as CreateLocationData);
@@ -89,7 +91,7 @@ const LocationTab = forwardRef((props, ref) => {
             });
           }
         })
-        .catch((e) => { });
+        .catch((e) => {});
 
       setImage(asset);
     }
@@ -142,9 +144,11 @@ const LocationTab = forwardRef((props, ref) => {
                 setData({ ...data, cities: address.city });
               }
             });
+          } else {
+            setLocationsOpen(true);
           }
         })
-        .catch((e) => { });
+        .catch((e) => {});
 
       setImage(asset);
     }
@@ -178,6 +182,15 @@ const LocationTab = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save() {
+      if (
+        !image ||
+        !data.description ||
+        !data.locationLat ||
+        !data.locationLong
+      ) {
+        return;
+      }
+      console.log(data);
       return createLocation(data, image);
     },
   }));
@@ -256,7 +269,32 @@ const LocationTab = forwardRef((props, ref) => {
         }
       >
         <View style={{ backgroundColor: "white", margin: 10, marginTop: 0 }}>
-        
+          <GooglePlacesAutocomplete
+            fetchDetails={true}
+            placeholder="Search"
+            enablePoweredByContainer={false}
+            onPress={(geoData, geoDetails = null) => {
+              const newData = { ...data };
+              newData.locationLong =
+                geoDetails.geometry?.location?.lng.toString() || "0";
+              newData.locationLat =
+                geoDetails.geometry?.location?.lat.toString() || "0";
+              setData(newData);
+              getLocationData(newData.locationLat, newData.locationLong)
+                .then((address) => {
+                  if (address?.city) {
+                    setData((prev) => ({ ...prev, cities: address.city }));
+                  }
+                })
+                .catch((e) => {
+                });
+              // 'details' is provided when fetchDetails = true
+            }}
+            query={{
+              key: MAPS_KEY_IOS,
+              language: "en",
+            }}
+          />
         </View>
       </ListItem.Accordion>
     </KeyboardAwareScrollView>
