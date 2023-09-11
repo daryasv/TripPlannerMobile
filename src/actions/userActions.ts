@@ -14,10 +14,12 @@ export const postUserRegister = (
   image,
   callback: (success: boolean) => void
 ) => {
+  console.log("uri",image.uri)
   FileSystem.uploadAsync(BASE_URL + "/users/register", image?.uri, {
-    fieldName: "imageFile",
+    fieldName: "file",
     httpMethod: "POST",
     uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+    headers: { Authorization: null },
     parameters: {
       "userFirstName": data.userFirstName,
       "userLastName": data.userLastName,
