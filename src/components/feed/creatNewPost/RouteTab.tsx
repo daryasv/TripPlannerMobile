@@ -95,8 +95,9 @@ const RouteTab = forwardRef((props, ref) => {
         setPath([res.coords]);
         getLocationData(res.coords.latitude, res.coords.longitude)
           .then((address) => {
-            if (address?.city) {
-              setCity(address.city);
+            const city = address?.city || address?.state || address.country;
+            if (city) {
+              setCity(city);
             }
           })
           .catch((e) => {});

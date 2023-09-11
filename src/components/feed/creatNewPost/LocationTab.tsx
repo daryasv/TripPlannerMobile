@@ -86,8 +86,9 @@ const LocationTab = forwardRef((props, ref) => {
               extraData.location.latitude,
               extraData.location.longitude
             ).then((address) => {
-              if (address?.city) {
-                setData(prev => ({ ...prev, cities: address.city }));
+              const city = address?.city || address?.state || address.country;
+              if (city) {
+                setData((prev) => ({ ...prev, cities: city }));
               }
             });
           }
@@ -141,8 +142,9 @@ const LocationTab = forwardRef((props, ref) => {
               extraData.location.latitude,
               extraData.location.longitude
             ).then((address) => {
-              if (address?.city) {
-                setData((prev) => ({ ...prev, cities: address.city }));
+              const city = address?.city || address?.state || address.country;
+              if (city) {
+                setData((prev) => ({ ...prev, cities: city }));
               }
             });
           } else {
@@ -180,7 +182,6 @@ const LocationTab = forwardRef((props, ref) => {
       }
     );
   };
-
 
   useImperativeHandle(ref, () => ({
     save() {
@@ -284,8 +285,9 @@ const LocationTab = forwardRef((props, ref) => {
               setData(newData);
               getLocationData(newData.locationLat, newData.locationLong)
                 .then((address) => {
-                  if (address?.city) {
-                    setData((prev) => ({ ...prev, cities: address.city }));
+                  const city = address?.city || address?.state || address.country;
+                  if (city) {
+                    setData((prev) => ({ ...prev, cities: city }));
                   }
                 })
                 .catch((e) => {});
