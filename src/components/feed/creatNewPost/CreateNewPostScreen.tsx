@@ -30,14 +30,23 @@ export default function CreateNewPostScreen() {
         (createLocationRef.current as any)
           .save()
           .then((r) => {
-            setSaving(false);
-            Toast.show({
-              type: "success",
-              text1: "Success",
-              text2: "Post created successfully",
-            });
-            DeviceEventEmitter.emit("update_feed");
-            nav.goBack();
+            if (r.status !== 200 && r.status !== 201) {
+              setSaving(false);
+              Toast.show({
+                type: "error",
+                text1: "Failed",
+                text2: "Failed to create the post",
+              });
+            } else {
+              setSaving(false);
+              Toast.show({
+                type: "success",
+                text1: "Success",
+                text2: "Post created successfully",
+              });
+              DeviceEventEmitter.emit("update_feed");
+              nav.goBack();
+            }
           })
           .catch((e) => {
             Toast.show({
@@ -103,7 +112,7 @@ export default function CreateNewPostScreen() {
         />
         <Tab.Item
           titleStyle={{
-            color: currentTab === 1 ? "black"  : "#939393",
+            color: currentTab === 1 ? "black" : "#939393",
             ...styles.tabTitle,
           }}
           title={"Route"}
