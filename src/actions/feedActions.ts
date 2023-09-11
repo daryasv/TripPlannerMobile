@@ -21,7 +21,7 @@ export function getExploreFeed(
       callback(res.data);
     })
     .catch((e) => {
-      console.log(`~~~ The ERROR IS ~~~ : ${JSON.stringify(e)}`, );
+      console.log(`~~~ The ERROR IS ~~~ : ${JSON.stringify(e)}`,);
       callback(null);
     });
 }
@@ -49,7 +49,6 @@ export const createLocation = (
       "location.latitude": data.locationLat,
       cities: data.cities,
       postGenre: data.postGen,
-      user_id: "D@gmail.com",
     },
   });
 };

@@ -107,7 +107,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
       setErrors({});
       setLoading(true);
       setGeneralError("");
-      postUserRegister(data, (success) => {
+      postUserRegister(data, image, (success) => {
         if (success) {
           setMode("login");
         } else {
@@ -200,7 +200,7 @@ export const SignupContainer = ({ setMode }: CardContainer) => {
           label="Username"
           placeholder="Username"
           leftIcon={{ type: "feather", name: "user" }}
-          //value={data.userFirstName}
+        //value={data.userFirstName}
         />
         <Input
           label="Email"
