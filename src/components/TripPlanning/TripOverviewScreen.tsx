@@ -77,12 +77,12 @@ export default function TripOverViewScreen({ route }) {
       setShownLocations(tripLocations[parseInt(day.slice(4))])
     }
 
-    setShownPath(path[parseInt(day.slice(4))]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(path[parseInt(day.slice(4))]?.map(item => ({ latitude: item.latitude, longitude: item.longitude })))
   };
 
   useEffect(() => {
     setShownLocations(tripLocations[1])
-    setShownPath(path[1]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(path[1]?.map(item => ({ latitude: item.latitude, longitude: item.longitude })))
   }, []);
 
   return (
@@ -112,8 +112,8 @@ export default function TripOverViewScreen({ route }) {
             shownLocations?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.contentData.locationDTO.longitude,
-                  longitude: pinnedLocation.contentData.locationDTO.latitude,
+                  latitude: pinnedLocation.contentData.locationDTO.latitude,
+                  longitude: pinnedLocation.contentData.locationDTO.longitude,
                 }}
                 title={pinnedLocation.contentData.descriptionDTO}
               />

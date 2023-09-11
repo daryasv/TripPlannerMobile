@@ -98,15 +98,15 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
                   data.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
                       <Marker
                           coordinate={{
-                            latitude: pinnedLocation?.contentData?.locationDTO.longitude,
-                            longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+                            latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                            longitude: pinnedLocation?.contentData?.locationDTO?.longitude,
                           }}
                           title={pinnedLocation?.contentData?.descriptionDTO}
                       />
                   ))}
               {
                 <Polyline
-                    coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.longitude, longitude: item.latitude }))}
+                    coordinates={data.contentData?.locationsDTO[1].map(item => ({ latitude: item.latitude, longitude: item.longitude }))}
                     strokeColor="#FF0000"
                     strokeWidth={3}
                 />
@@ -175,8 +175,8 @@ function RouteDetailsScreen({ route }) {
                 data.contentData.pinnedLocationsDTO.map((pinnedLocation) => (
                     <Marker
                         coordinate={{
-                          latitude: pinnedLocation.locationDTO.longitude,
-                          longitude: pinnedLocation.locationDTO.latitude,
+                          latitude: pinnedLocation.locationDTO.latitude,
+                          longitude: pinnedLocation.locationDTO.longitude,
                         }}
                         title={pinnedLocation.descriptionDTO}
                     />
@@ -229,48 +229,21 @@ function RouteDetailsScreen({ route }) {
   );
 }
 
-// const calculatedRegion = (data: PostType): Region => {
-//   if (!data.contentData?.locationsDTO?.day1.length) return null;
-//   const minLatitude = Math.min(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
-//   );
-//   const maxLatitude = Math.max(
-//     ...data.contentData.locationsDTO?.day1?.map((coord) => coord.latitude)
-//   );
-//   const minLongitude = Math.min(
-//     ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
-//   );
-//   const maxLongitude = Math.max(
-//     ...data.contentData.locationsDTO?.day1.map((coord) => coord.longitude)
-//   );
-
-//   const padding = 0.01; // Adjust the padding as needed
-
-//   const calculatedRegion: Region = {
-//     latitude: (minLatitude + maxLatitude) / 2,
-//     longitude: (minLongitude + maxLongitude) / 2,
-//     latitudeDelta: Math.abs(maxLatitude - minLatitude) + padding,
-//     longitudeDelta: Math.abs(maxLongitude - minLongitude) + padding,
-//   };
-
-//   return calculatedRegion;
-// };
-
 export const calculatedRegion = (data: RouteDTO): Region => {
   //console.log(data.locationsDTO[1])
 
   if (!data.locationsDTO[1].length) return null;
   const minLatitude = Math.min(
-      ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
   const maxLatitude = Math.max(
-      ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
   );
   const minLongitude = Math.min(
-      ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
   const maxLongitude = Math.max(
-      ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
   );
 
   const padding = 0.01; // Adjust the padding as needed
