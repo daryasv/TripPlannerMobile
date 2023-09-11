@@ -152,7 +152,7 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
               <Text style={styles.location}>
                 {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
                 Created at{" "}
-                {data.dateUploaded}
+                {data.dateUploaded.split("T")[0]}
               </Text>
             </View>
           </View>
@@ -162,7 +162,7 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
               <Text style={styles.location}>{data.categories.join(" | ")}</Text>
             </View>
             <View style={[styles.row, { marginTop: 10 }]}>
-              <Text style={styles.location}>Created at{" "}{data.dateUploaded}</Text>
+              <Text style={styles.location}>Created at{" "}{data.dateUploaded.split("T")[0]}</Text>
             </View>
           </View>
         )}
@@ -208,7 +208,7 @@ function RouteDetailsScreen({ route }) {
               {" "}
               {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss")} hours |{" "}
               Created at{" "}
-              {data.dateUploaded}
+              {data.dateUploaded.split("T")[0]}
             </Text>
           </View>
           <Text style={styles.pinnedLocations}>Pinned Locations:</Text>
