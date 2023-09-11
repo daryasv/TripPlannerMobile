@@ -129,7 +129,14 @@ export default function RecommendedPlansScreen({ route }) {
   
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {moment.utc(item.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours
+            {item.categories.join(" | ")}
+          </Text>
+        </View>
+        <View style={[styles.row, { marginTop: 10 }]}>
+          <Text style={styles.location}>
+            {moment.utc(item.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
+            Created at{" "}
+            {item.dateUploaded}
           </Text>
         </View>
       </View>

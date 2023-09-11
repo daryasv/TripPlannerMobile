@@ -142,6 +142,12 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
         ) : null}
 
         {type === "route" ? (
+          <View>
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>
+                {data.categories.join(" | ")}
+              </Text>
+            </View>
             <View style={[styles.row, { marginTop: 10 }]}>
               <Text style={styles.location}>
                 {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
@@ -149,10 +155,16 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
                 {data.dateUploaded}
               </Text>
             </View>
+          </View>
         ) : (
+          <View>
             <View style={[styles.row, { marginTop: 10 }]}>
               <Text style={styles.location}>{data.categories.join(" | ")}</Text>
             </View>
+            <View style={[styles.row, { marginTop: 10 }]}>
+              <Text style={styles.location}>Created at{" "}{data.dateUploaded}</Text>
+            </View>
+          </View>
         )}
       </View>
   );
