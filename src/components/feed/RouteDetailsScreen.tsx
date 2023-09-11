@@ -73,12 +73,12 @@ export default function RouteDetailsScreen({ route }) {
       setShownLocations(data.pinnedLocationsDTO[parseInt(day.slice(4))])
     }
 
-    setShownPath(data.locationsDTO[parseInt(day.slice(4))]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(data.locationsDTO[parseInt(day.slice(4))]?.map(item => ({ latitude: item.latitude, longitude: item.longitude })))
   };
 
   useEffect(() => {
     setShownLocations(data.pinnedLocationsDTO[1])
-    setShownPath(data.locationsDTO[1]?.map(item => ({ latitude: item.longitude, longitude: item.latitude })))
+    setShownPath(data.locationsDTO[1]?.map(item => ({ latitude: item.latitude, longitude: item.longitude })))
   }, []);
 
   return (
@@ -108,8 +108,8 @@ export default function RouteDetailsScreen({ route }) {
             shownLocations?.map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation.contentData.locationDTO.longitude,
-                  longitude: pinnedLocation.contentData.locationDTO.latitude,
+                  latitude: pinnedLocation.contentData.locationDTO.latitude,
+                  longitude: pinnedLocation.contentData.locationDTO.longitude,
                 }}
                 title={pinnedLocation.contentData.descriptionDTO}
               />

@@ -100,8 +100,8 @@ export default function RecommendedPlansScreen({ route }) {
             item.contentData.pinnedLocationsDTO[1].map((pinnedLocation) => (
               <Marker
                 coordinate={{
-                  latitude: pinnedLocation?.contentData?.locationDTO.longitude,
-                  longitude: pinnedLocation?.contentData?.locationDTO?.latitude,
+                  latitude: pinnedLocation?.contentData?.locationDTO.latitude,
+                  longitude: pinnedLocation?.contentData?.locationDTO?.longitude,
                 }}
                 title={pinnedLocation?.contentData?.descriptionDTO}
               />
@@ -152,16 +152,16 @@ export default function RecommendedPlansScreen({ route }) {
   const calculatedRegion = (data: RouteDTO): Region => {
     if (!data.locationsDTO[1].length) return null;
     const minLatitude = Math.min(
-      ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
     );
     const maxLatitude = Math.max(
-      ...data.locationsDTO[1].map((coord) => coord.longitude)
+      ...data.locationsDTO[1].map((coord) => coord.latitude)
     );
     const minLongitude = Math.min(
-      ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
     );
     const maxLongitude = Math.max(
-      ...data.locationsDTO[1].map((coord) => coord.latitude)
+      ...data.locationsDTO[1].map((coord) => coord.longitude)
     );
   
     const padding = 0.01; // Adjust the padding as needed

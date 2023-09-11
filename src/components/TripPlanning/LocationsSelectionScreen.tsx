@@ -100,9 +100,9 @@ export default function LocationsSelectionScreen({ route }) {
                     key={pinnedLocation.dataID + temp.getTime()}
                     coordinate={{
                       longitude:
-                        pinnedLocation.contentData.locationDTO.latitude,
-                      latitude:
                         pinnedLocation.contentData.locationDTO.longitude,
+                      latitude:
+                        pinnedLocation.contentData.locationDTO.latitude,
                     }}
                     title={pinnedLocation.contentData.descriptionDTO}
                     pinColor={
