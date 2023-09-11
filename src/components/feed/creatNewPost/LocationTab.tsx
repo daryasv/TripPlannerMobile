@@ -8,7 +8,7 @@ import React, {
 import { Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
-import {} from "react-native-google-places-autocomplete";
+import { } from "react-native-google-places-autocomplete";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -23,8 +23,8 @@ const LocationTab = forwardRef((props, ref) => {
 
   const [data, setData] = useState({
     description: "",
-    locationLat: "100",
-    locationLong: "200",
+    locationLat: "",
+    locationLong: "",
     postGen: "0",
     cities: "",
   } as CreateLocationData);
@@ -89,7 +89,7 @@ const LocationTab = forwardRef((props, ref) => {
             });
           }
         })
-        .catch((e) => {});
+        .catch((e) => { });
 
       setImage(asset);
     }
@@ -144,7 +144,7 @@ const LocationTab = forwardRef((props, ref) => {
             });
           }
         })
-        .catch((e) => {});
+        .catch((e) => { });
 
       setImage(asset);
     }
