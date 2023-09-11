@@ -22,7 +22,7 @@ import { MAPS_KEY_IOS } from "../../../actions/actionsConfig";
 
 const LocationTab = forwardRef((props, ref) => {
   const [locationsOpen, setLocationsOpen] = React.useState(false as boolean);
-
+  const [loadingImage, setLoadingImage] = useState(false);
   const [data, setData] = useState({
     description: "",
     locationLat: "0",
@@ -62,7 +62,7 @@ const LocationTab = forwardRef((props, ref) => {
 
     if (!result.canceled) {
       const asset = result.assets[0];
-
+      setLoadingImage(true);
       MediaLibrary.getAssetInfoAsync({
         id: asset.assetId,
         filename: asset.fileName,
@@ -82,15 +82,17 @@ const LocationTab = forwardRef((props, ref) => {
               locationLat: extraData.location.latitude.toString(),
               locationLong: extraData.location.longitude.toString(),
             }));
-            getLocationData(
-              extraData.location.latitude,
-              extraData.location.longitude
-            ).then((address) => {
-              const city = address?.city || address?.state || address.country;
-              if (city) {
-                setData((prev) => ({ ...prev, cities: city }));
-              }
-            });
+            window.setTimeout(() => {
+              getLocationData(
+                extraData.location.latitude,
+                extraData.location.longitude
+              ).then((address) => {
+                const city = address?.city || address?.state || address.country;
+                if (city) {
+                  setData((prev) => ({ ...prev, cities: city }));
+                }
+              });
+            }, 200);
           }
         })
         .catch((e) => {});
@@ -138,15 +140,18 @@ const LocationTab = forwardRef((props, ref) => {
               locationLat: extraData.location.latitude.toString(),
               locationLong: extraData.location.longitude.toString(),
             }));
-            getLocationData(
-              extraData.location.latitude,
-              extraData.location.longitude
-            ).then((address) => {
-              const city = address?.city || address?.state || address.country;
-              if (city) {
-                setData((prev) => ({ ...prev, cities: city }));
-              }
-            });
+            window.setTimeout(() => {
+              getLocationData(
+                extraData.location.latitude,
+                extraData.location.longitude
+              ).then((address) => {
+                console.log(address);
+                const city = address?.city || address?.state || address.country;
+                if (city) {
+                  setData((prev) => ({ ...prev, cities: city }));
+                }
+              });
+            }, 300);
           } else {
             setLocationsOpen(true);
           }
@@ -272,32 +277,35 @@ const LocationTab = forwardRef((props, ref) => {
         }
       >
         <View style={{ backgroundColor: "white", margin: 10, marginTop: 0 }}>
-          <GooglePlacesAutocomplete
-            fetchDetails={true}
-            placeholder="Search"
-            enablePoweredByContainer={false}
-            onPress={(geoData, geoDetails = null) => {
-              const newData = { ...data };
-              newData.locationLong =
-                geoDetails.geometry?.location?.lng.toString() || "0";
-              newData.locationLat =
-                geoDetails.geometry?.location?.lat.toString() || "0";
-              setData(newData);
-              getLocationData(newData.locationLat, newData.locationLong)
-                .then((address) => {
-                  const city = address?.city || address?.state || address.country;
-                  if (city) {
-                    setData((prev) => ({ ...prev, cities: city }));
-                  }
-                })
-                .catch((e) => {});
-              // 'details' is provided when fetchDetails = true
-            }}
-            query={{
-              key: MAPS_KEY_IOS,
-              language: "en",
-            }}
-          />
+          {locationsOpen ? (
+            <GooglePlacesAutocomplete
+              fetchDetails={true}
+              placeholder="Search"
+              enablePoweredByContainer={false}
+              onPress={(geoData, geoDetails = null) => {
+                const newData = { ...data };
+                newData.locationLong =
+                  geoDetails.geometry?.location?.lng.toString() || "0";
+                newData.locationLat =
+                  geoDetails.geometry?.location?.lat.toString() || "0";
+                setData(newData);
+                getLocationData(newData.locationLat, newData.locationLong)
+                  .then((address) => {
+                    const city =
+                      address?.city || address?.state || address.country;
+                    if (city) {
+                      setData((prev) => ({ ...prev, cities: city }));
+                    }
+                  })
+                  .catch((e) => {});
+                // 'details' is provided when fetchDetails = true
+              }}
+              query={{
+                key: MAPS_KEY_IOS,
+                language: "en",
+              }}
+            />
+          ) : null}
         </View>
       </ListItem.Accordion>
     </KeyboardAwareScrollView>
