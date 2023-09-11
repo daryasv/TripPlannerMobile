@@ -14,7 +14,7 @@ import {
 import ReadMore from "@fawazahmed/react-native-read-more";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {
-  getExploreFeed,
+  getExploreFeed, getFreshExploreFeedPosts,
   saveLocation,
   unSaveLocation,
 } from "../../actions/feedActions";
@@ -367,18 +367,24 @@ export default function FeedScreen({ navigation }) {
     setFilteringPage(()=> 1);
     setPostsPage(()=> 1);
     setPrevActiveCities(()=> []);
-    getPosts(postsPage);
   }
 
-
   const handleRefresh = () => {
+    console.log("WE ARE IN handleRefresh");
     if (!loading && !loadingMore) {
       setLoading(true);
-      setPosts(()=> []);
-      setFilteredPosts(()=> []);
+      setPosts([]);
+      setFilteredPosts([]);
       getUniqueCitiesAndImages();
-
       resetToDefault();
+      getFreshExploreFeedPosts({ page: 1 }, (data) => {
+        if (data?.allPosts) {
+          console.log(JSON.stringify(data.allPosts));
+          setPosts(data.allPosts);
+          setLoading(false);
+          setPostsPage(2);  // Assuming you want to load the second page next.
+        }
+      });
     }
   };
 

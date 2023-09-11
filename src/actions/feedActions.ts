@@ -26,6 +26,24 @@ export function getExploreFeed(
     });
 }
 
+export function getFreshExploreFeedPosts(
+    params: { page?: number },
+    callback: (data?: { allPosts: PostType[] }) => void
+) {
+  axios
+      .get(POSTS_URL + "/refresh", {
+        params: params,
+        headers: { Authorization: getToken() },
+      })
+      .then((res) => {
+        callback(res.data);
+      })
+      .catch((e) => {
+        console.log(`Error in getFreshExploreFeedPosts: ${JSON.stringify(e)}`);
+        callback(null);
+      });
+}
+
 export interface CreateLocationData {
   description: string;
   locationLong: string;
