@@ -150,7 +150,7 @@ export const Item = ({ data, type }: { data: PostType; type: "image" | "route" }
             </View>
             <View style={[styles.row, { marginTop: 10 }]}>
               <Text style={styles.location}>
-                {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
+                {moment.utc(data.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} duration |{" "}
                 Created at{" "}
                 {data.dateUploaded.split("T")[0]}
               </Text>

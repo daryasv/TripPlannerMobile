@@ -134,7 +134,7 @@ export default function RecommendedPlansScreen({ route }) {
         </View>
         <View style={[styles.row, { marginTop: 10 }]}>
           <Text style={styles.location}>
-            {moment.utc(item.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} hours |{" "}
+            {moment.utc(item.contentData?.totalDurationDTO).format("HH:mm:ss") || 0} duration |{" "}
             Created at{" "}
             {item.dateUploaded.split("T")[0]}
           </Text>
