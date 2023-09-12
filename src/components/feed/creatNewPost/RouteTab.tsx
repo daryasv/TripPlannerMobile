@@ -117,7 +117,7 @@ const RouteTab = forwardRef((props, ref) => {
         window.setTimeout(() => {
           getLocationData(res.coords.latitude, res.coords.longitude)
             .then((address) => {
-              const city = address?.city || address?.state || address.country;
+              const city = address?.city || address?.state || "";
               if (city) {
                 setCity(city);
               }
