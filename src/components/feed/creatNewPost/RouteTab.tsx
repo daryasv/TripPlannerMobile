@@ -382,12 +382,19 @@ function NewPinLocation(props: { handleSavePin(pin: PinLocationProps): void }) {
       const location: PinLocationProps["location"] = (
         await Location.getCurrentPositionAsync()
       )?.coords;
-
+      let city = "";
+      try {
+        const address = await getLocationData(
+          location.latitude.toString(),
+          location.longitude.toString()
+        );
+        city = address?.city || address?.state || address?.country || "";
+      } catch (e) {}
       const dataToSend: CreateLocationData = {
         description: details.description,
         locationLat: location.latitude.toString(),
         locationLong: location.longitude.toString(),
-        cities: "",
+        cities: city,
         postGen: "0",
       };
 
