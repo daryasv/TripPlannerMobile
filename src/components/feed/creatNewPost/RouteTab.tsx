@@ -46,7 +46,7 @@ const RouteTab = forwardRef((props, ref) => {
   const timerRef = useRef<NodeJS.Timer>();
   const [status, requestPermission] = Location.useForegroundPermissions();
   const [locations, setLocations] = useState([] as Location.LocationObject[]);
-  const [path, setPath] = useState([] as Location.LocationObjectCoords[]);
+  
   const [pins, setPins] = useState([] as PinLocationProps[]);
   const [description, setDescription] = useState("");
   const [city, setCity] = useState("");
@@ -113,7 +113,7 @@ const RouteTab = forwardRef((props, ref) => {
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
-        setPath([res.coords]);
+        
         window.setTimeout(() => {
           getLocationData(res.coords.latitude, res.coords.longitude)
             .then((address) => {
@@ -146,18 +146,18 @@ const RouteTab = forwardRef((props, ref) => {
             // check `error.message` for more details.
             return;
           }
-          if (data?.locations?.coords) {
+          if (data?.locations?.length) {
             setLocations((oldLocations) => [
               ...oldLocations,
               ...data.locations,
             ]);
-            setPath((oldPath) => [...oldPath, ...data.locations.coords]);
+            
           }
         });
       })
       .catch(() => {
         setLocations([]);
-        setPath([]);
+        
       });
   }, [locations, timeLabel]);
 
