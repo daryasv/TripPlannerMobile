@@ -66,7 +66,8 @@ const RouteTab = forwardRef((props, ref) => {
     save() {
       if (description && timeLabel) {
         const pinnedLocationsDictionary: { [key: string]: string[] } = {};
-        const locationsDictionary: { [key: string]: GeolocationCoordinates[] } = {};
+        const locationsDictionary: { [key: string]: GeolocationCoordinates[] } =
+          {};
         pinnedLocationsDictionary["1"] = pins.map((p) => p.id);
         locationsDictionary["1"] = locations.map((location) => location.coords);
         return createRoute({
@@ -85,7 +86,7 @@ const RouteTab = forwardRef((props, ref) => {
   const handleStart = useCallback(() => {
     // Clear any existing timer intervals
     if (timerRef.current) {
-        clearInterval(timerRef.current);
+      clearInterval(timerRef.current);
     }
 
     setRecording(true);
@@ -94,33 +95,35 @@ const RouteTab = forwardRef((props, ref) => {
     setTimeLabel("00:00:00");
 
     timerRef.current = setInterval(() => {
-        // Get the difference in milliseconds directly
-        const elapsedMilliseconds = moment().diff(start);
+      // Get the difference in milliseconds directly
+      const elapsedMilliseconds = moment().diff(start);
 
-        // Convert the milliseconds into a moment duration
-        const duration = moment.duration(elapsedMilliseconds);
+      // Convert the milliseconds into a moment duration
+      const duration = moment.duration(elapsedMilliseconds);
 
-        // Convert duration to hours and set
-        const d = duration.asMilliseconds();
-        setDuration(d);
+      // Convert duration to hours and set
+      const d = duration.asMilliseconds();
+      setDuration(d);
 
-        // Format the duration into HH:mm:ss and set
-        const label = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-        setTimeLabel(label);
+      // Format the duration into HH:mm:ss and set
+      const label = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+      setTimeLabel(label);
     }, 1000);
 
     Location.getCurrentPositionAsync()
       .then((res) => {
         setLocations([res]);
         setPath([res.coords]);
-        getLocationData(res.coords.latitude, res.coords.longitude)
-          .then((address) => {
-            const city = address?.city || address?.state || address.country;
-            if (city) {
-              setCity(city);
-            }
-          })
-          .catch((e) => {});
+        window.setTimeout(() => {
+          getLocationData(res.coords.latitude, res.coords.longitude)
+            .then((address) => {
+              const city = address?.city || address?.state || address.country;
+              if (city) {
+                setCity(city);
+              }
+            })
+            .catch((e) => {});
+        }, 300);
 
         Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           distanceInterval: 100,
