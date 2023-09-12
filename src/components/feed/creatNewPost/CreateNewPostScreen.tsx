@@ -31,35 +31,39 @@ export default function CreateNewPostScreen() {
     if (currentTab === 0) {
       if (createLocationRef?.current && !saving) {
         setSaving(true);
-        (createLocationRef.current as any)
-          .save()
-          .then((r) => {
-            if (r.status !== 200 && r.status !== 201) {
-              setSaving(false);
+        try {
+          (createLocationRef.current as any)
+            .save()
+            .then((r) => {
+              if (r.status !== 200 && r.status !== 201) {
+                setSaving(false);
+                Toast.show({
+                  type: "error",
+                  text1: "Failed",
+                  text2: "Failed to create the post",
+                });
+              } else {
+                setSaving(false);
+                Toast.show({
+                  type: "success",
+                  text1: "Success",
+                  text2: "Post created successfully",
+                });
+                DeviceEventEmitter.emit("update_feed");
+                nav.goBack();
+              }
+            })
+            .catch((e) => {
               Toast.show({
                 type: "error",
                 text1: "Failed",
-                text2: "Failed to create the post",
+                text2: "Failed to create post",
               });
-            } else {
               setSaving(false);
-              Toast.show({
-                type: "success",
-                text1: "Success",
-                text2: "Post created successfully",
-              });
-              DeviceEventEmitter.emit("update_feed");
-              nav.goBack();
-            }
-          })
-          .catch((e) => {
-            Toast.show({
-              type: "error",
-              text1: "Failed",
-              text2: "Failed to create post",
             });
-            setSaving(false);
-          });
+        } catch (e) {
+          setSaving(false);
+        }
       }
     } else {
       if (createRouteRef?.current && !saving) {
