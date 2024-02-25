@@ -1,4 +1,0 @@
-# TripPlannerMobile
-
-
-npx expo start
