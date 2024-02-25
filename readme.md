@@ -10,13 +10,13 @@
 ### Custom City Feed
 Get personalized content and explore cities through the eyes of fellow travelers.
 <div align="center">
-  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/UI.png" alt="Custom City Feed"  width="100%" style="max-width: 300px;">
+  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/UI.png" alt="Custom City Feed"  width="100%" style="max-width: 200px;">
 </div>
 
 ### Live Route Record
 Capture every step of your journey with live route recording.
 <div align="center">
-  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/TripRecord.png" alt="Live Route Record"  width="100%" style="max-width: 300px;"">
+  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/TripRecord.png" alt="Live Route Record"  width="100%" style="max-width: 200px;"">
 </div>
 
 ---
