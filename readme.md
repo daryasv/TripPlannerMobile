@@ -10,7 +10,7 @@
 ### Custom City Feed
 Get personalized content and explore cities through the eyes of fellow travelers.
 <div align="center">
-  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/UI.jpg" alt="Custom City Feed">
+  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/UI.png" alt="Custom City Feed">
 </div>
 
 ### Live Route Record
@@ -25,7 +25,7 @@ Capture every step of your journey with live route recording.
 Easily clone trips from other users and customize them to fit your travel plans.
 
 <div align="center">
-  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/TripClone.jpg" alt="Trip Cloning" width="200" style="margin: 10px;">
+  <img src="https://github.com/RavidYael/TripPlannerMobile/blob/main/readme_assets/TripClone.png" alt="Trip Cloning" width="200" style="margin: 10px;">
 </div>
 
 ---
